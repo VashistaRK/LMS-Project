@@ -15,15 +15,15 @@ services:
       - OIDC_CLIENT_ID=857081833212-ug3q9qmc5kjg5et9u9lfmoe6rlb2167f.apps.googleusercontent.com
       - OIDC_CLIENT_SECRET=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
       - OIDC_ISSUER=https://accounts.google.com 
-      - OIDC_REDIRECT_URI=http://localhost:3000/auth/callback
+      - OIDC_REDIRECT_URI=https://sunadhedutech.com/auth/callback
       - APP_JWT_SECRET=sjdhf9834hr2y48hr92384hr28fhr9283hf9283hf92hf
-      - APP_JWT_ISS=http://sunadhedutech.com/api
+      - APP_JWT_ISS=https://sunadhedutech.com/api
       - APP_JWT_AUD=my-backend-api
       - PORT=3000
-      - WEB_ORIGIN=http://sunadhedutech.com
+      - WEB_ORIGIN=https://sunadhedutech.com
       - MONGO_URI=mongodb+srv://shoterking1357:MainKey123@cluster0.3kun17m.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       - MONGO_DBNAME=LMS_DATA
-      - OPENAI_API_KEY=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
+      - OPENAI_API_KEY=YOUR_KEY
     ports:
       - "3000:3000"
     depends_on:
@@ -36,16 +36,16 @@ services:
       context: ./Frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://localhost:3000
+        - VITE_API_URL=https://sunadhedutech.com/api
     restart: unless-stopped
     ports:
       - "5173:5173"
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=http://sunadhedutech.com/api
-      - VITE_API_URL_CMR=http://localhost:5000
-      - VITE_SOCKET_URL=http://sunadhedutech.com
+      - VITE_API_URL=https://sunadhedutech.com/api
+      - VITE_API_URL_CMR=https://sunadhedutech.com/api_cmr     # or your own URL
+      - VITE_SOCKET_URL=wss://sunadhedutech.com
 
 volumes:
   mongo_data:
