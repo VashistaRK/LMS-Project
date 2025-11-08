@@ -1,0 +1,298 @@
+import fs from "fs";
+import path from "path";
+import pdfParse from "pdf-parse/lib/pdf-parse.js";
+import mammoth from "mammoth";
+import QuizQuestion from "../models/quizQuestion.js";
+import OpenAI from "openai";
+import Quiz from "../models/quiz.model.js";
+import Course from "../models/Course.js";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+//
+export const uploadDocumentQuiz = async (req, res) => {
+  const filePath = path.resolve(req.file.path);
+
+  try {
+    let text = "";
+
+    if (req.file.mimetype === "application/pdf") {
+      const buf = fs.readFileSync(filePath);
+      const parsed = await pdfParse(buf);
+      text = parsed.text;
+    } else if (
+      req.file.mimetype ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      const result = await mammoth.extractRawText({ path: filePath });
+      text = result.value;
+    } else {
+      return res.status(400).json({ error: "Unsupported file type" });
+    }
+
+    // ask GPT
+    const prompt = `
+      Generate 5 MCQ questions based on this content:
+
+      "${text}"
+
+      Return JSON ONLY:
+      [
+        {
+          "title":"...",
+          "options":[0,1,2,3],
+          "correctAnswer":1
+        }
+      ]
+    `;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+    });
+
+    let raw = completion.choices[0].message.content.trim();
+    if (raw.startsWith("```")) raw = raw.replace(/```json|```/g, "").trim();
+
+    const quizArray = JSON.parse(raw);
+
+    // save questions
+    const mappedQuestions = quizArray.map((q) => {
+      let answerIndex = 0;
+
+      if (typeof q.correctAnswer === "number") {
+        // GPT returned 0/1/2/3
+        answerIndex = q.correctAnswer;
+      } else if (typeof q.correctAnswer === "string") {
+        // GPT returned "A" / "B" / ...
+        const letter = q.correctAnswer.trim();
+        answerIndex = "ABCD".indexOf(letter.toUpperCase());
+        if (answerIndex === -1) answerIndex = 0; // fallback
+      }
+
+      return {
+        type: "mcq",
+        questionText: q.title,
+        options: q.options,
+        correctAnswer: answerIndex,
+        genre: "generated",
+      };
+    });
+
+    const savedQuestions = await QuizQuestion.insertMany(mappedQuestions);
+
+    // create quiz doc (store IDs only)
+    const quizDoc = await Quiz.create({
+      title: req.body.title || "Uploaded Quiz",
+      questions: savedQuestions.map((q) => q._id),
+    });
+
+    // UPDATE COURSE → set quizId
+    const { courseId, sectionId, chapterId } = req.params;
+    await Course.updateOne(
+      { id: courseId },
+      {
+        $set: {
+          [`sections.${sectionId}.chapters.${chapterId}.quizId`]: quizDoc._id,
+        },
+      }
+    );
+
+    fs.unlink(filePath, () => {});
+
+    return res.status(201).json({
+      success: true,
+      quizId: quizDoc._id,
+      questionCount: savedQuestions.length,
+    });
+  } catch (err) {
+    console.error(err);
+    fs.unlink(filePath, () => {});
+    res.status(500).json({ error: "Failed to process document" });
+  }
+};
+
+// 🧩 Generate quiz questions from content
+export const generateQuiz = async (req, res) => {
+  try {
+    const { chapterTitle, courseContent } = req.body;
+
+    if (!chapterTitle || !courseContent) {
+      return res
+        .status(400)
+        .json({ error: "Missing chapterTitle or courseContent" });
+    }
+
+    const prompt = `
+      Generate 5 MCQ questions for the chapter "${chapterTitle}" based on:
+      "${courseContent}".
+
+      Format as a JSON array:
+      [
+        {
+          "title": "Question text",
+          "options": ["A", "B", "C", "D"],
+          "correctAnswer": "B"
+        }
+      ]
+    `;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 500,
+    });
+
+    let raw = completion.choices[0].message.content.trim();
+    if (raw.startsWith("```")) raw = raw.replace(/```json|```/g, "").trim();
+
+    const quizArray = JSON.parse(raw);
+
+    // Normalize and validate quiz items
+    const toSave = quizArray.map((q) => {
+      let answerIndex = 0;
+      if (typeof q.correctAnswer === "number") {
+        answerIndex = q.correctAnswer;
+      } else if (typeof q.correctAnswer === "string") {
+        const letter = q.correctAnswer.trim().toUpperCase();
+        const idx = "ABCD".indexOf(letter[0]);
+        answerIndex = idx === -1 ? 0 : idx;
+      }
+
+      return {
+        type: "mcq",
+        questionText: q.title || q.question || "",
+        options: Array.isArray(q.options) ? q.options : [],
+        correctAnswer: answerIndex,
+        chapterTitle,
+        genre: q.genre || "generated",
+      };
+    });
+
+    // Save each MCQ as a separate document
+    const savedQuestions = await QuizQuestion.insertMany(toSave);
+
+    // format response for frontend expectations
+    const questions = savedQuestions.map((q) => {
+      const idx = typeof q.correctAnswer === 'number' ? q.correctAnswer : 0;
+      const letter = String.fromCharCode(65 + (idx || 0));
+      return {
+        id: q._id,
+        question: q.questionText,
+        options: q.options,
+        correctAnswerText: (q.options && q.options[idx]) || null,
+        correctAnswerLetter: letter,
+      };
+    });
+
+    res.status(201).json({ success: true, questions });
+  } catch (err) {
+    console.error("Quiz generation error:", err);
+    res.status(500).json({ error: "Failed to generate quiz", details: String(err.message || err) });
+  }
+};
+
+// 🧩 Get all quiz questions (filterable)
+export const getAllQuestions = async (req, res) => {
+  try {
+    const { chapterTitle, courseId, genre } = req.query;
+    const filter = {};
+
+    if (chapterTitle) filter.chapterTitle = chapterTitle;
+    if (courseId) filter.courseId = courseId;
+    if (genre) filter.genre = genre;
+
+    const quizzes = await QuizQuestion.find(
+      filter,
+      "_id type questionText genre"
+    );
+    res.json(quizzes);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// new: list distinct genres
+export const getGenres = async (req, res) => {
+  try {
+    const genres = await QuizQuestion.distinct("genre");
+    res.json(genres);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// 🧩 Get a single quiz question
+export const getQuestionById = async (req, res) => {
+  try {
+    const quiz = await QuizQuestion.findById(req.params.id);
+    if (!quiz) return res.status(404).json({ error: "Quiz not found" });
+    res.json(quiz);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// 🧩 Create manually
+export const createQuestion = async (req, res) => {
+  try {
+    const quiz = new QuizQuestion(req.body);
+    await quiz.save();
+    res.status(201).json(quiz);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// 🧩 Update quiz
+export const updateQuestion = async (req, res) => {
+  try {
+    const updated = await QuizQuestion.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: "Not found" });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// 🧩 Delete quiz
+export const deleteQuestion = async (req, res) => {
+  try {
+    const deleted = await QuizQuestion.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Not found" });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// GET QUIZ + questions
+export const getQuizById = async (req, res) => {
+  try {
+    const quiz = await Quiz.findById(req.params.quizId);
+    if (!quiz) return res.status(404).json({ error: "Quiz not found" });
+
+    const questions = await QuizQuestion.find({ _id: { $in: quiz.questions } });
+
+    // frontend expects this shape:
+    const formatted = questions.map((q) => ({
+      id: q._id,
+      question: q.questionText,
+      options: q.options,
+      answer: q.options[q.correctAnswer],
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error("get quiz error:", err);
+    res.status(500).json({ error: "Failed to load quiz" });
+  }
+};
