@@ -1,22 +1,19 @@
-# Use Node 20 (Vite requires Node >= 20.19 or 22.12+)
-FROM node:20-alpine
+# Stage 1: Build frontend
+FROM node:20-alpine AS build
 
-# Set working directory inside container
 WORKDIR /app
 
-# Copy npm config first (if provided) to tune network behavior
-COPY .npmrc .npmrc
-
-# Copy package files and install dependencies reproducibly
-# Use npm ci and disable audit/optional progress to speed and stabilize builds
 COPY package*.json ./
-RUN npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps || npm install --no-audit --no-fund
+RUN npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps
 
-# Copy the rest of the frontend source code
 COPY . .
+RUN npm run build   # build static files into /app/dist
 
-# Expose Vite’s default dev server port
-EXPOSE 5173
+# Stage 2: Serve with Nginx
+FROM nginx:alpine
 
-# Start the frontend in dev mode
-CMD ["npm", "run", "dev"]
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx/lms.conf /etc/nginx/conf.d/lms.conf
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
