@@ -25,6 +25,7 @@ export default function AuthPage() {
       } else {
         navigate("/", { replace: true });
       }
+      console.log(user);
     }
   }, [user, loading, navigate]);
 
@@ -40,7 +41,18 @@ export default function AuthPage() {
         const msg = await res.json().catch(() => ({}));
         throw new Error(msg.error || "Login failed");
       }
-      return true;
+        // Parse the JSON payload. The backend may include a `redirect` field for admin users.
+        const data = await res.json().catch(() => ({}));
+
+        if (data.redirect) {
+          // Navigate the browser to the admin UI (this is a full navigation so the cookie is sent)
+          window.location.href = data.redirect;
+          return true;
+        }
+
+        // Otherwise reload so the auth provider re-checks /auth/me and updates user state
+        window.location.reload();
+        return true;
     },
     onError: (err: any) => setError(err.message || "Login failed"),
   });

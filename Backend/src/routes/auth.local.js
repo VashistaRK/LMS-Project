@@ -14,8 +14,15 @@ const {
 
 // sign JWT
 function signToken(user) {
+    // Keep JWT shape consistent with OIDC flow: use `sub` and include `role` so
+    // frontend `/auth/me` responses contain the role and the app can route correctly.
     return jwt.sign(
-        { id: user._id, email: user.email, name: user.name },
+        {
+            sub: user._id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+        },
         APP_JWT_SECRET,
         { expiresIn: "15d", issuer: APP_JWT_ISS, audience: APP_JWT_AUD }
     );
@@ -49,7 +56,8 @@ router.post("/register", async (req, res) => {
         secure: process.env.NODE_ENV === "production",
         maxAge: 15 * 24 * 60 * 60 * 1000
     });
-    res.json({ user: { id: user._id, email, name }, token });
+    // return created user info including role to be consistent with other flows
+    res.json({ user: { sub: user._id, email, name, role: user.role }, token });
 });
 
 // Login
@@ -80,7 +88,17 @@ router.post("/login", async (req, res) => {
     }
 
     res.cookie("app_session", token, cookieOptions);
-    res.json({ user: { id: user._id, email, name: user.name }, token });
+    // Build standard JSON response payload (use `sub` and include role to match /me)
+    const payload = { user: { sub: user._id, email, name: user.name, role: user.role }, token };
+
+    // If this user is an admin, include a redirect URL in the JSON so AJAX clients
+    // (the frontend uses fetch) can perform a client-side navigation. Using res.redirect
+    // does not cause the browser to navigate when the login request is made via fetch.
+    if (user.role === "admin" || user.role === "Master_ADMIN") {
+        payload.redirect = `${process.env.WEB_ORIGIN || ''}/admin`;
+    }
+
+    return res.json(payload);
 });
 
 

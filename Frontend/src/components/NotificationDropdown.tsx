@@ -263,13 +263,7 @@ const NotificationDropdown: React.FC = () => {
             )}
           </div>
 
-          {!isConnected && (
-            <div className="p-4 bg-yellow-50 border-t border-yellow-200">
-              <p className="text-sm text-yellow-800">
-                ⚠️ Connection lost. Notifications may not be real-time.
-              </p>
-            </div>
-          )}
+          {/* Connection-lost warning removed per UX request; socket disconnect will be silent. */}
         </div>
       )}
     </div>

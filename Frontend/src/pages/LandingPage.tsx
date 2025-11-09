@@ -125,16 +125,17 @@ export default function LandingPage() {
     <ParallaxProvider>
       <div className="text-gray-800 flex flex-col items-center font-Quick overflow-hidden">
         {/* Hero Section */}
-        <section className="relative w-full h-screen overflow-hidden">
-          {/* 🔹 Background Video */}
+        <section className="relative w-full min-h-[100dvh] overflow-hidden flex items-center justify-center">
           <video
-            className="absolute top-0 left-0 w-full h-full object-cover select-none pointer-events-none"
+            className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
             src="videos/bgg.mp4"
             autoPlay
             loop
             muted
             playsInline
           />
+        </section>
+
 
         </section>
 

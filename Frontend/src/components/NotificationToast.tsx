@@ -16,7 +16,7 @@ interface ToastNotification {
 
 const NotificationToast: React.FC = () => {
     const [toasts, setToasts] = useState<ToastNotification[]>([]);
-    const { socket, isConnected } = useSocket();
+    const { socket } = useSocket();
     const { user } = useAuthContext();
 
     
@@ -154,16 +154,7 @@ const NotificationToast: React.FC = () => {
                 </div>
             ))}
             
-            {!isConnected && (
-                <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-3 max-w-sm">
-                    <div className="flex items-center space-x-2">
-                        <Bell className="w-4 h-4 text-yellow-600" />
-                        <span className="text-sm text-yellow-800">
-                            Connection lost. Notifications may not be real-time.
-                        </span>
-                    </div>
-                </div>
-            )}
+            {/* Removed connection-lost toast per UX request. Socket disconnect no longer shows this toast. */}
         </div>
     );
 };
