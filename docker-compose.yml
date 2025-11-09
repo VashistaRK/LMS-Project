@@ -17,7 +17,7 @@ services:
       - OIDC_ISSUER=https://accounts.google.com 
       - OIDC_REDIRECT_URI=https://sunadhedutech.com/auth/callback
       - APP_JWT_SECRET=sjdhf9834hr2y48hr92384hr28fhr9283hf9283hf92hf
-      - APP_JWT_ISS=https://sunadhedutech.com/api
+      - APP_JWT_ISS=https://sunadhedutech.com
       - APP_JWT_AUD=my-backend-api
       - PORT=3000
       - WEB_ORIGIN=https://sunadhedutech.com
@@ -36,16 +36,16 @@ services:
       context: ./Frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=https://sunadhedutech.com/api
+        - VITE_API_URL=https://sunadhedutech.com
     restart: unless-stopped
     ports:
       - "5173:5173"
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=https://sunadhedutech.com/api
+      - VITE_API_URL=https://sunadhedutech.com
       - VITE_API_URL_CMR=https://sunadhedutech.com/api_cmr     # or your own URL
-      - VITE_SOCKET_URL=wss://sunadhedutech.com
+      - VITE_SOCKET_URL=https://sunadhedutech.com
 
 volumes:
   mongo_data:

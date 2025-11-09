@@ -230,8 +230,9 @@ io.on('connection', (socket) => {
 // Make io available globally for notification service
 global.io = io;
 
+const APP_JWT_ISS = process.env.APP_JWT_ISS ;
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Server running ${APP_JWT_ISS}:${PORT}`));
+server.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running ${APP_JWT_ISS}:${PORT}`));
 
 // graceful shutdown
 process.on('SIGINT', async () => {
