@@ -136,9 +136,6 @@ export default function LandingPage() {
           />
         </section>
 
-
-        </section>
-
         {/* Scroll-linked Hero Text with Scale Effect */}
         <motion.section
           ref={scaleSectionRef}
