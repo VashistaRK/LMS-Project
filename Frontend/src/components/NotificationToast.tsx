@@ -1,6 +1,6 @@
 /* eslint-disable  */
 import React, { useState, useEffect } from 'react';
-import { X, Check, Bell } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import { useSocket } from '../hooks/useSocket';
 import { useAuthContext } from '../context/AuthProvider';
 import { notificationService } from '../services/notificationService';

@@ -23,7 +23,7 @@ const NotificationDropdown: React.FC = () => {
 
   const {
     //  socket,
-    isConnected,
+    // isConnected,
     unreadCount,
     markAsRead,
     markAllAsRead,
