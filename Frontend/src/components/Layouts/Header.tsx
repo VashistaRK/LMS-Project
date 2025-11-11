@@ -92,6 +92,7 @@ export default function Header() {
 
   const Controls = (
     <div className={`flex items-center space-x-4 ${ isLanding? "text-white":"text-black"}`}>
+      <section className={`hidden md:flex items-center space-x-4 ${ isLanding? "text-white":"text-black"}`}>
       <button onClick={() => setIsSearchOpen((p) => !p)} className="p-2 rounded-full hover:bg-white/30 transition">
         <Search className="w-5 h-5" />
       </button>
@@ -139,7 +140,7 @@ export default function Header() {
 
           <AnimatePresence>
             {isUserMenuOpen && (
-              <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }} className="absolute right-0 mt-2 w-56 bg-white/90 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl py-2 z-50">
+              <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }} className="absolute right-0 mt-2 w-56 bg-white/90 text-black backdrop-blur-lg border border-white/20 rounded-xl shadow-xl py-2 z-50">
                 <div className="px-4 py-3 border-b border-white/20">
                   <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
                   <p className="text-xs text-gray-500">{user?.email}</p>
@@ -152,6 +153,7 @@ export default function Header() {
           </AnimatePresence>
         </div>
       )}
+      </section>
 
       <button onClick={() => setIsMobileMenuOpen((p) => !p)} className="md:hidden p-2 rounded-xl hover:bg-white/30 transition">
         {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -210,11 +212,13 @@ export default function Header() {
       {/* Mobile dropdown */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="md:hidden bg-white/90 backdrop-blur-lg border-t border-white/30 rounded-b-2xl">
-            <div className="px-4 py-3 space-y-2">
-              <a href="/courses" className="block px-3 py-2 rounded-lg hover:bg-white/40">Courses</a>
-              <a href="/my-learning" className="block px-3 py-2 rounded-lg hover:bg-white/40">My Learning</a>
-              <a href="/cart" className="block px-3 py-2 rounded-lg hover:bg-white/40">Cart ({cartItems.length})</a>
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="md:hidden fixed left-0 right-0 top-26 z-[9999] bg-white/95 backdrop-blur-md border-t border-white/30">
+            <div className="px-4 py-3 z-10 space-y-2">
+              <a href="/companies" className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"><Building2 className="w-4 h-4 mr-2" />Companies</a>
+              <a href="/freshers-pratice" className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"><Library className="w-4 h-4 mr-2" />Freshers Ready</a>
+              <a href="/courses" className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"><GraduationCap className="w-4 h-4 mr-2" />Courses</a>
+              <a href="/my-learning" className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"><BookOpen className="w-4 h-4 mr-2" />My Learning</a>
+              <a href="/cart" className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"><ShoppingCart className="w-5 h-5 mr-2" />Cart ({cartItems.length})</a>
               {!user ? (
                 <a href="/Authenticate" className="block px-3 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-white rounded-lg text-center">Sign In</a>
               ) : (
