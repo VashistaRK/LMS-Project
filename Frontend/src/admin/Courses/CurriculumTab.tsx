@@ -243,8 +243,7 @@ const CourseCurriculumTab: React.FC = () => {
           <div className="p-2 bg-gradient-to-r from-[#C21817] to-[#A51515] rounded-lg">
             <BookOpen className="w-6 h-6 text-white" />
           </div>
-          <div>
-                            className="border-2 border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm"
+          <div  className="border-2 border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
             <p className="text-sm text-gray-600 mt-1">
               Build your course structure with sections and chapters
             </p>

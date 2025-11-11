@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MarqueeDemo } from "./Marquee";
+import { CompanyMarquee } from "./Marquee";
 
 interface AccordionItemProps {
   title: string;
@@ -10,26 +10,29 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ title, content }) => {
   const [open, setOpen] = useState(false);
   return (
     <div
-      className={`border-t border-gray-200 py-5 cursor-pointer ${open ? "pb-6" : ""
-        }`}
+      className={`border-t border-gray-200 py-4 md:py-5 cursor-pointer ${
+        open ? "pb-5 md:pb-6" : ""
+      }`}
       onClick={() => setOpen(!open)}
     >
-      <div className="flex justify-between items-center">
-        <span className="text-lg md:text-xl text-gray-800 font-medium">
+      <div className="flex justify-between items-center gap-4">
+        <span className="text-base sm:text-lg md:text-xl text-gray-800 font-medium flex-1">
           {title}
         </span>
         <span
-          className={`text-2xl transition-transform duration-300 ${open ? "rotate-45" : ""
-            }`}
+          className={`text-xl sm:text-2xl transition-transform duration-300 flex-shrink-0 ${
+            open ? "rotate-45" : ""
+          }`}
         >
           +
         </span>
       </div>
       <div
-        className={`overflow-hidden transition-all duration-500 ${open ? "max-h-60 mt-3" : "max-h-0"
-          }`}
+        className={`overflow-hidden transition-all duration-500 ${
+          open ? "max-h-80 md:max-h-60 mt-3" : "max-h-0"
+        }`}
       >
-        <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+        <p className="text-gray-600 text-sm sm:text-base md:text-base leading-relaxed pr-2">
           {content}
         </p>
       </div>
@@ -53,47 +56,54 @@ const Section: React.FC<SectionProps> = ({
   image,
 }) => {
   return (
-    <section className="bg-[#fffff8] py-20 px-6 md:px-20 grid grid-cols-1 md:grid-cols-2 gap-30 items-start even:[&>.text-content]:order-2 even:[&>.image-content]:order-1">
+    <section className="bg-[#fffff8] py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-12 lg:px-20 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start even:[&>.text-content]:md:order-2 even:[&>.image-content]:md:order-1">
       <div className="text-content">
-        <div className="uppercase tracking-[3px] bg-zinc-800 p-2 font-bold text-lg text-white mb-3">
+        <div className="uppercase tracking-[2px] sm:tracking-[3px] bg-zinc-800 p-2 sm:p-2.5 font-bold text-sm sm:text-base md:text-lg text-white mb-3 sm:mb-4 inline-block">
           {header}
         </div>
-        <h2 className="text-3xl md:text-5xl bg-red-700 text-white font-serif mb-6 leading-tight">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl bg-red-700 text-white font-serif mb-4 sm:mb-5 md:mb-6 leading-tight px-2 sm:px-3 py-2 sm:py-2.5">
           {title}
         </h2>
-        <p className="text-gray-600 text-sm md:text-base mb-8 leading-relaxed">
+        <p className="text-gray-600 text-sm sm:text-base md:text-base mb-6 sm:mb-7 md:mb-8 leading-relaxed">
           {description}
         </p>
 
-        {items.map((item, i) => (
-          <AccordionItem key={i} title={item.title} content={item.content} />
-        ))}
+        <div className="mb-4 sm:mb-6">
+          {items.map((item, i) => (
+            <AccordionItem key={i} title={item.title} content={item.content} />
+          ))}
+        </div>
         {title === "Company Preparation" && (
-          <a href="/companies">
-            <button className="text-white px-3 py-1 text-lg bg-red-700 hover:bg-red-800/60 hover:scale-110 rounded mt-6">
+          <a href="/companies" className="inline-block">
+            <button className="text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-base sm:text-lg md:text-lg bg-red-700 hover:bg-red-800/60 hover:scale-105 active:scale-95 transition-transform rounded mt-4 sm:mt-5 md:mt-6 w-full sm:w-auto">
               Company
             </button>
           </a>
         )}
       </div>
 
-      <div className={`image-content ${title==="Get Placed"? "w-full":"w-8/12"} select-none relative`}>
-        {title==="Get Placed"?(<MarqueeDemo/>):(<img
-              src={image}
-              alt={`Image for ${title}`}
-              className="w-full h-full object-cover pointer-events-none object-top rounded"
-            />)}
-            
+      <div
+        className={`image-content ${
+          title === "Get Placed" ? "w-full h-full" : "w-full h-full"
+        } select-none flex justify-center items-center relative mx-auto md:mx-0`}
+      >
+        {title === "Get Placed" ? (
+          <CompanyMarquee />
+        ) : (
+          <img
+            src={image}
+            alt={`Image for ${title}`}
+            className="w-8/12 h-auto object-cover pointer-events-none object-top rounded shadow-lg"
+          />
+        )}
       </div>
-
-
     </section>
   );
 };
 
 const CareerPreparation: React.FC = () => {
   return (
-    <div className="bg-gray-100">
+    <div className="bg-gray-100 w-full overflow-x-hidden">
       {/* Communication Skills */}
       <Section
         header="Career Preparation"
@@ -116,7 +126,7 @@ const CareerPreparation: React.FC = () => {
               "Build rapport and work effectively in teams. Develop the ability to collaborate, empathize, and create positive working relationships.",
           },
         ]}
-        image = "images/Verbal Communication.png"
+        image="images/Verbal Communication.png"
       />
 
       {/* Logical Skills */}
@@ -141,7 +151,7 @@ const CareerPreparation: React.FC = () => {
               "Learn systematic approaches to break down complex challenges into manageable components for efficient solutions.",
           },
         ]}
-        image = "images/Quantitative Aptitude.png"
+        image="images/Quantitative Aptitude.png"
       />
 
       {/* Technical Skills */}
@@ -166,7 +176,7 @@ const CareerPreparation: React.FC = () => {
               "Develop proficiency in HTML, CSS, modern frameworks, and API integration for full-stack development capabilities.",
           },
         ]}
-        image = "images/technical.jpg"
+        image="images/technical.jpg"
       />
 
       {/* Company Preparation */}
@@ -191,7 +201,7 @@ const CareerPreparation: React.FC = () => {
               "Analyze organizational values, work environment, and team dynamics to align your approach with company expectations.",
           },
         ]}
-        image = "images/company.jpg"
+        image="images/company.jpg"
       />
 
       {/* Get Placed */}
@@ -216,7 +226,7 @@ const CareerPreparation: React.FC = () => {
               "Learn to evaluate and negotiate job offers effectively, understanding compensation packages and making informed career decisions.",
           },
         ]}
-        image = ""
+        image=""
       />
     </div>
   );

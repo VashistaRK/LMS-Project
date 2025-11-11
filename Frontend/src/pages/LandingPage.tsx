@@ -73,10 +73,9 @@ export default function LandingPage() {
   };
 
   const videos = [
-    "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    "https://www.youtube.com/embed/oHg5SJYRHA0",
-    "https://www.youtube.com/embed/3GwjfUFyY6M",
-    "https://www.youtube.com/embed/tVj0ZTS4WF4",
+    "https://www.youtube.com/embed/eV0m6NowqWA?si=Nz_Nw6-orR3H3raK",
+    "https://www.youtube.com/embed/Lv1ABw3RPwc?si=PHJd53FTA73ssqdx",
+    "https://www.youtube.com/embed/w6C_ABHXMZU?si=YAEpmOZCDcoE5SVd",
   ];
 
 

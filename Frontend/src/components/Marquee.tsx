@@ -1,100 +1,96 @@
 import { cn } from "@/lib/utils";
 import { Marquee } from "@/components/ui/marquee";
-const reviews = [
+
+const companies = [
   {
-    name: "Jack",
-    username: "@jack",
-    body: "I've never seen anything like this before. It's amazing. I love it.",
-    img: "https://avatar.vercel.sh/jack",
+    name: "Accenture",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/c/cd/Accenture.svg",
   },
   {
-    name: "Jill",
-    username: "@jill",
-    body: "I don't know what to say. I'm speechless. This is amazing.",
-    img: "https://avatar.vercel.sh/jill",
+    name: "Tata Consultancy Services (TCS)",
+    logo: "https://upload.wikimedia.org/wikipedia/en/b/b1/Tata_Consultancy_Services.svg",
   },
   {
-    name: "John",
-    username: "@john",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/john",
+    name: "Cognizant",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/4/43/Cognizant_logo_2022.svg",
   },
   {
-    name: "Jane",
-    username: "@jane",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/jane",
+    name: "Infosys",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/9/95/Infosys_logo.svg",
   },
   {
-    name: "Jenny",
-    username: "@jenny",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/jenny",
+    name: "Wipro",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/8/89/Wipro_new_logo.svg",
   },
   {
-    name: "James",
-    username: "@james",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/james",
+    name: "Capgemini",
+    logo: "https://upload.wikimedia.org/wikipedia/en/7/7c/Capgemini_New_logo.svg",
+  },
+  {
+    name: "IBM",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg",
+  },
+  {
+    name: "Tech Mahindra",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/3/32/TM_Logo_Color_Pos_RGB.svg",
+  },
+  {
+    name: "Oracle",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg",
+  },
+  {
+    name: "HCLTech",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/e/e5/HCLTech-new-logo.svg",
   },
 ];
-const firstRow = reviews.slice(0, reviews.length / 2);
-const secondRow = reviews.slice(reviews.length / 2);
-const ReviewCard = ({
-  img,
-  name,
-  username,
-  body,
-}: {
-  img: string;
-  name: string;
-  username: string;
-  body: string;
-}) => {
+
+const firstRow = companies.slice(0, companies.length / 2);
+const secondRow = companies.slice(companies.length / 2);
+
+const CompanyCard = ({ logo, name }: { logo: string; name: string }) => {
   return (
-    <figure
+    <div
       className={cn(
-        "relative h-full w-64 cursor-pointer overflow-hidden rounded-xl border p-4",
-        // light styles
-        "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-        // dark styles
-        "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]"
+        "relative flex h-20 w-40 sm:w-48 md:w-56 md:p-8 items-center justify-center rounded-xl border",
+        "border-gray-950/[.1] bg-[#fff8f8] hover:bg-gray-100",
+        "dark:border-gray-50/[.1] dark:bg-gray-900/70 dark:hover:bg-gray-800/90",
+        "transition-all duration-300 ease-in-out shadow-sm hover:shadow-md"
       )}
     >
-      <div className="flex flex-row items-center gap-2">
-        <img className="rounded-full" width="32" height="32" alt="" src={img} />
-        <div className="flex flex-col">
-          <figcaption className="text-sm font-medium dark:text-white">
-            {name}
-          </figcaption>
-          <p className="text-xs font-medium dark:text-white/40">{username}</p>
-        </div>
-      </div>
-      <blockquote className="mt-2 text-sm">{body}</blockquote>
-    </figure>
+      <img
+        src={logo}
+        alt={name}
+        className="object-contain max-h-10 sm:max-h-12 md:max-h-14 grayscale hover:grayscale-0 transition-all duration-300"
+      />
+    </div>
   );
 };
-export function MarqueeDemo() {
+
+export function CompanyMarquee() {
   return (
-    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-      <Marquee pauseOnHover className="marquee [--duration:20s]">
-        <div className="marquee-content flex gap-4">
-          {firstRow.map((review) => (
-            <ReviewCard key={review.username} {...review} />
+    <section className="relative flex w-full flex-col items-center justify-center overflow-hidden py-6 sm:py-10 dark:bg-red-950">
+
+      {/* First row - Reverse direction */}
+      <Marquee reverse pauseOnHover className="marquee [--duration:40s]">
+        <div className="marquee-content flex gap-4 sm:gap-6">
+          {firstRow.map((company) => (
+            <CompanyCard key={company.name} {...company} />
           ))}
         </div>
       </Marquee>
 
-      <Marquee reverse pauseOnHover className="marquee [--duration:20s]">
-        <div className="marquee-content flex gap-4">
-          {secondRow.map((review) => (
-            <ReviewCard key={review.username} {...review} />
+      {/* Second row - Normal direction */}
+      <Marquee pauseOnHover className="marquee [--duration:30s] mt-3 sm:mt-4">
+        <div className="marquee-content flex gap-4 sm:gap-6">
+          {secondRow.map((company) => (
+            <CompanyCard key={company.name} {...company} />
           ))}
         </div>
       </Marquee>
 
-      <div className="from-background pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r"></div>
-      <div className="from-background pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l"></div>
-    </div>
+      {/* gradient fade on edges */}
+      <div className="from-[#fffff8] dark:from-gray-950 pointer-events-none absolute inset-y-0 left-0 w-1/6 sm:w-1/5 bg-gradient-to-r"></div>
+      <div className="from-[#fffff8] dark:from-gray-950 pointer-events-none absolute inset-y-0 right-0 w-1/6 sm:w-1/5 bg-gradient-to-l"></div>
+    </section>
   );
 }
