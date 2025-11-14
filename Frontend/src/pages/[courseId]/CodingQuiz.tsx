@@ -69,7 +69,7 @@ export default function LeetCodeQuiz() {
   const { data: question, isLoading, error } = useQuery<Question>({
     queryKey: ["coding-quiz", quizId],
     queryFn: async () => {
-      const res = await fetch(`${API}/api/code/questions/${quizId}`);
+      const res = await fetch(`${API}/api/code/${quizId}`);
       if (!res.ok) throw new Error("Failed to load question");
       return res.json();
     },
@@ -600,7 +600,7 @@ export default function LeetCodeQuiz() {
                         <div className="text-sm font-mono">
                           <div className={mutedTextClass}>Input:</div>
                           <div className="mb-2">{tc.input}</div>
-                          <div className={mutedTextClass}>output:</div>
+                          <div className={mutedTextClass}>Expected Output:</div>
                           <div>{tc.output}</div>
                         </div>
                       </div>
