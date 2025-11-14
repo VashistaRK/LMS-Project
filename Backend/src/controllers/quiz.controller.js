@@ -92,6 +92,14 @@ export const uploadDocumentQuiz = async (req, res) => {
 
     // UPDATE COURSE → set quizId
     const { courseId, sectionId, chapterId } = req.params;
+
+    // make sure course exists first
+    const course = await Course.findOne({ id: courseId });
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    // update using the SAME identifier
     await Course.updateOne(
       { id: courseId },
       {
@@ -101,7 +109,8 @@ export const uploadDocumentQuiz = async (req, res) => {
       }
     );
 
-    fs.unlink(filePath, () => {});
+
+    fs.unlink(filePath, () => { });
 
     return res.status(201).json({
       success: true,
@@ -110,7 +119,7 @@ export const uploadDocumentQuiz = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    fs.unlink(filePath, () => {});
+    fs.unlink(filePath, () => { });
     res.status(500).json({ error: "Failed to process document" });
   }
 };
