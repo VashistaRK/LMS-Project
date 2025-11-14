@@ -67,7 +67,7 @@ export default function QuestionForm() {
         output: safeJsonParse(tc.expected, null),
       }));
 
-      const res = await axios.post(`${baseURL}/api/code/questions`, {
+      const res = await axios.post(`${baseURL}/api/code`, {
         title,
         description,
         functionName,
