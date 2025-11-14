@@ -243,7 +243,7 @@ const CourseCurriculumTab: React.FC = () => {
           <div className="p-2 bg-gradient-to-r from-[#C21817] to-[#A51515] rounded-lg">
             <BookOpen className="w-6 h-6 text-white" />
           </div>
-          <div  className="border-2 border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+          <div className="border-2 border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
             <p className="text-sm text-gray-600 mt-1">
               Build your course structure with sections and chapters
             </p>
@@ -385,7 +385,7 @@ const CourseCurriculumTab: React.FC = () => {
                                 <div onClick={() => toggleChapter(sectionIndex, chapterIndex)} className="flex items-center gap-3 flex-1">
                                   <button
                                     type="button"
-                                    
+
                                     className="p-1 hover:bg-red-100 rounded transition-colors"
                                   >
                                     {isChapterExpanded ? (
@@ -423,20 +423,20 @@ const CourseCurriculumTab: React.FC = () => {
                                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                                     Chapter Title *
                                   </label>
-                                    <input
-                                      type="text"
-                                      value={chapter.title}
-                                      onChange={(e) =>
-                                        handleChapterChange(
-                                          sectionIndex,
-                                          chapterIndex,
-                                          "title",
-                                          e.target.value
-                                        )
-                                      }
-                                      placeholder="Enter chapter title"
-                                      className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C21817] focus:border-[#C21817] transition-all"
-                                    />
+                                  <input
+                                    type="text"
+                                    value={chapter.title}
+                                    onChange={(e) =>
+                                      handleChapterChange(
+                                        sectionIndex,
+                                        chapterIndex,
+                                        "title",
+                                        e.target.value
+                                      )
+                                    }
+                                    placeholder="Enter chapter title"
+                                    className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C21817] focus:border-[#C21817] transition-all"
+                                  />
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -600,7 +600,49 @@ const CourseCurriculumTab: React.FC = () => {
                                         courseId={courseId || ''}
                                         sectionId={String(sectionIndex)}
                                         chapterId={String(chapterIndex)}
-                                        onUploadSuccess={(quizId) => handleChapterChange(sectionIndex, chapterIndex, "quizId", quizId)}
+                                        // When an upload finishes we need to both update local state
+                                        // and persist the updated sections to the backend so the
+                                        // quizId is saved in the course document immediately.
+                                        onUploadSuccess={async (quizId: string) => {
+                                          // update local state first
+                                          handleChapterChange(sectionIndex, chapterIndex, "quizId", quizId);
+
+                                          // persist change to backend
+                                          if (!courseId) {
+                                            toast.error("Course ID missing, cannot attach quiz.");
+                                            return;
+                                          }
+
+                                          setLoading(true);
+                                          try {
+                                            const updatedSections = [...(formData.sections || [])];
+                                            // ensure chapter exists
+                                            if (!updatedSections[sectionIndex]) updatedSections[sectionIndex] = { title: "", lectureCount: 0, duration: "", chapters: [] } as any;
+                                            if (!updatedSections[sectionIndex].chapters[chapterIndex]) updatedSections[sectionIndex].chapters[chapterIndex] = {} as any;
+                                            updatedSections[sectionIndex].chapters[chapterIndex] = {
+                                              ...updatedSections[sectionIndex].chapters[chapterIndex],
+                                              quizId,
+                                            } as any;
+
+                                            await coursesApi.update(courseId, { sections: updatedSections });
+
+                                            // update context courseData so other components reflect the change
+                                            setCourseData((prev) => {
+                                              if (!prev) return null;
+                                              return {
+                                                ...prev,
+                                                sections: updatedSections,
+                                              };
+                                            });
+
+                                            toast.success("Quiz attached to chapter and saved.");
+                                          } catch (error: any) {
+                                            console.error("Failed to save quizId to course:", error);
+                                            toast.error("Failed to save quiz id to course.");
+                                          } finally {
+                                            setLoading(false);
+                                          }
+                                        }}
                                       />
                                     )}
                                   </div>
