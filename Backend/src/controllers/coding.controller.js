@@ -6,13 +6,22 @@ function evaluateCode(code, question) {
   const results = [];
 
   try {
-    const vm = new VM({ timeout: 1000, sandbox: {} });
+    const vm = new VM({
+      timeout: 1000,
+      sandbox: {},
+      eval: false,
+      wasm: false,
+    });
 
-    // Run the user code
+    // Run user code once
     vm.run(code);
 
-    // Extract the function
-    const fn = vm.run(`typeof ${question.functionName} !== 'undefined' ? ${question.functionName} : null`);
+    // Retrieve function
+    const fn = vm.run(`
+      (typeof ${question.functionName} === 'function') 
+        ? ${question.functionName} 
+        : null
+    `);
 
     if (typeof fn !== "function") {
       throw new Error(`Function "${question.functionName}" not defined`);
@@ -25,7 +34,9 @@ function evaluateCode(code, question) {
 
       try {
         output = fn(...testCase.input);
-        pass = JSON.stringify(output) === JSON.stringify(testCase.output);
+
+        pass =
+          JSON.stringify(output) === JSON.stringify(testCase.output);
       } catch (err) {
         output = `Error: ${err.message}`;
       }
@@ -111,13 +122,19 @@ export const submitSolution = async (req, res) => {
     const { code, questionId } = req.body;
 
     const question = await CodingQuestion.findById(questionId);
-    if (!question) return res.status(404).json({ error: "Question not found" });
+    if (!question) {
+      return res.status(404).json({ error: "Question not found" });
+    }
 
     const results = evaluateCode(code, question);
-    const passedAll = results.every((r) => r.pass);
+
+    const passedAll = Array.isArray(results)
+      ? results.every(r => r.pass)
+      : false;
 
     res.json({ results, passedAll });
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: err.message });
   }
 };
+
