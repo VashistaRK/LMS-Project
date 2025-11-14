@@ -1,6 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const Base_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-const BASE = `${Base_URL}/api/questions`;
+
+// Helper to build API URLs safely when VITE_API_URL may already include '/api'
+function buildApi(path: string) {
+  const root = (Base_URL || '').replace(/\/$/, '');
+  const p = path.startsWith('/') ? path : `/${path}`;
+  if (root.endsWith('/api')) return `${root}${p}`; // avoid /api/api
+  return `${root}/api${p}`;
+}
+
+const BASE = buildApi('/questions');
 
 async function handleRes(res: Response) {
   const txt = await res.text();
@@ -15,8 +24,7 @@ export async function uploadQuizDoc(
   chapterId: string,
   form: FormData
 ) {
-  const Base_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-  const url = `${Base_URL}/api/questions/${courseId}/${sectionId}/${chapterId}/upload-doc`;
+  const url = buildApi(`/questions/${courseId}/${sectionId}/${chapterId}/upload-doc`);
 
   const res = await fetch(url, {
     method: "POST",

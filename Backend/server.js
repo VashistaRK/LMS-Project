@@ -93,6 +93,10 @@ app.use('/auth', oidcAuth);        // OIDC auth
 app.use('/courses', apiLimiter, courseRoutes);
 app.use('/docs',docRoutes);
 
+// Also expose docs under /api/docs so frontend code using an /api prefix
+// (for example VITE_API_URL=/api) can reach the same endpoints without 404s.
+app.use('/api/docs', docRoutes);
+
 app.use('/cart', apiLimiter, cartRoutes);
 app.use('/api/user', apiLimiter, userRoutes);
 app.use("/api/admin", apiLimiter, analysisRoutes);
