@@ -138,3 +138,71 @@ export const submitSolution = async (req, res) => {
   }
 };
 
+export const runCode = async (req, res) => {
+  try {
+    const { code, functionName, testCase } = req.body;
+
+    if (!code || !functionName || !testCase) {
+      return res.status(400).json({ error: "Invalid request" });
+    }
+
+    const { input, expected } = testCase;
+
+    // Create VM sandbox
+    const vm = new NodeVM({
+      console: "redirect",
+      timeout: 2000,
+      sandbox: {},
+      eval: false,
+      wasm: false,
+    });
+
+    let consoleLogs = [];
+    vm.on("console.log", (msg) => consoleLogs.push(msg));
+
+    // Wrap user code to safely export the function
+    const wrappedCode = `
+      ${code}
+      module.exports = ${functionName};
+    `;
+
+    let userFn;
+
+    try {
+      // Compile user's code
+      userFn = vm.run(wrappedCode);
+    } catch (err) {
+      return res.json({
+        success: false,
+        error: "Compilation Error: " + err.message,
+      });
+    }
+
+    let output;
+    try {
+      // Run user's function with test case input array
+      output = await userFn(...input);
+    } catch (err) {
+      return res.json({
+        success: false,
+        error: "Runtime Error: " + err.message,
+        logs: consoleLogs,
+      });
+    }
+
+    // Evaluate correctness
+    const pass =
+      JSON.stringify(output) === JSON.stringify(expected);
+
+    return res.json({
+      success: true,
+      pass,
+      output,
+      expected,
+      logs: consoleLogs,
+    });
+  } catch (err) {
+    console.error("runCode error:", err);
+    res.status(500).json({ error: "Server error running code" });
+  }
+};
