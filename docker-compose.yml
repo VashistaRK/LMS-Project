@@ -23,7 +23,7 @@ services:
       - WEB_ORIGIN=https://sunadhedutech.com
       - MONGO_URI=mongodb+srv://shoterking1357:MainKey123@cluster0.3kun17m.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       - MONGO_DBNAME=LMS_DATA
-      - OPENAI_API_KEY=YOUR_KEY
+      - OPENAI_API_KEY=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
     ports:
       - "3000:3000"
     depends_on:
