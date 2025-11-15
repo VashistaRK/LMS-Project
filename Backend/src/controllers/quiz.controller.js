@@ -13,21 +13,46 @@ const openai = new OpenAI({
 
 //
 export const uploadDocumentQuiz = async (req, res) => {
-  const filePath = path.resolve(req.file.path);
+  const filePath = path.resolve(req.file?.path || "");
+  console.log("uploadDocumentQuiz called. filePath=", filePath, "originalName=", req.file?.originalname);
 
   try {
     let text = "";
 
+    if (!filePath || !fs.existsSync(filePath)) {
+      console.error("Uploaded file not found at", filePath);
+      return res.status(500).json({ error: "Uploaded file not found on server" });
+    }
+
+    // Ensure we can read the file
+    try {
+      fs.accessSync(filePath, fs.constants.R_OK);
+    } catch (accessErr) {
+      console.error("Cannot read uploaded file:", accessErr);
+      return res.status(500).json({ error: "Cannot read uploaded file" });
+    }
+
     if (req.file.mimetype === "application/pdf") {
-      const buf = fs.readFileSync(filePath);
+      let buf;
+      try {
+        buf = fs.readFileSync(filePath);
+      } catch (readErr) {
+        console.error("Error reading uploaded PDF:", readErr);
+        return res.status(500).json({ error: "Failed to read uploaded PDF" });
+      }
       const parsed = await pdfParse(buf);
       text = parsed.text;
     } else if (
       req.file.mimetype ===
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ) {
-      const result = await mammoth.extractRawText({ path: filePath });
-      text = result.value;
+      try {
+        const result = await mammoth.extractRawText({ path: filePath });
+        text = result.value;
+      } catch (mErr) {
+        console.error("Error parsing docx with mammoth:", mErr);
+        return res.status(500).json({ error: "Failed to parse uploaded docx" });
+      }
     } else {
       return res.status(400).json({ error: "Unsupported file type" });
     }
@@ -109,18 +134,18 @@ export const uploadDocumentQuiz = async (req, res) => {
       }
     );
 
-
-    fs.unlink(filePath, () => { });
-
+  fs.unlink(filePath, (uErr) => { if (uErr) console.warn("Failed to unlink uploaded file:", uErr); });
     return res.status(201).json({
       success: true,
       quizId: quizDoc._id,
       questionCount: savedQuestions.length,
     });
   } catch (err) {
-    console.error(err);
-    fs.unlink(filePath, () => { });
-    res.status(500).json({ error: "Failed to process document" });
+    console.error("uploadDocumentQuiz error:", err);
+    try {
+      fs.unlink(filePath, (uErr) => { if (uErr) console.warn("Failed to unlink after error:", uErr); });
+    } catch (ignored) {}
+    res.status(500).json({ error: "Failed to process document", details: String(err?.message || err) });
   }
 };
 

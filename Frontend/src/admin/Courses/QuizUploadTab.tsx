@@ -12,7 +12,6 @@ interface QuizUploadFormProps {
 
 function UploadForm({ courseId, sectionId, chapterId, onUploadSuccess }: QuizUploadFormProps) {
   const [file, setFile] = useState<File | null>(null);
-
   const uploadMutation = useMutation({
     mutationFn: (form: FormData) =>
       uploadQuizDoc(courseId, sectionId, chapterId, form),
@@ -23,11 +22,12 @@ function UploadForm({ courseId, sectionId, chapterId, onUploadSuccess }: QuizUpl
       alert("⚠️ Server error while uploading file");
     }
   });
-
+  
   const handleUpload = async () => {
     if (!file) return;
     const form = new FormData();
     form.append("doc", file);
+    console.log("UploadForm props:", { courseId, sectionId, chapterId });
     await uploadMutation.mutateAsync(form);
   };
 

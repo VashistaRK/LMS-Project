@@ -2,7 +2,7 @@
 const Base_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 // Helper to build API URLs safely when VITE_API_URL may already include '/api'
-function buildApi(path: string) {
+function buildApi(path: string) { 
   const root = (Base_URL || '').replace(/\/$/, '');
   const p = path.startsWith('/') ? path : `/${path}`;
   if (root.endsWith('/api')) return `${root}${p}`; // avoid /api/api
@@ -25,7 +25,6 @@ export async function uploadQuizDoc(
   form: FormData
 ) {
   const url = buildApi(`/questions/${courseId}/${sectionId}/${chapterId}/upload-doc`);
-
   const res = await fetch(url, {
     method: "POST",
     body: form,
