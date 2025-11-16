@@ -281,10 +281,10 @@ const CourseLearningPage: React.FC = () => {
   // --- Chapter Selection ---
   const onSelectChapter = (selected: Chapters) => {
     if (selected.type === "quiz") {
-      return (window.location.href = `/my-courses/${selected.quizId}/${courseId}`);
+      return (window.location.href = `/my-courses/test/${selected.testId}`);
     }
     if (selected.type === "assignment") {
-      return (window.location.href = `/coding-quiz/${selected.quizId}`);
+      return (window.location.href = `/coding-quiz/${selected.testId}`);
     }
 
     setChapter(selected);
@@ -516,7 +516,7 @@ const CourseLearningPage: React.FC = () => {
                                 {ch.type === "quiz" ||
                                 ch.type === "assignment" ? (
                                   <span className="text-[#9B111E]">
-                                    Score: {scores[ch.quizId ?? ""] ?? 0}
+                                    Score: {scores[ch.testId ?? ""] ?? 0}
                                   </span>
                                 ) : (
                                   <>

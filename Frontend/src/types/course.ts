@@ -66,7 +66,7 @@ export interface Chapters {
   isPreviewable: boolean;
   tags: string[];
   video: string;
-  quizId: string;
+  testId: string;
   notes: {
     heading?: string;
     content: string;

@@ -9,7 +9,9 @@ import type { CourseData, Chapters, Sections } from "../../types/course";
 import NotesForm from "./NotesForm";
 import type { Note } from "../../services/notesApi";
 import MyEditor from "./Doceditor";
-import UploadForm from "./QuizUploadTab";
+import TestBuilder from "./TestBuilder";
+import axios from "axios";
+const BASE = import.meta.env.VITE_API_URL;
 
 const CourseCurriculumTab: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -36,11 +38,13 @@ const CourseCurriculumTab: React.FC = () => {
         const data = await coursesApi.getById(courseId);
         setFormData(data);
         setCourseData(data);
+
       } catch (error) {
         console.error("Error fetching curriculum:", error);
         toast.error("Failed to load curriculum.");
       } finally {
         setLoading(false);
+
       }
     };
 
@@ -49,7 +53,14 @@ const CourseCurriculumTab: React.FC = () => {
 
   // 🟢 Sync context → local state
   useEffect(() => {
-    if (courseData) setFormData(courseData);
+    if (courseData) {
+      setFormData(courseData);
+      fetchTestData();
+      async function fetchTestData() {
+        const testData = await axios.get(`${BASE}/tests/${formData?.sections[1].chapters[1].testId}`);
+        console.log("data i want: ", testData);
+      }
+    }
   }, [courseData]);
 
   const toggleSection = (index: number) => {
@@ -128,7 +139,7 @@ const CourseCurriculumTab: React.FC = () => {
       isPreviewable: false,
       tags: [],
       video: "",
-      quizId: "",
+      testId: "",
       notes: [
         {
           heading: "",
@@ -243,7 +254,7 @@ const CourseCurriculumTab: React.FC = () => {
           <div className="p-2 bg-gradient-to-r from-[#C21817] to-[#A51515] rounded-lg">
             <BookOpen className="w-6 h-6 text-white" />
           </div>
-          <div  className="border-2 border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+          <div className="border-2 border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
             <p className="text-sm text-gray-600 mt-1">
               Build your course structure with sections and chapters
             </p>
@@ -385,7 +396,7 @@ const CourseCurriculumTab: React.FC = () => {
                                 <div onClick={() => toggleChapter(sectionIndex, chapterIndex)} className="flex items-center gap-3 flex-1">
                                   <button
                                     type="button"
-                                    
+
                                     className="p-1 hover:bg-red-100 rounded transition-colors"
                                   >
                                     {isChapterExpanded ? (
@@ -423,20 +434,20 @@ const CourseCurriculumTab: React.FC = () => {
                                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                                     Chapter Title *
                                   </label>
-                                    <input
-                                      type="text"
-                                      value={chapter.title}
-                                      onChange={(e) =>
-                                        handleChapterChange(
-                                          sectionIndex,
-                                          chapterIndex,
-                                          "title",
-                                          e.target.value
-                                        )
-                                      }
-                                      placeholder="Enter chapter title"
-                                      className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C21817] focus:border-[#C21817] transition-all"
-                                    />
+                                  <input
+                                    type="text"
+                                    value={chapter.title}
+                                    onChange={(e) =>
+                                      handleChapterChange(
+                                        sectionIndex,
+                                        chapterIndex,
+                                        "title",
+                                        e.target.value
+                                      )
+                                    }
+                                    placeholder="Enter chapter title"
+                                    className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C21817] focus:border-[#C21817] transition-all"
+                                  />
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -591,17 +602,20 @@ const CourseCurriculumTab: React.FC = () => {
                                 ) : chapter.type === "quiz" ? (
                                   <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                      Quiz Upload
+                                      Test Upload
                                     </label>
-                                    {chapter.quizId ? (
-                                      <p className="text-sm text-gray-600">Quiz ID: {chapter.quizId}</p>
+                                    {chapter.testId ? (
+                                      <p className="text-sm text-gray-600">Quiz ID: {chapter.testId}</p>
                                     ) : (
-                                      <UploadForm
-                                        courseId={courseId || ''}
-                                        sectionId={String(sectionIndex)}
-                                        chapterId={String(chapterIndex)}
-                                        onUploadSuccess={(quizId) => handleChapterChange(sectionIndex, chapterIndex, "quizId", quizId)}
+                                      <TestBuilder
+                                        courseId={courseId}
+                                        sectionId={sectionIndex}
+                                        chapterId={chapterIndex}
+                                        onSave={(testId) =>
+                                          handleChapterChange(sectionIndex, chapterIndex, "testId", testId)
+                                        }
                                       />
+
                                     )}
                                   </div>
                                 ) : (
@@ -611,12 +625,12 @@ const CourseCurriculumTab: React.FC = () => {
                                     </label>
                                     <input
                                       type="text"
-                                      value={chapter.quizId}
+                                      value={chapter.testId}
                                       onChange={(e) =>
                                         handleChapterChange(
                                           sectionIndex,
                                           chapterIndex,
-                                          "quizId",
+                                          "testId",
                                           e.target.value
                                         )
                                       }

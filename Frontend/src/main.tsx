@@ -26,6 +26,7 @@ import { RequireAdmin } from "./RequireInstructor.tsx";
 import CourseLearningPage from "./pages/[courseId]/CourseLearner.tsx";
 import MyLearning from "./pages/MyLearing.tsx";
 import QuizPage from "./pages/[quizId]/CourseTest.tsx";
+import TestPage1 from "./pages/[testId]/TestPage1.tsx";
 import AdminPanel from "./admin/AdminPanel.tsx";
 import CollegeAdminPage from "./admin/[collegeId]/CollegeAdminPage.tsx";
 import CodingQuiz from "./pages/[courseId]/CodingQuiz.tsx";
@@ -90,6 +91,7 @@ const router = createBrowserRouter([
     ],
   },
   { path: "my-courses/:courseId", element: <CourseLearningPage /> },
+  { path: "my-courses/test/:testId", element: <TestPage1 /> },
   { path: "my-courses/:quizId/:courseId", element: <QuizPage /> },
   { path: "coding-quiz/:quizId", element: <CodingQuiz /> },
   { path: "Authenticate", element: <LoginPage /> },

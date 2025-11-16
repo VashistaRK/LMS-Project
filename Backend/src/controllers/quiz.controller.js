@@ -149,6 +149,83 @@ export const uploadDocumentQuiz = async (req, res) => {
   }
 };
 
+export const uploadDocumentQuestions = async (req, res) => {
+  const filePath = path.resolve(req.file?.path || "");
+
+  try {
+    if (!filePath || !fs.existsSync(filePath)) {
+      return res.status(400).json({ error: "File missing or failed to upload" });
+    }
+
+    // extract text
+    let text = "";
+    if (req.file.mimetype === "application/pdf") {
+      text = (await pdfParse(fs.readFileSync(filePath))).text;
+    } else {
+      const result = await mammoth.extractRawText({ path: filePath });
+      text = result.value;
+    }
+
+    // ask GPT to convert document → MCQs
+    const prompt = `
+      You are a professional question generator.
+      Create 5 MCQ questions only.
+
+      Return ONLY pure JSON. No explanation.
+
+      [
+        {
+          "title": "Question text",
+          "options": ["A", "B", "C", "D"],
+          "correctAnswer": "B",
+          "genre": "imported"
+        }
+      ]
+    `;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "user", content: prompt + "\nCONTENT:\n" + text }
+      ],
+      temperature: 0.4,
+    });
+
+    let raw = completion.choices[0].message.content.trim();
+    if (raw.startsWith("```")) raw = raw.replace(/```json|```/g, "").trim();
+
+    const quizArray = JSON.parse(raw);
+
+    // normalize for DB
+    const formatted = quizArray.map((q) => ({
+      type: "mcq",
+      questionText: q.title,
+      options: q.options,
+      correctAnswer: "ABCD".indexOf(q.correctAnswer.toUpperCase()),
+      genre: q.genre || "imported",
+    }));
+
+    // save directly to question bank
+    const saved = await QuizQuestion.insertMany(formatted);
+
+    fs.unlink(filePath, () => {});
+
+    return res.status(201).json({
+      success: true,
+      added: saved.length,
+      questions: saved,
+    });
+
+  } catch (err) {
+    console.error("UPLOAD QUESTION ERROR:", err);
+    return res.status(500).json({
+      error: "Failed to extract questions",
+      details: err.message
+    });
+  }
+};
+
+
 // 🧩 Generate quiz questions from content
 export const generateQuiz = async (req, res) => {
   try {
@@ -240,11 +317,16 @@ export const getAllQuestions = async (req, res) => {
     if (courseId) filter.courseId = courseId;
     if (genre) filter.genre = genre;
 
-    const quizzes = await QuizQuestion.find(
-      filter,
-      "_id type questionText genre"
-    );
-    res.json(quizzes);
+    // include options and correctAnswer in the projection to avoid undefined
+    const quizzes = await QuizQuestion.find(filter, "_id type questionText genre options correctAnswer");
+    const formatted = quizzes.map((q) => ({
+      id: q._id,
+      question: q.questionText,
+      genre:q.genre,
+      options: q.options || [],
+      answer: (Array.isArray(q.options) && typeof q.correctAnswer === 'number') ? q.options[q.correctAnswer] : null,
+    }));
+    res.json(formatted);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

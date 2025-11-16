@@ -69,7 +69,7 @@ export default function LeetCodeQuiz() {
   const { data: question, isLoading, error } = useQuery<Question>({
     queryKey: ["coding-quiz", quizId],
     queryFn: async () => {
-      const res = await fetch(`${API}/api/code/questions/${quizId}`);
+      const res = await fetch(`${API}/api/code/${quizId}`);
       if (!res.ok) throw new Error("Failed to load question");
       return res.json();
     },

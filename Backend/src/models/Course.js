@@ -15,7 +15,7 @@ const chapterSchema = new mongoose.Schema(
     isPreviewable: { type: Boolean, default: false },
     tags: { type: [String], default: [] },
     video: { type: String, default: "" },
-    quizId: { type: String, default: "" },
+    testId: { type: String, default: "" },
     notesId: { type: String, default: "" },
     notes: {
       type: [{

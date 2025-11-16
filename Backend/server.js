@@ -33,6 +33,7 @@ import docRoutes from './src/routes/doc.route.js';
 import companyRoutes from './src/routes/company.route.js';
 import Faq from './src/models/Faq.js';
 import Review from './src/models/Reviews.js';
+import testRoutes from './src/routes/Test.route.js';
 
 
 const app = express();
@@ -93,6 +94,7 @@ app.use('/auth', oidcAuth);        // OIDC auth
 app.use('/courses', apiLimiter, courseRoutes);
 app.use('/docs',docRoutes);
 
+app.use("/tests", testRoutes);
 // Also expose docs under /api/docs so frontend code using an /api prefix
 // (for example VITE_API_URL=/api) can reach the same endpoints without 404s.
 app.use('/api/docs', docRoutes);
@@ -106,7 +108,6 @@ app.use("/api/colleges", apiLimiter, collegeRoutes);
 app.use("/api/code", apiLimiter, codeRoutes);
 app.use('/api/notifications', apiLimiter, notificationRoutes);
 app.use('/api/companies', apiLimiter, companyRoutes);
-// app.use("/api/courses", );
 app.use("/api/faqs", apiLimiter, faqRoutes);
 app.use("/api/reviews", apiLimiter, reviewRoutes);
 app.use("/api/admin", apiLimiter, adminRoutes);
