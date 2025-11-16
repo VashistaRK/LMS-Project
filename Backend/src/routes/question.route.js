@@ -29,14 +29,10 @@ try {
 
 const upload = multer({ dest: uploadDir });
 
-router.post("/:courseId/:sectionId/:chapterId/upload-doc", upload.single("doc"), uploadDocumentQuiz);
 router.get("/quiz/:quizId", getQuizById);
-
 router.post("/upload-doc", upload.single("doc"), uploadDocumentQuestions);
-
 // 🧩 Auto-generate quiz from content
 router.post("/generate", generateQuiz);
-
 // genres
 router.get("/genres", getGenres);
 
@@ -46,5 +42,7 @@ router.get("/:id", getQuestionById);
 router.post("/", validateQuestion, createQuestion);
 router.put("/:id", validateQuestion, updateQuestion);
 router.delete("/:id", deleteQuestion);
+
+router.post("/:courseId/:sectionId/:chapterId/upload-doc", upload.single("doc"), uploadDocumentQuiz);
 
 export default router;
