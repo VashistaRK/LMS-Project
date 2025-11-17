@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { getQuestions, createQuestion, updateQuestion, deleteQuestion } from "../services/questionApi";
 import { Trash2, Edit3, Plus, X, Check } from "lucide-react";
 
-const api = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const api = import.meta.env.VITE_API_URL;
 
 function QuestionBankUploader({ onUploaded }: { onUploaded: () => void }) {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
@@ -20,14 +20,14 @@ function QuestionBankUploader({ onUploaded }: { onUploaded: () => void }) {
 
     try {
       const res = await axios.post(`${api}/api/questions/upload-doc`, form, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    toast.success(`Added ${res.data.added} questions to Question Bank`);
+      toast.success(`Added ${res.data.added} questions to Question Bank`);
 
-    if (onUploaded) onUploaded();// refresh table
+      if (onUploaded) onUploaded();// refresh table
     } catch (err: any) {
       toast.error(err.message);
     }
@@ -53,17 +53,28 @@ export default function AdminQuizPage() {
   const [editData, setEditData] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const normalizeArray = (res: any) => {
+    if (!res) return [];
+    if (Array.isArray(res)) return res;
+    if (Array.isArray(res.data)) return res.data;
+    if (Array.isArray(res?.data?.data)) return res.data.data;
+    if (Array.isArray(res?.notifications)) return res.notifications;
+    return [];
+  };
+
   const fetchQuestions = async () => {
     try {
       const res = await getQuestions();
-      const arr = Array.isArray(res) ? res : res?.data || [];
-      console.log("Fetched questions:", arr);
-      const normalized = (arr || []).map((q: any) => ({
-        _id: q._id || q.id || q.id?.toString?.() || String(q.id || ''),
+      const arr = normalizeArray(res);
+
+      const normalized = arr.map((q: any) => ({
+        _id: q._id || q.id || String(q.id),
         type: q.type || 'mcq',
         questionText: q.questionText || q.question || q.title || '',
         options: q.options || [],
-        correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : (q.correctAnswer ?? 0),
+        correctAnswer: typeof q.correctAnswer === 'number'
+          ? q.correctAnswer
+          : (q.correctAnswer ?? 0),
         genre: q.genre || 'general',
         meta: q.meta || {},
         __raw: q,
@@ -114,7 +125,7 @@ export default function AdminQuizPage() {
     }
   };
 
-  const filteredQuestions = questions.filter(q => 
+  const filteredQuestions = questions.filter(q =>
     q.questionText.toLowerCase().includes(searchTerm.toLowerCase()) ||
     q.genre.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -168,8 +179,8 @@ export default function AdminQuizPage() {
               <h2 className="text-2xl font-bold text-white">
                 {initial && initial._id ? "Edit Question" : "Create New Question"}
               </h2>
-              <button 
-                onClick={onClose} 
+              <button
+                onClick={onClose}
                 className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
               >
                 <X size={24} />
@@ -226,11 +237,10 @@ export default function AdminQuizPage() {
                   <div className="space-y-3">
                     {(form.options || []).map((opt: string, i: number) => (
                       <div key={i} className="flex items-center gap-3 group">
-                        <div className={`flex items-center justify-center w-10 h-10 rounded-xl border-2 transition-all ${
-                          form.correctAnswer === i 
-                            ? 'bg-red-500 border-red-500' 
-                            : 'border-gray-200 hover:border-red-300'
-                        }`}>
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-xl border-2 transition-all ${form.correctAnswer === i
+                          ? 'bg-red-500 border-red-500'
+                          : 'border-gray-200 hover:border-red-300'
+                          }`}>
                           <input
                             type="radio"
                             name="correctOption"
@@ -254,8 +264,8 @@ export default function AdminQuizPage() {
                           placeholder={`Option ${i + 1}`}
                         />
                         {form.options.length > 2 && (
-                          <button 
-                            onClick={() => removeOption(i)} 
+                          <button
+                            onClick={() => removeOption(i)}
                             className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
                           >
                             <Trash2 size={20} />
@@ -264,8 +274,8 @@ export default function AdminQuizPage() {
                       </div>
                     ))}
                   </div>
-                  <button 
-                    onClick={addOption} 
+                  <button
+                    onClick={addOption}
                     className="mt-4 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2"
                   >
                     <Plus size={18} /> Add Option
@@ -284,14 +294,14 @@ export default function AdminQuizPage() {
           </div>
 
           <div className="flex justify-end gap-3 px-8 py-6 bg-gray-50 rounded-b-2xl border-t">
-            <button 
-              onClick={onClose} 
+            <button
+              onClick={onClose}
               className="px-6 py-3 rounded-xl border-2 border-gray-300 font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
             >
               Cancel
             </button>
-            <button 
-              onClick={submit} 
+            <button
+              onClick={submit}
               className="px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold hover:from-red-600 hover:to-red-700 transition-all shadow-lg shadow-red-500/30"
             >
               Save Question
@@ -351,11 +361,10 @@ export default function AdminQuizPage() {
                   <tr key={q._id} className={`hover:bg-red-50/50 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
                     <td className="px-6 py-4 text-sm font-mono text-gray-600">{q._id}</td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                        q.type === 'mcq' 
-                          ? 'bg-red-100 text-red-700' 
-                          : 'bg-gray-100 text-gray-700'
-                      }`}>
+                      <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${q.type === 'mcq'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-gray-100 text-gray-700'
+                        }`}>
                         {q.type === 'mcq' ? 'MCQ' : 'Text'}
                       </span>
                     </td>
