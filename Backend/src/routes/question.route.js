@@ -28,6 +28,7 @@ try {
 }
 
 const upload = multer({ dest: uploadDir });
+router.get("/", getAllQuestions);
 
 router.get("/quiz/:quizId", getQuizById);
 router.post("/upload-doc", upload.single("doc"), uploadDocumentQuestions);
@@ -37,7 +38,6 @@ router.post("/generate", generateQuiz);
 router.get("/genres", getGenres);
 
 // 🧩 CRUD routes
-router.get("/", getAllQuestions);
 router.get("/:id", getQuestionById);
 router.post("/", validateQuestion, createQuestion);
 router.put("/:id", validateQuestion, updateQuestion);
