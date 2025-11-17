@@ -137,7 +137,7 @@ function SortableQuestionItem(props: {
   return (
     <div ref={setNodeRef} style={style} className="flex items-center gap-2 p-2 border rounded mb-2 bg-white">
       <div {...attributes} {...listeners} className="cursor-grab p-1 rounded bg-gray-100">
-        <svg width="14" height="14" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z" /></svg>
       </div>
       <input type="checkbox" checked={checked} onChange={() => onToggle(qId)} />
       <div className="text-sm">{label}</div>
@@ -161,8 +161,8 @@ const normalizeArrayResponse = <T,>(res: any): T[] => {
 
 const TestBuilder: React.FC<TestBuilderProps> = ({ courseId, sectionId, chapterId, onSave, initial }) => {
   const [title, setTitle] = useState(initial?.title || "");
-  const [timeLimit, setTimeLimit] = useState<number>(initial?.timeLimit ?? 0);
-  const [totalMarks, setTotalMarks] = useState<number>(initial?.totalMarks ?? 0);
+  const [timeLimit, setTimeLimit] = useState<string>(initial?.timeLimit?.toString() ?? "");
+  const [totalMarks, setTotalMarks] = useState<string>(initial?.totalMarks?.toString() ?? "");
   const [sections, setSections] = useState<Section[]>(initial?.sections ?? []);
 
   const [allQuiz, setAllQuiz] = useState<QuizQuestion[]>([]);
@@ -188,10 +188,10 @@ const TestBuilder: React.FC<TestBuilderProps> = ({ courseId, sectionId, chapterI
         const genreData = normalizeArrayResponse<string>(genreRes.data ?? genreRes);
 
         // normalize shape: ensure _id and expected fields exist
-        setAllQuiz(quizData.map((q) => ({ _id: String((q as any)._id || (q as any).id || ""), questionText: (q as any).questionText || (q as any).question || "" , genre: (q as any).genre })));
+        setAllQuiz(quizData.map((q) => ({ _id: String((q as any)._id || (q as any).id || ""), questionText: (q as any).questionText || (q as any).question || "", genre: (q as any).genre })));
         setAllCoding(codingData.map((c) => ({ _id: String((c as any)._id || (c as any).id || ""), title: (c as any).title || "", genre: (c as any).genre })));
         setGenres(genreData as string[]);
-        console.log("Fetched questions and genres",genres);
+        console.log("Fetched questions and genres", genres);
       } catch (err) {
         console.error("Fetching error:", err);
         setAllQuiz([]);
@@ -305,8 +305,8 @@ const TestBuilder: React.FC<TestBuilderProps> = ({ courseId, sectionId, chapterI
     try {
       const payload = {
         title,
-        timeLimit,
-        totalMarks,
+        timeLimit: Number(timeLimit),
+        totalMarks: Number(totalMarks),
         sections: safeSections,
         courseId,
         sectionId,
@@ -337,13 +337,13 @@ const TestBuilder: React.FC<TestBuilderProps> = ({ courseId, sectionId, chapterI
     const list =
       section.type === "mcq"
         ? safeQuiz.filter((q) => {
-            if (!section.genre) return true;
-            return !!q.genre && q.genre === section.genre;
-          })
+          if (!section.genre) return true;
+          return !!q.genre && q.genre === section.genre;
+        })
         : safeCoding.filter((q) => {
-            if (!section.genre) return true;
-            return !!q.genre && q.genre === section.genre;
-          });
+          if (!section.genre) return true;
+          return !!q.genre && q.genre === section.genre;
+        });
 
     return (
       <div className="mt-3">
@@ -409,12 +409,20 @@ const TestBuilder: React.FC<TestBuilderProps> = ({ courseId, sectionId, chapterI
 
         <div className="flex flex-col gap-1">
           <Label>Time Limit (minutes)</Label>
-          <Input type="number" value={timeLimit} onChange={(e) => setTimeLimit(Number(e.target.value))} />
+          <Input
+            type="number"
+            value={timeLimit}
+            onChange={(e) => setTimeLimit(e.target.value)}
+          />
         </div>
 
         <div className="flex flex-col gap-1">
           <Label>Total Marks</Label>
-          <Input type="number" value={totalMarks} onChange={(e) => setTotalMarks(Number(e.target.value))} />
+          <Input
+            type="number"
+            value={totalMarks}
+            onChange={(e) => setTotalMarks(e.target.value)}
+          />
         </div>
 
         <div className="col-span-1 sm:col-span-3 flex gap-3 mt-2">
@@ -468,7 +476,7 @@ const TestBuilder: React.FC<TestBuilderProps> = ({ courseId, sectionId, chapterI
       </DndContext>
 
       <div className="flex justify-end gap-2 mt-3">
-        <Button variant="secondary" onClick={() => { setSections([]); setTitle(""); setTimeLimit(0); setTotalMarks(0); }}>Reset</Button>
+        <Button variant="secondary" onClick={() => { setSections([]); setTitle(""); setTimeLimit(""); setTotalMarks(""); }}>Reset</Button>
         <Button onClick={handleSave} disabled={saving}>{saving ? "Saving..." : "Save Test"}</Button>
       </div>
     </div>

@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import McqSectionInline from "./McqSectionInline.tsx";
-import CodingSectionInline from "./CodingSectionInline.tsx";
+// import CodingSectionInline from "./CodingSectionInline.tsx";
 import { useAuthContext } from "@/context/AuthProvider.tsx";
+import LeetCodeQuiz from "../[courseId]/CodingQuiz.tsx";
 
 type Section = {
   _id: string;
@@ -190,7 +191,7 @@ export default function TestPage1() {
               </div>
             )}
             <button
-              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              className="px-4 py-2 bg-red-600 rounded hover:bg-red-700 text-white"
               onClick={() => {
                 if (confirm("Submit test now?")) handleSubmitAll();
               }}
@@ -201,58 +202,27 @@ export default function TestPage1() {
         </header>
 
         {/* Sections list / navigation */}
-        <nav className="flex gap-2 overflow-auto">
-          {sections.map((s, idx) => {
-            const isActive = idx === activeSectionIndex;
-            const completed = sectionResults[idx] != null;
-            return (
-              <button
-                key={s._id}
-                onClick={() => setActiveSectionIndex(idx)}
-                className={`px-3 py-1 rounded border ${isActive ? "bg-red-600 text-white" : "bg-white"
-                  } ${completed ? "ring-2 ring-green-300" : ""}`}
-              >
-                {idx + 1}. {s.title} ({s.type})
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Active section area */}
-        <main className="bg-white p-6 rounded shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">
-              Section {activeSectionIndex + 1}: {activeSection.title}
-            </h2>
-
-            <div className="text-sm text-gray-500">
-              {activeSection.type === "mcq" ? "MCQ Section" : "Coding Section"}
-            </div>
+        <nav className="flex gap-2 overflow-auto justify-between items-center">
+          <div className="flex gap-2 overflow-auto">
+            {sections.map((s, idx) => {
+              // const isActive = idx === activeSectionIndex;
+              // const completed = sectionResults[idx] != null;
+              return (
+                <button
+                  key={s._id}
+                  onClick={() => {
+                    // ❌ Block access to completed section
+                    if (sectionResults[idx]) return;
+                    setActiveSectionIndex(idx);
+                  }}
+                  className={`px-3 py-1 rounded border ${idx === activeSectionIndex ? "bg-red-600 text-white" : "bg-white"} ${sectionResults[idx] ? "opacity-50 cursor-not-allowed ring-2 ring-green-300" : ""} `}>
+                  {idx + 1}. {s.title} ({s.type})
+                </button>
+              );
+            })}
           </div>
-
-          <div>
-            {activeSection.type === "mcq" ? (
-              <McqSectionInline
-                key={activeSection._id}
-                sectionIndex={activeSectionIndex}
-                questions={activeSection.questions}
-                onSave={(res) => saveSectionResult(activeSectionIndex, res)}
-                onFinish={() => handleNextSection()}
-              // you can forward more props if needed
-              />
-            ) : (
-              <CodingSectionInline
-                key={activeSection._id}
-                sectionIndex={activeSectionIndex}
-                questions={activeSection.questions}
-                onSave={(res) => saveSectionResult(activeSectionIndex, res)}
-                onFinish={() => handleNextSection()}
-              />
-            )}
-          </div>
-
           {/* Section navigation controls */}
-          <div className="mt-6 flex justify-between">
+          <div className="mt-6 flex gap-3 justify-between">
             <div>
               <button
                 onClick={handlePrevSection}
@@ -275,15 +245,58 @@ export default function TestPage1() {
                 Save & Next
               </button>
 
-              <button
-                onClick={() => {
-                  if (confirm("Submit entire test?")) handleSubmitAll();
-                }}
-                className="px-4 py-2 rounded bg-red-600 text-white"
-              >
-                Submit Test
-              </button>
             </div>
+          </div>
+        </nav>
+
+        {/* Active section area */}
+        <main className="bg-white p-6 rounded shadow">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">
+              Section {activeSectionIndex + 1}: {activeSection.title}
+            </h2>
+
+            <div className="text-sm text-gray-500">
+              {activeSection.type === "mcq" ? "MCQ Section" : "Coding Section"}
+            </div>
+          </div>
+
+          <div>
+            {sectionResults[activeSectionIndex] ? (
+              // ⭐ Show the completed section summary
+              <div className="p-6 text-center bg-green-50 border border-green-300 rounded-lg">
+                <h3 className="text-xl font-bold text-green-700 mb-3">
+                  Section Completed
+                </h3>
+
+                <p className="text-lg text-gray-700 mb-4">
+                  Score:{" "}
+                  <span className="font-bold text-green-600">
+                      {sectionResults[activeSectionIndex]?.score != null ? `${sectionResults[activeSectionIndex].score} / ${sectionResults[activeSectionIndex].total}` : "Completed"}
+                  </span>
+                </p>
+
+                <p className="text-gray-600">
+                  You cannot reopen this section once completed.
+                </p>
+              </div>
+            ) : activeSection.type === "mcq" ? (
+              <McqSectionInline
+                key={activeSection._id}
+                sectionIndex={activeSectionIndex}
+                questions={activeSection.questions}
+                onSave={(res) => saveSectionResult(activeSectionIndex, res)}
+                onFinish={() => handleNextSection()}
+              />
+            ) : (
+              <LeetCodeQuiz
+                key={activeSection._id}
+                sectionIndex={activeSectionIndex}
+                questions={activeSection.questions}
+                onSave={(res) => saveSectionResult(activeSectionIndex, res)}
+                onFinish={() => handleNextSection()}
+              />
+            )}
           </div>
         </main>
       </div>

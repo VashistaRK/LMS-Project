@@ -1,9 +1,9 @@
 import {
   BookOpenText,
-  BarChart3,
+  // BarChart3,
   Image,
   List,
-  Rocket,
+  // Rocket,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -14,10 +14,10 @@ import { useParams } from "react-router";
 import type { CourseData } from "../../../types/course";
 import { coursesApi } from "../../../services/GlobalApi";
 import { CourseProvider } from "../../../context/CourseContext";
-import InstructorTab from "../InstructorTab";
+// import InstructorTab from "../InstructorTab";
 import ThumbnailTab from "../ThumbnailTab";
-import QuestionForm from "../CourseQuestions";
-import PDFUploader from "../DocUpload";
+// import QuestionForm from "../CourseQuestions";
+// import PDFUploader from "../DocUpload";
 
 const CourseManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("details");
@@ -47,14 +47,14 @@ const CourseManagement: React.FC = () => {
         return <CourseCurriculumTab />;
       case "media":
         return <MediaLibraryTab />;
-      case "QuestionForm":
-        return <QuestionForm />;
-      case "Instructor":
-        return <InstructorTab />;
+      // case "QuestionForm":
+      //   return <QuestionForm />;
+      // case "Instructor":
+      //   return <InstructorTab />;
       case "Thumbnail":
         return <ThumbnailTab />;
-      case "Docupload":
-        return <PDFUploader />;
+      // case "Docupload":
+      //   return <PDFUploader />;
       default:
         return null;
     }
@@ -109,7 +109,7 @@ const CourseManagement: React.FC = () => {
                 <Image className="w-5 h-5" />
                 <p>Thumbnail</p>
               </li>
-              <li
+              {/* <li
                 className={`flex flex-row items-center justify-center p-4 gap-2 cursor-pointer ${
                   activeTab === "QuestionForm"
                     ? "bg-blue-50 border-b-2 border-blue-500"
@@ -141,7 +141,7 @@ const CourseManagement: React.FC = () => {
               >
                 <Rocket className="w-5 h-5" />
                 <p>Instructor</p>
-              </li>
+              </li> */}
             </ul>
           </section>
 

@@ -29,7 +29,7 @@ import QuizPage from "./pages/[quizId]/CourseTest.tsx";
 import TestPage1 from "./pages/[testId]/TestPage1.tsx";
 import AdminPanel from "./admin/AdminPanel.tsx";
 import CollegeAdminPage from "./admin/[collegeId]/CollegeAdminPage.tsx";
-import CodingQuiz from "./pages/[courseId]/CodingQuiz.tsx";
+// import CodingQuiz from "./pages/[courseId]/CodingQuiz.tsx";
 import NotificationsPage from "./pages/NotificationsPage";
 import NotificationToast from "./components/NotificationToast";
 import NotFound from "./pages/NotFound.tsx";
@@ -93,7 +93,7 @@ const router = createBrowserRouter([
   { path: "my-courses/:courseId", element: <CourseLearningPage /> },
   { path: "my-courses/test/:testId", element: <TestPage1 /> },
   { path: "my-courses/:quizId/:courseId", element: <QuizPage /> },
-  { path: "coding-quiz/:quizId", element: <CodingQuiz /> },
+  // { path: "coding-quiz/:quizId", element: <CodingQuiz /> },
   { path: "Authenticate", element: <LoginPage /> },
   {
     element: <RequireAdmin />,
