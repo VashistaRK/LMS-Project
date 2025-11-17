@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Bell, X, Check, Trash2, CheckCheck } from "lucide-react";
 import { useSocket } from "../hooks/useSocket";
 import { notificationService } from "../services/notificationService";
+import { useLocation } from "react-router-dom";
 
 interface Notification {
   _id: string;
@@ -20,6 +21,8 @@ const NotificationDropdown: React.FC = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const isLandingPage = location.pathname === "/";
 
   const {
     //  socket,
@@ -151,7 +154,7 @@ const NotificationDropdown: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2  text-white hover:text-red-50  rounded-xl  transition-colors"
+        className={`relative p-2 ${isLandingPage ? "text-white hover:text-red-50": "text-black"} rounded-xl transition-colors`}
       >
         <Bell className="w-6 h-6" />
         {unreadCount > 0 && (

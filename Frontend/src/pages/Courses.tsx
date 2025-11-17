@@ -257,7 +257,7 @@ const CourseCatalog: React.FC = () => {
                 {renderedCourses.map((course) => {
                   const thumbUrl = getThumbnailUrl(course);
                   const names = getInstructorNames(course);
-                  const price = getPrice(course);
+                  // const price = getPrice(course);
 
                   return (
                     course.isPublished && (
@@ -314,7 +314,7 @@ const CourseCatalog: React.FC = () => {
                           </div>
 
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 pt-1">
-                            <div className="flex items-center gap-2 mb-2">
+                            {/* <div className="flex items-center gap-2 mb-2">
                               <span className="font-bold text-base sm:text-lg">
                                 ₹{price.toFixed(2)}
                               </span>
@@ -325,7 +325,7 @@ const CourseCatalog: React.FC = () => {
                                     ₹{course.price}
                                   </del>
                                 )}
-                            </div>
+                            </div> */}
                             {viewMode === "list" && (
                               <span className="bg-gray-200 flex items-center flex-row rounded-xl px-2">
                                 <TagIcon className="h-3" />

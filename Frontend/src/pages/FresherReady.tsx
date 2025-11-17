@@ -130,7 +130,7 @@ export default function FreshersReady() {
   <div className="max-w-6xl mx-auto px-8 py-12">
         {/* Tab Navigation */}
         <div className="mb-12">
-          <div className="bg-white rounded-2xl shadow-xl p-2 inline-flex gap-2">
+          <div className="bg-white rounded-2xl shadow-xl p-2 flex flex-col md:flex-row md:inline-flex gap-2">
             {tabs.map(t => (
               <button
                 key={t.key}
