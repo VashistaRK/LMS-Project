@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import AdminCompanyTests from "./AdminCompanyTests"; // ← new: render tests admin inline
+import AdminCompanyTests from "./AdminCompanyTests";
 
 const Base_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const BASE = `${Base_URL}/api/companies`;
