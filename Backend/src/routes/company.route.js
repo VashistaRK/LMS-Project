@@ -248,7 +248,7 @@ router.post('/:slug/tests/:testId/start', async (req, res) => {
     const qDocs = await QuizQuestion.find({ _id: { $in: allIds } }).lean();
     const map = new Map(qDocs.map(q => [String(q._id), q]));
 
-    // build sections with sanitized questions
+    // build sections with questions including correctAnswer for frontend evaluation
     const sections = test.sections.map((s, si) => {
       const questions = (s.questionIds || []).map((qid, idx) => {
         const q = map.get(String(qid));
@@ -259,13 +259,14 @@ router.post('/:slug/tests/:testId/start', async (req, res) => {
           type: q.type === 'mcq' ? 'MCQ' : 'Descriptive',
           question: q.questionText,
           options: q.type === 'mcq' ? (q.options || []) : [],
+          correctAnswer: q.type === 'mcq' ? q.correctAnswer : undefined, // include correctAnswer for frontend evaluation
           points: s.pointsPerQuestion || 1
         };
       }).filter(Boolean);
       return { key: s.key, title: s.title, questions };
     });
 
-    // return test metadata + sanitized sections (no answers) — server does not persist attempt
+    // return test metadata + sections with correctAnswer for frontend evaluation
     res.json({ testId: test.testId, title: test.title, sections });
   } catch (err) {
     console.error('Error starting company test:', err);
@@ -310,14 +311,17 @@ router.post('/:slug/tests/:testId/submit', async (req, res) => {
           secDetail.push({ bankId: r.bankId, error: 'question not found' });
           continue;
         }
-        if (s.key === 'mcq' && q.type === 'mcq') {
+        // Evaluate MCQ questions regardless of section key (check question type)
+        if (q.type === 'mcq' || q.type === 'MCQ') {
           mcqTotal += 1;
           // r.value is expected to be index (number) of selected option
           const correctIndex = Number(q.correctAnswer);
           const submitted = (typeof r.value === 'number') ? Number(r.value) : Number(r.value);
           const correct = !Number.isNaN(submitted) && submitted === correctIndex;
           if (correct) mcqCorrect += 1;
-          secDetail.push({ bankId: q._id, correct, submitted, correctIndex, points: s.pointsPerQuestion || 1 });
+          // Use section points per question, fallback to question points, then 1
+          const points = s.pointsPerQuestion ?? q.points ?? 1;
+          secDetail.push({ bankId: q._id, correct, submitted, correctIndex, points });
         } else {
           // coding / essay / descriptive -> not auto-graded
           secDetail.push({ bankId: q._id, note: 'not auto-graded' });
@@ -326,7 +330,8 @@ router.post('/:slug/tests/:testId/submit', async (req, res) => {
       details[s.key] = secDetail;
     }
 
-    // compute score (only MCQ counted)
+    // compute score (only MCQ counted) - these are counts, not points
+    // Frontend will calculate point-based score from details
     const score = mcqCorrect;
     const total = mcqTotal;
 
