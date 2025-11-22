@@ -1,14 +1,13 @@
 /* eslint-disable */
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { BookOpen, Plus, X, Loader2, ChevronDown, ChevronUp, Video, FileQuestion, Code } from "lucide-react";
+import { BookOpen, Plus, X, Loader2, ChevronDown, ChevronUp, Video, FileQuestion } from "lucide-react";
 import { coursesApi } from "../../services/GlobalApi";
 import { toast } from "sonner";
 import { CourseContext } from "../../context/CourseContext";
 import type { CourseData, Chapters, Sections } from "../../types/course";
 import NotesForm from "./NotesForm";
 import type { Note } from "../../services/notesApi";
-import MyEditor from "./Doceditor";
 import TestBuilder from "./TestBuilder";
 import axios from "axios";
 const BASE = import.meta.env.VITE_API_URL;
@@ -179,26 +178,6 @@ const CourseCurriculumTab: React.FC = () => {
     setFormData(updated);
     setCourseData(updated);
   };
-
-  // Ensure chapter has notesId only when needed
-  const ensureNotesId = (sectionIndex: number, chapterIndex: number, forceCreate = false): string | undefined => {
-    const chapter = formData.sections?.[sectionIndex]?.chapters?.[chapterIndex];
-
-    // Return if already exists
-    if (chapter?.notesId) {
-      return chapter.notesId;
-    }
-
-    // Only generate if explicitly asked
-    if (forceCreate) {
-      const newDocId = generateDocId(sectionIndex, chapterIndex);
-      handleChapterChange(sectionIndex, chapterIndex, "notesId", newDocId);
-      return newDocId;
-    }
-
-    return undefined;
-  };
-
 
   // ---------------------------
   // Save Handler
