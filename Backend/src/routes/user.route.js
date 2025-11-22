@@ -86,6 +86,58 @@ router.put("/profile", authMiddleware, async (req, res) => {
     }
 });
 
+// UPDATE profile with picture upload
+router.put(
+    "/profile",
+    authMiddleware,
+    upload.single("picture"),
+    async (req, res) => {
+      try {
+        const { name, password } = req.body;
+        const updates = {};
+  
+        if (name) updates.name = name;
+  
+        // If picture uploaded as file
+        if (req.file) {
+          const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+          updates.picture = base64Image; // store base64 directly OR upload to Cloudinary
+        }
+  
+        // If picture provided as URL
+        if (req.body.picture && !req.file) {
+          updates.picture = req.body.picture;
+        }
+  
+        // For password update
+        if (password) {
+          const user = await User.findById(req.user.id || req.user.sub);
+          if (!user) return res.status(404).json({ error: "User not found" });
+  
+          if (user.provider !== "local") {
+            return res.status(400).json({
+              error: "Password change not allowed for OIDC users",
+            });
+          }
+  
+          updates.passwordHash = await bcrypt.hash(password, 12);
+        }
+  
+        const updatedUser = await User.findByIdAndUpdate(
+          req.user.id || req.user.sub,
+          { $set: updates },
+          { new: true, runValidators: true }
+        ).select("-passwordHash");
+  
+        res.json({ user: updatedUser });
+      } catch (err) {
+        console.error("PROFILE UPDATE ERROR:", err);
+        res.status(500).json({ error: "Failed to update profile" });
+      }
+    }
+  );
+  
+
 // UPDATE completed chapters
 router.put("/:userId/completed", async (req, res) => {
     try {

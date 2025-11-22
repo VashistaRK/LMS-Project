@@ -239,8 +239,6 @@ const CourseCurriculumTab: React.FC = () => {
         return <Video className="w-4 h-4 text-[#C21817]" />;
       case "quiz":
         return <FileQuestion className="w-4 h-4 text-[#C21817]" />;
-      case "assignment":
-        return <Code className="w-4 h-4 text-green-600" />;
       default:
         return <Video className="w-4 h-4" />;
     }
@@ -469,8 +467,7 @@ const CourseCurriculumTab: React.FC = () => {
                                       className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C21817] focus:border-[#C21817] transition-all"
                                     >
                                       <option value="video">📹 Video</option>
-                                      <option value="quiz">❓ Quiz</option>
-                                      <option value="assignment">💻 Coding</option>
+                                      <option value="quiz">❓ Test</option>
                                     </select>
                                   </div>
 
@@ -562,30 +559,6 @@ const CourseCurriculumTab: React.FC = () => {
                                       />
                                     </div>
 
-                                    {/* Doc Editor */}
-                                    <div className="border-2 border-[#FFEAEA] rounded-lg p-4 bg-[#fff5f5]/50">
-                                      <label className="block text-lg font-bold text-gray-700 mb-3">
-                                        Chapter Notes Editor
-                                      </label>
-                                      {chapter.notesId ? (
-                                        <MyEditor docId={chapter.notesId} />
-                                      ) : (
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            const newId = ensureNotesId(sectionIndex, chapterIndex, true); // now force create
-                                            if (newId) {
-                                              // state is already updated via handleChapterChange
-                                            }
-                                          }}
-                                          className="px-4 py-2 bg-gradient-to-r from-[#C21817] to-[#A51515] text-white rounded-lg hover:opacity-95"
-                                        >
-                                          ➕ Add Notes
-                                        </button>
-                                      )}
-                                    </div>
-
-
                                     <NotesForm
                                       initialNotes={chapter.notes}
                                       notesId={chapter.notesId}
@@ -618,27 +591,7 @@ const CourseCurriculumTab: React.FC = () => {
 
                                     )}
                                   </div>
-                                ) : (
-                                  <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                      Coding Question ID
-                                    </label>
-                                    <input
-                                      type="text"
-                                      value={chapter.testId}
-                                      onChange={(e) =>
-                                        handleChapterChange(
-                                          sectionIndex,
-                                          chapterIndex,
-                                          "testId",
-                                          e.target.value
-                                        )
-                                      }
-                                      placeholder="e.g., 1"
-                                      className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                                    />
-                                  </div>
-                                )}
+                                ): null }
 
                                 {/* Previewable */}
                                 <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
