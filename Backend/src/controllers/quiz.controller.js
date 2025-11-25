@@ -59,7 +59,7 @@ export const uploadDocumentQuiz = async (req, res) => {
 
     // ask GPT
     const prompt = `
-      Generate 5 MCQ questions based on this content:
+      Generate all MCQ questions based on this content:
 
       "${text}"
 
@@ -289,7 +289,7 @@ export const generateQuiz = async (req, res) => {
     }
 
     const prompt = `
-      Generate 5 MCQ questions for the chapter "${chapterTitle}" based on:
+      Generate all MCQ questions for the chapter "${chapterTitle}" based on:
       "${courseContent}".
 
       Format as a JSON array:
