@@ -13,7 +13,7 @@ const openai = new OpenAI({
 
 //
 export const uploadDocumentQuiz = async (req, res) => {
-  const filePath = path.resolve(req.file?.path || "");
+  const filePath = path.join(process.cwd(), "uploads", req.file.filename);
   console.log("uploadDocumentQuiz called. filePath=", filePath, "originalName=", req.file?.originalname);
 
   try {
@@ -150,7 +150,7 @@ export const uploadDocumentQuiz = async (req, res) => {
 };
 
 export const uploadDocumentQuestions = async (req, res) => {
-  const filePath = path.resolve(req.file?.path || "");
+  const filePath = path.join(process.cwd(), "uploads", req.file.filename);
 
   try {
     if (!filePath || !fs.existsSync(filePath)) {
