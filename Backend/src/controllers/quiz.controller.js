@@ -193,7 +193,7 @@ export const uploadDocumentQuestions = async (req, res) => {
     // GPT Prompt
     // -----------------------
     const prompt = `
-Extract exactly 5 MCQs from the following text.
+Extract exactly all MCQs from the following text.
 
 Return ONLY JSON. No Markdown. No explanation.
 

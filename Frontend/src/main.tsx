@@ -70,28 +70,32 @@ const router = createBrowserRouter([
       { path: "carrers", element: <Carrer /> },
       { path: "courses", element: <CourseCatalog /> },
       { path: "freshers-pratice", element: <FreshersReady /> },
-      { path: "freshers-pratice/test/:id/:testId", element: <TestPage /> },
       { path: "companies", element: <CompaniesPage /> },
-      { path: "companies/:slug", element: <CompanyPage /> },
-      { path: "companies/:slug/tests/:testId", element: <CompanyTestTake /> },
+      {
+        path: "course-details/:courseId",
+        element: <CourseDetailsPage />,
+      },
       {
         element: <RequireAuth />, // acts as guard
         children: [
-          {
-            path: "course-details/:courseId",
-            element: <CourseDetailsPage />,
-          },
           { path: "cart", element: <Cart /> },
           { path: "/my-learning", element: <MyLearningWrapper /> },
           { path: "notifications", element: <NotificationsPage /> },
           { path: "/profile", element: <ProfilePage /> },
+          { path: "my-courses/:courseId", element: <CourseLearningPage /> },
+          { path: "my-courses/test/:testId", element: <TestPage1 /> },
+          { path: "my-courses/:quizId/:courseId", element: <QuizPage /> },
+          { path: "freshers-pratice/test/:id/:testId", element: <TestPage /> },
+          { path: "companies/:slug", element: <CompanyPage /> },
+          {
+            path: "companies/:slug/tests/:testId",
+            element: <CompanyTestTake />,
+          },
         ],
       },
     ],
   },
-  { path: "my-courses/:courseId", element: <CourseLearningPage /> },
-  { path: "my-courses/test/:testId", element: <TestPage1 /> },
-  { path: "my-courses/:quizId/:courseId", element: <QuizPage /> },
+
   // { path: "coding-quiz/:quizId", element: <CodingQuiz /> },
   { path: "Authenticate", element: <LoginPage /> },
   {
@@ -106,7 +110,10 @@ const router = createBrowserRouter([
           { path: "analytics", element: <AdminAnalysisPage /> },
           { path: "FAQ", element: <AdminFaqsPage /> },
           { path: "assessments", element: <AdminAssessments /> },
-          { path: "assessments/analytics", element: <AdminAttemptsAnalytics /> },
+          {
+            path: "assessments/analytics",
+            element: <AdminAttemptsAnalytics />,
+          },
           { path: "clg/:collegeId", element: <CollegeAdminPage /> },
           { path: "Courses", element: <CoursesPage /> },
           { path: "companies", element: <CompaniesAdmin /> },

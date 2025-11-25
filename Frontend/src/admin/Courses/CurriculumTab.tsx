@@ -147,6 +147,8 @@ const CourseCurriculumTab: React.FC = () => {
       ],
       notesId: newDocId,
     });
+    formData.sections[sectionIndex].lectureCount =
+      updatedSections[sectionIndex].chapters.length;
 
     const updated: CourseData = { ...formData, sections: updatedSections };
     setFormData(updated);
@@ -158,6 +160,8 @@ const CourseCurriculumTab: React.FC = () => {
     updatedSections[sectionIndex].chapters = updatedSections[
       sectionIndex
     ].chapters.filter((_, i) => i !== chapterIndex);
+    formData.sections[sectionIndex].lectureCount =
+      updatedSections[sectionIndex].chapters.length;
 
     const updated: CourseData = { ...formData, sections: updatedSections };
     setFormData(updated);
@@ -231,10 +235,11 @@ const CourseCurriculumTab: React.FC = () => {
           <div className="p-2 bg-gradient-to-r from-[#C21817] to-[#A51515] rounded-lg">
             <BookOpen className="w-6 h-6 text-white" />
           </div>
-          <div className="border-2 border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
-            <p className="text-sm text-gray-600 mt-1">
+          <div className="overflow-hidden p-3 text-2xl font-bold text-gray-800 whitespace-nowrap overflow-ellipsis">
+            {formData.title}
+            {/* <p className="text-sm text-gray-600 mt-1">
               Build your course structure with sections and chapters
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
@@ -317,19 +322,7 @@ const CourseCurriculumTab: React.FC = () => {
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
                           Lecture Count *
                         </label>
-                        <input
-                          type="number"
-                          value={section.lectureCount}
-                          onChange={(e) =>
-                            handleSectionChange(
-                              sectionIndex,
-                              "lectureCount",
-                              +e.target.value
-                            )
-                          }
-                          placeholder="0"
-                          className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
-                        />
+                        <p className="w-full px-4 py-3 text-black/70 select-none border-2 bg-gray-200 border-gray-300 rounded-lg transition-all">{section.lectureCount}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
