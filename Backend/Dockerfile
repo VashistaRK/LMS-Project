@@ -18,15 +18,22 @@ WORKDIR /app
 # Copy installed node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy app source
+# Copy project files
 COPY . .
 
-# Create uploads directory before switching user
-RUN mkdir -p /app/uploads
-RUN chown -R appuser:appgroup /app/uploads
+# ----------------------------------------------------
+# Create non-root user FIRST
+# ----------------------------------------------------
+RUN addgroup --system appgroup && adduser --system appuser --ingroup appgroup
 
-# Create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# ----------------------------------------------------
+# Create uploads directory with proper permissions
+# ----------------------------------------------------
+RUN mkdir -p /app/uploads \
+    && chown -R appuser:appgroup /app/uploads \
+    && chmod -R 775 /app/uploads
+
+# Switch to non-root user
 USER appuser
 
 ENV NODE_ENV=production
