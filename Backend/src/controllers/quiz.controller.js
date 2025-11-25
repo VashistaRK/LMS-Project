@@ -150,62 +150,117 @@ export const uploadDocumentQuiz = async (req, res) => {
 };
 
 export const uploadDocumentQuestions = async (req, res) => {
-  const filePath = path.join(process.cwd(), "uploads", req.file.filename);
-
   try {
-    if (!filePath || !fs.existsSync(filePath)) {
-      return res.status(400).json({ error: "File missing or failed to upload" });
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
     }
 
-    // extract text
+    const filePath = path.join(process.cwd(), "uploads", req.file.filename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(400).json({ error: "File upload failed" });
+    }
+
+    // -----------------------
+    // Extract text
+    // -----------------------
     let text = "";
-    if (req.file.mimetype === "application/pdf") {
-      text = (await pdfParse(fs.readFileSync(filePath))).text;
-    } else {
-      const result = await mammoth.extractRawText({ path: filePath });
-      text = result.value;
+
+    try {
+      if (req.file.mimetype === "application/pdf") {
+        const buffer = fs.readFileSync(filePath);
+        const parsed = await pdfParse(buffer);
+        text = parsed.text;
+      } else if (
+        req.file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ) {
+        const result = await mammoth.extractRawText({ path: filePath });
+        text = result.value;
+      } else {
+        return res.status(400).json({ error: "Unsupported file type" });
+      }
+    } catch (err) {
+      console.error("TEXT EXTRACTION ERROR:", err);
+      return res.status(500).json({ error: "Failed to extract text" });
     }
 
-    // ask GPT to convert document → MCQs
+    if (!text.trim()) {
+      return res.status(400).json({ error: "Document has no text" });
+    }
+
+    // -----------------------
+    // GPT Prompt
+    // -----------------------
     const prompt = `
-      You are a professional question generator.
-      Create 5 MCQ questions only.
+Extract exactly 5 MCQs from the following text.
 
-      Return ONLY pure JSON. No explanation.
+Return ONLY JSON. No Markdown. No explanation.
 
-      [
-        {
-          "title": "Question text",
-          "options": ["A", "B", "C", "D"],
-          "correctAnswer": "B",
-          "genre": "imported"
-        }
-      ]
-    `;
+Format:
+[
+  {
+    "title": "Question text",
+    "options": ["A", "B", "C", "D"],
+    "correctAnswer": "A",
+    "genre": "imported"
+  }
+]
+
+TEXT:
+${text}
+`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [
-        { role: "user", content: prompt + "\nCONTENT:\n" + text }
-      ],
-      temperature: 0.4,
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.2,
+      max_tokens: 800,
     });
 
     let raw = completion.choices[0].message.content.trim();
-    if (raw.startsWith("```")) raw = raw.replace(/```json|```/g, "").trim();
 
-    const quizArray = JSON.parse(raw);
+    // Remove backticks / code fences
+    raw = raw.replace(/```json/g, "").replace(/```/g, "").trim();
 
-    // normalize for DB
+    // -----------------------
+    // Extract pure JSON using regex
+    // -----------------------
+    const jsonMatch = raw.match(/\[([\s\S]*)\]/);
+
+    if (!jsonMatch) {
+      console.error("GPT RAW OUTPUT:", raw);
+      return res.status(500).json({
+        error: "GPT did not return valid JSON",
+        raw,
+      });
+    }
+
+    const cleanJson = jsonMatch[0];
+
+    let quizArray = [];
+
+    try {
+      quizArray = JSON.parse(cleanJson);
+    } catch (err) {
+      console.error("JSON PARSE ERROR:", err, cleanJson);
+      return res.status(500).json({
+        error: "Failed to parse JSON",
+        raw: cleanJson,
+      });
+    }
+
+    // -----------------------
+    // Format questions for DB
+    // -----------------------
     const formatted = quizArray.map((q) => ({
       type: "mcq",
-      questionText: q.title,
-      options: q.options,
-      correctAnswer: "ABCD".indexOf(q.correctAnswer.toUpperCase()),
+      questionText: q.title || "",
+      options: q.options || [],
+      correctAnswer: "ABCD".indexOf((q.correctAnswer || "A").toUpperCase()),
       genre: q.genre || "imported",
     }));
 
-    // save directly to question bank
     const saved = await QuizQuestion.insertMany(formatted);
 
     fs.unlink(filePath, () => {});
@@ -217,14 +272,10 @@ export const uploadDocumentQuestions = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("UPLOAD QUESTION ERROR:", err);
-    return res.status(500).json({
-      error: "Failed to extract questions",
-      details: err.message
-    });
+    console.error("UPLOAD ERROR:", err);
+    return res.status(500).json({ error: "Failed to process", details: err.message });
   }
 };
-
 
 // 🧩 Generate quiz questions from content
 export const generateQuiz = async (req, res) => {
