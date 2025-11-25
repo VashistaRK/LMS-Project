@@ -38,7 +38,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AdminMonitoringPage from "./admin/AdminMonitoring.tsx";
 import AdminAnalysisPage from "./admin/adminAnalysis.tsx";
 import AdminFaqsPage from "./admin/AdminFaq.tsx";
-import { SmoothCursor } from "./components/ui/smooth-cursor.tsx";
 import FreshersReady from "./pages/FresherReady.tsx";
 import TestPage from "./pages/TestPage.tsx";
 import AdminAssessments from "./admin/AdminAssessments.tsx";
@@ -131,7 +130,6 @@ createRoot(document.getElementById("root")!).render(
         <SocketProvider>
           <ParallaxProvider>
             <RouterProvider router={router} />
-            <SmoothCursor />
             <NotificationToast />
           </ParallaxProvider>
         </SocketProvider>

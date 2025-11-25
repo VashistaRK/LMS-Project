@@ -11,8 +11,7 @@ import {
   deleteQuestion,
   getGenres,
   uploadDocumentQuiz,
-  getQuizById,
-  uploadDocumentQuestions
+  getQuizById
 } from "../controllers/quiz.controller.js";
 import { validateQuestion } from "../middleware/questionValidation.js";
 
@@ -31,7 +30,7 @@ const upload = multer({ dest: uploadDir });
 router.get("/", getAllQuestions);
 
 router.get("/quiz/:quizId", getQuizById);
-router.post("/upload-doc", upload.single("doc"), uploadDocumentQuestions);
+
 // 🧩 Auto-generate quiz from content
 router.post("/generate", generateQuiz);
 // genres
