@@ -3,13 +3,28 @@ import React from "react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { getQuestions, createQuestion, updateQuestion, deleteQuestion } from "../services/questionApi";
-import { Trash2, Edit3, Plus, X, Check, Upload, Code, FileText, Search } from "lucide-react";
+import {
+  getQuestions,
+  createQuestion,
+  updateQuestion,
+  deleteQuestion,
+} from "../services/questionApi";
+import {
+  Trash2,
+  Edit3,
+  Plus,
+  X,
+  Check,
+  Upload,
+  Code,
+  FileText,
+  Search,
+} from "lucide-react";
 import {
   getCodingQuestions,
   createCodingQuestion,
   updateCodingQuestion,
-  deleteCodingQuestion
+  deleteCodingQuestion,
 } from "../services/codingQuestionsApi.ts";
 
 const api = import.meta.env.VITE_API_URL;
@@ -45,8 +60,12 @@ function QuestionBankUploader({ onUploaded }: { onUploaded: () => void }) {
           <Upload className="w-8 h-8 text-red-600" />
         </div>
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">Upload Question Document</h3>
-          <p className="text-sm text-gray-500">Upload PDF or DOCX to auto-extract questions</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+            Upload Question Document
+          </h3>
+          <p className="text-sm text-gray-500">
+            Upload PDF or DOCX to auto-extract questions
+          </p>
         </div>
         <input
           type="file"
@@ -108,7 +127,10 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
   };
 
   const addTestCase = () =>
-    setForm({ ...form, testCases: [...form.testCases, { input: [""], output: "" }] });
+    setForm({
+      ...form,
+      testCases: [...form.testCases, { input: [""], output: "" }],
+    });
 
   const removeTestCase = (index: number) => {
     const copy = [...form.testCases];
@@ -176,7 +198,9 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
                 <select
                   className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-red-500 focus:outline-none transition-colors"
                   value={form.difficulty}
-                  onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, difficulty: e.target.value })
+                  }
                 >
                   <option value="Easy">Easy</option>
                   <option value="Medium">Medium</option>
@@ -195,13 +219,17 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
                 placeholder="Describe the problem statement in detail..."
                 rows={4}
                 value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, description: e.target.value })
+                }
               />
             </div>
 
             {/* Examples */}
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Examples</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Examples
+              </h3>
               <div className="space-y-3">
                 {form.examples.map((ex: any, idx: number) => (
                   <div key={idx} className="flex gap-2">
@@ -209,7 +237,9 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
                       className="flex-1 border-2 border-gray-200 rounded-lg px-4 py-2 focus:border-red-500 focus:outline-none transition-colors"
                       placeholder={`Example ${idx + 1}: Input → Output`}
                       value={ex}
-                      onChange={(e) => updateArrayField("examples", idx, e.target.value)}
+                      onChange={(e) =>
+                        updateArrayField("examples", idx, e.target.value)
+                      }
                     />
                     {form.examples.length > 1 && (
                       <button
@@ -240,7 +270,9 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
                 placeholder="e.g., 1 ≤ array.length ≤ 10^4"
                 rows={3}
                 value={form.constraints}
-                onChange={(e) => setForm({ ...form, constraints: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, constraints: e.target.value })
+                }
               />
             </div>
 
@@ -254,7 +286,9 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
                   className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-red-500 focus:outline-none transition-colors font-mono"
                   placeholder="e.g., twoSum"
                   value={form.functionName}
-                  onChange={(e) => setForm({ ...form, functionName: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, functionName: e.target.value })
+                  }
                 />
               </div>
               <div>
@@ -265,7 +299,12 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
                   className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-red-500 focus:outline-none transition-colors"
                   placeholder="array, hash-table, two-pointers"
                   value={form.tags.join(", ")}
-                  onChange={(e) => setForm({ ...form, tags: e.target.value.split(",").map((t) => t.trim()) })}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      tags: e.target.value.split(",").map((t) => t.trim()),
+                    })
+                  }
                 />
               </div>
             </div>
@@ -280,13 +319,17 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
                 placeholder="function twoSum(nums, target) {&#10;  // Your code here&#10;}"
                 rows={6}
                 value={form.starterCode}
-                onChange={(e) => setForm({ ...form, starterCode: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, starterCode: e.target.value })
+                }
               />
             </div>
 
             {/* Hints */}
             <div className="bg-amber-50 rounded-xl p-6 border border-amber-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Hints (Optional)</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Hints (Optional)
+              </h3>
               <div className="space-y-3">
                 {form.hints.map((hint: any, idx: number) => (
                   <div key={idx} className="flex gap-2">
@@ -294,7 +337,9 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
                       className="flex-1 border-2 border-amber-200 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none transition-colors bg-white"
                       placeholder={`Hint ${idx + 1}`}
                       value={hint}
-                      onChange={(e) => updateArrayField("hints", idx, e.target.value)}
+                      onChange={(e) =>
+                        updateArrayField("hints", idx, e.target.value)
+                      }
                     />
                     {form.hints.length > 1 && (
                       <button
@@ -317,12 +362,19 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
 
             {/* Test Cases */}
             <div className="bg-green-50 rounded-xl p-6 border border-green-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Cases *</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Test Cases *
+              </h3>
               <div className="space-y-4">
                 {form.testCases.map((t: any, idx: number) => (
-                  <div key={idx} className="bg-white rounded-lg p-4 border-2 border-green-200">
+                  <div
+                    key={idx}
+                    className="bg-white rounded-lg p-4 border-2 border-green-200"
+                  >
                     <div className="flex justify-between items-center mb-3">
-                      <span className="font-semibold text-gray-700">Test Case {idx + 1}</span>
+                      <span className="font-semibold text-gray-700">
+                        Test Case {idx + 1}
+                      </span>
                       {form.testCases.length > 1 && (
                         <button
                           className="text-red-600 hover:bg-red-50 px-3 py-1 rounded-lg transition-colors text-sm"
@@ -335,22 +387,30 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
                     <div className="space-y-2">
                       <input
                         className="w-full border-2 border-gray-200 rounded-lg px-4 py-2 focus:border-green-500 focus:outline-none transition-colors font-mono text-sm"
-                        placeholder='Input (JSON array): [2, 7, 11, 15]'
+                        placeholder="Input (JSON array): [2, 7, 11, 15]"
                         value={JSON.stringify(t.input)}
                         onChange={(e) => {
                           try {
-                            updateTestCase(idx, "input", JSON.parse(e.target.value));
-                          } catch { }
+                            updateTestCase(
+                              idx,
+                              "input",
+                              JSON.parse(e.target.value)
+                            );
+                          } catch {}
                         }}
                       />
                       <input
                         className="w-full border-2 border-gray-200 rounded-lg px-4 py-2 focus:border-green-500 focus:outline-none transition-colors font-mono text-sm"
-                        placeholder='Expected Output: [0, 1]'
+                        placeholder="Expected Output: [0, 1]"
                         value={JSON.stringify(t.output)}
                         onChange={(e) => {
                           try {
-                            updateTestCase(idx, "output", JSON.parse(e.target.value));
-                          } catch { }
+                            updateTestCase(
+                              idx,
+                              "output",
+                              JSON.parse(e.target.value)
+                            );
+                          } catch {}
                         }}
                       />
                     </div>
@@ -387,7 +447,7 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
 };
 
 export default function AdminQuizPage() {
-  const [activeTab, setActiveTab] = useState<'mcq' | 'coding'>('mcq');
+  const [activeTab, setActiveTab] = useState<"mcq" | "coding">("mcq");
   const [questions, setQuestions] = useState<any[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState<any>(null);
@@ -395,6 +455,8 @@ export default function AdminQuizPage() {
   const [codingQuestions, setCodingQuestions] = useState<any[]>([]);
   const [codeModalOpen, setCodeModalOpen] = useState(false);
   const [editCodeData, setEditCodeData] = useState<any | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentCodePage, setCurrentCodePage] = useState(1);
 
   const normalizeArray = (res: any) => {
     if (!res) return [];
@@ -411,11 +473,14 @@ export default function AdminQuizPage() {
       const arr = normalizeArray(res);
       const normalized = arr.map((q: any) => ({
         _id: q._id || q.id || String(q.id),
-        type: q.type || 'mcq',
-        questionText: q.questionText || q.question || q.title || '',
+        type: q.type || "mcq",
+        questionText: q.questionText || q.question || q.title || "",
         options: q.options || [],
-        correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : (q.correctAnswer ?? 0),
-        genre: q.genre || 'general',
+        correctAnswer:
+          typeof q.correctAnswer === "number"
+            ? q.correctAnswer
+            : q.correctAnswer ?? 0,
+        genre: q.genre || "general",
         meta: q.meta || {},
         __raw: q,
       }));
@@ -463,7 +528,7 @@ export default function AdminQuizPage() {
       fetchQuestions();
     } catch (err) {
       console.error(err);
-      alert('Save failed');
+      alert("Save failed");
     }
   };
 
@@ -474,24 +539,49 @@ export default function AdminQuizPage() {
     }
   };
 
-  const filteredQuestions = questions.filter(q =>
-    q.questionText.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    q.genre.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredQuestions = questions.filter(
+    (q) =>
+      q.questionText.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      q.genre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredCodingQuestions = codingQuestions.filter(q =>
-    q.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    q.tags?.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredCodingQuestions = codingQuestions.filter(
+    (q) =>
+      q.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      q.tags?.some((tag: string) =>
+        tag.toLowerCase().includes(searchTerm.toLowerCase())
+      )
   );
 
   const QuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
-    const [form, setForm] = useState<any>(initial || { type: "mcq", questionText: "", options: [""], correctAnswer: 0, genre: "general" });
+    const [form, setForm] = useState<any>(
+      initial || {
+        type: "mcq",
+        questionText: "",
+        options: [""],
+        correctAnswer: 0,
+        genre: "general",
+      }
+    );
 
-    useEffect(() => setForm(initial || { type: "mcq", questionText: "", options: [""], correctAnswer: 0, genre: "general" }), [initial]);
+    useEffect(
+      () =>
+        setForm(
+          initial || {
+            type: "mcq",
+            questionText: "",
+            options: [""],
+            correctAnswer: 0,
+            genre: "general",
+          }
+        ),
+      [initial]
+    );
 
     if (!isOpen) return null;
 
-    const setField = (k: string, v: any) => setForm((s: any) => ({ ...s, [k]: v }));
+    const setField = (k: string, v: any) =>
+      setForm((s: any) => ({ ...s, [k]: v }));
 
     const updateOption = (idx: number, val: string) => {
       const opts = [...(form.options || [])];
@@ -517,7 +607,8 @@ export default function AdminQuizPage() {
       };
       if (form.type === "mcq") {
         payload.options = form.options || [];
-        payload.correctAnswer = typeof form.correctAnswer === "number" ? form.correctAnswer : 0;
+        payload.correctAnswer =
+          typeof form.correctAnswer === "number" ? form.correctAnswer : 0;
       } else {
         payload.options = [];
         payload.correctAnswer = null;
@@ -532,7 +623,9 @@ export default function AdminQuizPage() {
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                 <FileText size={28} />
-                {initial && initial._id ? "Edit MCQ Question" : "Create MCQ Question"}
+                {initial && initial._id
+                  ? "Edit MCQ Question"
+                  : "Create MCQ Question"}
               </h2>
               <button
                 onClick={onClose}
@@ -565,8 +658,8 @@ export default function AdminQuizPage() {
                     Genre / Category *
                   </label>
                   <input
-                    value={form.genre || ''}
-                    onChange={(e) => setField('genre', e.target.value)}
+                    value={form.genre || ""}
+                    onChange={(e) => setField("genre", e.target.value)}
                     className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-red-500 focus:outline-none transition-colors"
                     placeholder="e.g., JavaScript, Math, Science"
                   />
@@ -594,16 +687,21 @@ export default function AdminQuizPage() {
                   <div className="space-y-3">
                     {(form.options || []).map((opt: string, i: number) => (
                       <div key={i} className="flex items-center gap-3">
-                        <div className={`flex items-center justify-center w-10 h-10 rounded-xl border-2 transition-all cursor-pointer ${form.correctAnswer === i
-                          ? 'bg-red-600 border-red-600'
-                          : 'border-gray-200 hover:border-red-300'
-                          }`}>
+                        <div
+                          className={`flex items-center justify-center w-10 h-10 rounded-xl border-2 transition-all cursor-pointer ${
+                            form.correctAnswer === i
+                              ? "bg-red-600 border-red-600"
+                              : "border-gray-200 hover:border-red-300"
+                          }`}
+                        >
                           <button
                             type="button"
                             onClick={() => setField("correctAnswer", i)}
                             className="w-full h-full flex items-center justify-center"
                           >
-                            {form.correctAnswer === i && <Check size={20} className="text-white" />}
+                            {form.correctAnswer === i && (
+                              <Check size={20} className="text-white" />
+                            )}
                           </button>
                         </div>
                         <input
@@ -662,34 +760,60 @@ export default function AdminQuizPage() {
     );
   };
 
+  const ITEMS_PER_PAGE = 50;
+
+  const paginatedQuestions = filteredQuestions.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const totalPages = Math.ceil(filteredQuestions.length / ITEMS_PER_PAGE);
+
+  const CODE_ITEMS_PER_PAGE = 50;
+
+  const paginatedCodingQuestions = filteredCodingQuestions.slice(
+    (currentCodePage - 1) * CODE_ITEMS_PER_PAGE,
+    currentCodePage * CODE_ITEMS_PER_PAGE
+  );
+
+  const totalCodePages = Math.ceil(
+    filteredCodingQuestions.length / CODE_ITEMS_PER_PAGE
+  );
+
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Question Bank Manager</h1>
-          <p className="text-gray-600">Create and manage MCQ and coding assessment questions</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Question Bank Manager
+          </h1>
+          <p className="text-gray-600">
+            Create and manage MCQ and coding assessment questions
+          </p>
         </div>
 
         {/* Tabs */}
         <div className="mb-8">
           <div className="flex gap-2 bg-white p-1.5 rounded-xl shadow-sm border border-gray-200 w-fit">
             <button
-              onClick={() => setActiveTab('mcq')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'mcq'
-                ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-50'
-                }`}
+              onClick={() => setActiveTab("mcq")}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                activeTab === "mcq"
+                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-50"
+              }`}
             >
               <FileText size={20} />
               MCQ Questions
             </button>
             <button
-              onClick={() => setActiveTab('coding')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'coding'
-                ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-50'
-                }`}
+              onClick={() => setActiveTab("coding")}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                activeTab === "coding"
+                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-50"
+              }`}
             >
               <Code size={20} />
               Coding Questions
@@ -700,7 +824,10 @@ export default function AdminQuizPage() {
         {/* Search & Add Button */}
         <div className="mb-6 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Search
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
             <input
               type="text"
               placeholder="Search questions..."
@@ -711,7 +838,7 @@ export default function AdminQuizPage() {
           </div>
           <button
             onClick={() => {
-              if (activeTab === 'mcq') {
+              if (activeTab === "mcq") {
                 openNew();
               } else {
                 setEditCodeData(null);
@@ -723,57 +850,83 @@ export default function AdminQuizPage() {
             }`}
           >
             <Plus size={20} />
-            Add {activeTab === 'mcq' ? 'MCQ' : 'Coding'} Question
+            Add {activeTab === "mcq" ? "MCQ" : "Coding"} Question
           </button>
         </div>
 
         {/* MCQ Tab Content */}
-        {activeTab === 'mcq' && (
+        {activeTab === "mcq" && (
           <>
             <div className="mb-6">
               <QuestionBankUploader onUploaded={fetchQuestions} />
             </div>
 
+            {/* MAIN TABLE WRAPPER */}
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+              {/* TABLE */}
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="bg-gradient-to-r from-red-600 to-red-700 text-white">
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">ID</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Type</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Genre</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Question</th>
-                      <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider">Actions</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                        ID
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                        Genre
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                        Question
+                      </th>
+                      <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {filteredQuestions.map((q: any, idx: number) => (
-                      <tr key={q._id} className={`hover:bg-red-50/50 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
-                        <td className="px-6 py-4 text-sm font-mono text-gray-600">{q._id.slice(0, 8)}...</td>
+                    {/* MAP WITH PAGINATION */}
+                    {paginatedQuestions.map((q: any, idx: number) => (
+                      <tr
+                        key={q._id}
+                        className={`hover:bg-red-50/50 transition-colors ${
+                          idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                        }`}
+                      >
+                        <td className="px-6 py-4 text-sm font-mono text-gray-600">
+                          {q._id.slice(0, 8)}...
+                        </td>
+
                         <td className="px-6 py-4">
-                          <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold 
-                              bg-red-100 text-gray-700'
-                          }`}>
-                            {q.type === 'mcq' ? 'Multiple Choice' : 'Free Text'}
+                          <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-gray-700">
+                            {q.type === "mcq" ? "Multiple Choice" : "Free Text"}
                           </span>
                         </td>
+
                         <td className="px-6 py-4">
                           <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
                             {q.genre}
                           </span>
                         </td>
+
                         <td className="px-6 py-4 text-sm text-gray-900 max-w-md">
                           <div className="line-clamp-2">{q.questionText}</div>
                         </td>
+
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-2">
                             <button
-                              onClick={() => { setEditData(q); setModalOpen(true); }}
+                              onClick={() => {
+                                setEditData(q);
+                                setModalOpen(true);
+                              }}
                               className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                               title="Edit"
                             >
                               <Edit3 size={18} />
                             </button>
+
                             <button
                               onClick={() => handleDelete(q._id)}
                               className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -785,13 +938,22 @@ export default function AdminQuizPage() {
                         </td>
                       </tr>
                     ))}
+
+                    {/* EMPTY STATE */}
                     {filteredQuestions.length === 0 && (
                       <tr>
                         <td colSpan={5} className="px-6 py-12 text-center">
                           <div className="text-gray-400">
-                            <FileText className="mx-auto mb-3 text-gray-300" size={48} />
-                            <p className="text-lg font-semibold mb-2">No MCQ questions found</p>
-                            <p className="text-sm">Add your first question to get started</p>
+                            <FileText
+                              className="mx-auto mb-3 text-gray-300"
+                              size={48}
+                            />
+                            <p className="text-lg font-semibold mb-2">
+                              No MCQ questions found
+                            </p>
+                            <p className="text-sm">
+                              Add your first question to get started
+                            </p>
                           </div>
                         </td>
                       </tr>
@@ -800,49 +962,120 @@ export default function AdminQuizPage() {
                 </table>
               </div>
 
+              {/* FOOTER + PAGINATION */}
               {filteredQuestions.length > 0 && (
-                <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
+                <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-between">
                   <p className="text-sm text-gray-600">
-                    Showing <span className="font-semibold text-gray-900">{filteredQuestions.length}</span> of <span className="font-semibold text-gray-900">{questions.length}</span> questions
+                    Showing{" "}
+                    <span className="font-semibold text-gray-900">
+                      {(currentPage - 1) * ITEMS_PER_PAGE + 1}
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-semibold text-gray-900">
+                      {Math.min(
+                        currentPage * ITEMS_PER_PAGE,
+                        filteredQuestions.length
+                      )}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-semibold text-gray-900">
+                      {filteredQuestions.length}
+                    </span>{" "}
+                    questions
                   </p>
                 </div>
               )}
+
+              {/* PAGINATION BUTTONS */}
+              <div className="flex justify-between items-center px-6 py-4 bg-gray-50 border-t">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                    currentPage === 1
+                      ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                      : "text-red-600 border-red-300 hover:bg-red-50"
+                  }`}
+                >
+                  Previous
+                </button>
+
+                <span className="text-sm text-gray-700">
+                  Page <strong>{currentPage}</strong> of{" "}
+                  <strong>{totalPages}</strong>
+                </span>
+
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                    currentPage === totalPages
+                      ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                      : "text-red-600 border-red-300 hover:bg-red-50"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </>
         )}
 
         {/* Coding Tab Content */}
-        {activeTab === 'coding' && (
+        {activeTab === "coding" && (
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="bg-gradient-to-r from-red-600 to-red-700 text-white">
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Title</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Difficulty</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Tags</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Function</th>
-                    <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                      Title
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                      Difficulty
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                      Tags
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                      Function
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredCodingQuestions.map((q: any, idx: number) => (
-                    <tr key={q._id} className={`hover:bg-red-50/50 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">{q.title}</td>
+                  {paginatedCodingQuestions.map((q: any, idx: number) => (
+                    <tr
+                      key={q._id}
+                      className={`hover:bg-red-50/50 transition-colors ${
+                        idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                      }`}
+                    >
+                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                        {q.title}
+                      </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${q.difficulty === 'Easy'
-                          ? 'bg-green-100 text-green-700'
-                          : q.difficulty === 'Medium'
-                            ? 'bg-amber-100 text-amber-700'
-                            : 'bg-red-100 text-red-700'
-                          }`}>
+                        <span
+                          className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
+                            q.difficulty === "Easy"
+                              ? "bg-green-100 text-green-700"
+                              : q.difficulty === "Medium"
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
                           {q.difficulty}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-wrap gap-1">
                           {q.tags?.slice(0, 3).map((tag: string, i: number) => (
-                            <span key={i} className="inline-flex px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-700">
+                            <span
+                              key={i}
+                              className="inline-flex px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-700"
+                            >
                               {tag}
                             </span>
                           ))}
@@ -855,13 +1088,16 @@ export default function AdminQuizPage() {
                       </td>
                       <td className="px-6 py-4">
                         <code className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-700">
-                          {q.functionName || 'N/A'}
+                          {q.functionName || "N/A"}
                         </code>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => { setEditCodeData(q); setCodeModalOpen(true); }}
+                            onClick={() => {
+                              setEditCodeData(q);
+                              setCodeModalOpen(true);
+                            }}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Edit"
                           >
@@ -869,7 +1105,11 @@ export default function AdminQuizPage() {
                           </button>
                           <button
                             onClick={async () => {
-                              if (window.confirm("Are you sure you want to delete this coding question?")) {
+                              if (
+                                window.confirm(
+                                  "Are you sure you want to delete this coding question?"
+                                )
+                              ) {
                                 await deleteCodingQuestion(q._id);
                                 fetchCodingQuestions();
                               }
@@ -887,9 +1127,16 @@ export default function AdminQuizPage() {
                     <tr>
                       <td colSpan={5} className="px-6 py-12 text-center">
                         <div className="text-gray-400">
-                          <Code className="mx-auto mb-3 text-gray-300" size={48} />
-                          <p className="text-lg font-semibold mb-2">No coding questions found</p>
-                          <p className="text-sm">Add your first coding challenge to get started</p>
+                          <Code
+                            className="mx-auto mb-3 text-gray-300"
+                            size={48}
+                          />
+                          <p className="text-lg font-semibold mb-2">
+                            No coding questions found
+                          </p>
+                          <p className="text-sm">
+                            Add your first coding challenge to get started
+                          </p>
                         </div>
                       </td>
                     </tr>
@@ -901,10 +1148,55 @@ export default function AdminQuizPage() {
             {filteredCodingQuestions.length > 0 && (
               <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
                 <p className="text-sm text-gray-600">
-                  Showing <span className="font-semibold text-gray-900">{filteredCodingQuestions.length}</span> of <span className="font-semibold text-gray-900">{codingQuestions.length}</span> questions
+                  Showing{" "}
+                  <span className="font-semibold text-gray-900">
+                    {(currentCodePage - 1) * CODE_ITEMS_PER_PAGE + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-semibold text-gray-900">
+                    {Math.min(
+                      currentCodePage * CODE_ITEMS_PER_PAGE,
+                      filteredCodingQuestions.length
+                    )}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-gray-900">
+                    {codingQuestions.length}
+                  </span>{" "}
+                  questions
                 </p>
               </div>
             )}
+            <div className="flex justify-between items-center px-6 py-4 bg-gray-50 border-t">
+              <button
+                disabled={currentCodePage === 1}
+                onClick={() => setCurrentCodePage(currentCodePage - 1)}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                  currentCodePage === 1
+                    ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                    : "text-red-600 border-red-300 hover:bg-red-50"
+                }`}
+              >
+                Previous
+              </button>
+
+              <span className="text-sm text-gray-700">
+                Page <strong>{currentCodePage}</strong> of{" "}
+                <strong>{totalCodePages}</strong>
+              </span>
+
+              <button
+                disabled={currentCodePage === totalCodePages}
+                onClick={() => setCurrentCodePage(currentCodePage + 1)}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                  currentCodePage === totalCodePages
+                    ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                    : "text-red-600 border-red-300 hover:bg-red-50"
+                }`}
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -913,7 +1205,10 @@ export default function AdminQuizPage() {
       <QuestionModal
         isOpen={modalOpen}
         initial={editData}
-        onClose={() => { setModalOpen(false); setEditData(null); }}
+        onClose={() => {
+          setModalOpen(false);
+          setEditData(null);
+        }}
         onSave={handleSave}
       />
 
