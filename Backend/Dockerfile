@@ -21,6 +21,10 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy app source
 COPY . .
 
+# Create uploads directory before switching user
+RUN mkdir -p /app/uploads
+RUN chown -R appuser:appgroup /app/uploads
+
 # Create non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
