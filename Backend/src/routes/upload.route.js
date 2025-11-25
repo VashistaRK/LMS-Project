@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import { uploadDocumentQuestions } from "../controllers/quiz.controller";
+import { uploadDocumentQuestions } from "../controllers/quiz.controller.js";
 const router = express.Router();
 
 // Ensure uploads directory exists and use an absolute path so multer can
