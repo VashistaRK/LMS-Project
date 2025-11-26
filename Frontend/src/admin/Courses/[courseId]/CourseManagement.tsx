@@ -42,7 +42,7 @@ const CourseManagement: React.FC = () => {
       case "curriculum":
         return <CourseCurriculumTab />;
       case "Thumbnail":
-        return <ThumbnailTab />;
+        return <ThumbnailTab course={courseInfo} />;
       default:
         return null;
     }
