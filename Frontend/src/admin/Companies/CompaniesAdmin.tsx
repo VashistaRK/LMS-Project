@@ -8,9 +8,17 @@ const BASE = `${Base_URL}/api/companies`;
 export default function CompaniesAdmin() {
   const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newCompany, setNewCompany] = useState({ name: "", slug: "", description: "" });
+  const [newCompany, setNewCompany] = useState({
+    name: "",
+    slug: "",
+    description: "",
+  });
   const [addingPaperFor, setAddingPaperFor] = useState<string | null>(null);
-  const [paperForm, setPaperForm] = useState<{ title: string; year: number | ""; file: File | null }>({ title: "", year: "", file: null });
+  const [paperForm, setPaperForm] = useState<{
+    title: string;
+    year: number | "";
+    file: File | null;
+  }>({ title: "", year: "", file: null });
 
   // show inline tests UI for this company
   const [manageTestsFor, setManageTestsFor] = useState<string | null>(null);
@@ -23,7 +31,11 @@ export default function CompaniesAdmin() {
         const res = await fetch(`${BASE}`, { credentials: "include" });
         const data = await res.json().catch(() => null);
         if (cancelled) return;
-        const list = Array.isArray(data) ? data : (data && Array.isArray(data.data) ? data.data : []);
+        const list = Array.isArray(data)
+          ? data
+          : data && Array.isArray(data.data)
+          ? data.data
+          : [];
         setCompanies(list.filter(Boolean));
       } catch (err) {
         console.error("Failed to fetch companies", err);
@@ -32,12 +44,15 @@ export default function CompaniesAdmin() {
         if (!cancelled) setLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const createCompany = async () => {
     try {
-      if (!newCompany.name || !newCompany.slug) return alert("Name and slug required");
+      if (!newCompany.name || !newCompany.slug)
+        return alert("Name and slug required");
       const res = await fetch(`${BASE}/admin`, {
         method: "POST",
         credentials: "include",
@@ -51,12 +66,50 @@ export default function CompaniesAdmin() {
       // refresh
       const r2 = await fetch(`${BASE}`, { credentials: "include" });
       const d2 = await r2.json().catch(() => null);
-      const list = Array.isArray(d2) ? d2 : (d2 && Array.isArray(d2.data) ? d2.data : []);
+      const list = Array.isArray(d2)
+        ? d2
+        : d2 && Array.isArray(d2.data)
+        ? d2.data
+        : [];
       setCompanies(list.filter(Boolean));
       setNewCompany({ name: "", slug: "", description: "" });
     } catch (err) {
       console.error(err);
       alert("Failed to create company");
+    }
+  };
+
+  const deleteCompany = async (slug: string) => {
+    if (!confirm(`Are you sure you want to delete "${slug}"?`)) return;
+
+    try {
+      const res = await fetch(`${BASE}/admin/${encodeURIComponent(slug)}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const body = await res.text();
+        let msg = res.statusText;
+        try {
+          const parsed = JSON.parse(body);
+          msg = parsed?.error || JSON.stringify(parsed);
+        } catch {
+          //no code-op
+          }
+        throw new Error(msg);
+      }
+
+      // Refresh list after delete
+      const r2 = await fetch(`${BASE}`, { credentials: "include" });
+      const d2 = await r2.json().catch(() => null);
+      const list = Array.isArray(d2) ? d2 : d2?.data || [];
+      setCompanies(list.filter(Boolean));
+
+      alert("Company deleted");
+    } catch (err: any) {
+      console.error(err);
+      alert("Failed to delete company: " + err.message);
     }
   };
 
@@ -71,9 +124,10 @@ export default function CompaniesAdmin() {
   };
 
   const handleFileChange = (f?: FileList | null) => {
-    if (!f || f.length === 0) return setPaperForm(prev => ({ ...prev, file: null }));
+    if (!f || f.length === 0)
+      return setPaperForm((prev) => ({ ...prev, file: null }));
     const file = f[0];
-    setPaperForm(prev => ({ ...prev, file }));
+    setPaperForm((prev) => ({ ...prev, file }));
   };
 
   const submitAddPaper = async (companySlug: string) => {
@@ -86,11 +140,14 @@ export default function CompaniesAdmin() {
       fd.append("year", String(paperForm.year));
       fd.append("file", paperForm.file as File);
 
-      const res = await fetch(`${BASE}/admin/${encodeURIComponent(companySlug)}/papers`, {
-        method: "POST",
-        credentials: "include",
-        body: fd,
-      });
+      const res = await fetch(
+        `${BASE}/admin/${encodeURIComponent(companySlug)}/papers`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: fd,
+        }
+      );
 
       if (!res.ok) {
         const body = await res.text();
@@ -98,14 +155,20 @@ export default function CompaniesAdmin() {
         try {
           const parsed = JSON.parse(body);
           msg = parsed?.error || parsed?.details || JSON.stringify(parsed);
-        } catch { msg = body || msg; }
+        } catch {
+          msg = body || msg;
+        }
         throw new Error(msg);
       }
 
       // refresh list
       const r2 = await fetch(`${BASE}`, { credentials: "include" });
       const d2 = await r2.json().catch(() => null);
-      const list = Array.isArray(d2) ? d2 : (d2 && Array.isArray(d2.data) ? d2.data : []);
+      const list = Array.isArray(d2)
+        ? d2
+        : d2 && Array.isArray(d2.data)
+        ? d2.data
+        : [];
       setCompanies(list.filter(Boolean));
       cancelAddPaper();
     } catch (err: any) {
@@ -121,19 +184,47 @@ export default function CompaniesAdmin() {
       <section className="mb-6 bg-white p-4 rounded shadow">
         <h2 className="font-semibold mb-2">Create Company</h2>
         <div className="grid grid-cols-3 gap-2">
-          <input placeholder="Name" value={newCompany.name} onChange={e => setNewCompany(s => ({ ...s, name: e.target.value }))} className="border p-2" />
-          <input placeholder="Slug" value={newCompany.slug} onChange={e => setNewCompany(s => ({ ...s, slug: e.target.value }))} className="border p-2" />
-          <input placeholder="Description" value={newCompany.description} onChange={e => setNewCompany(s => ({ ...s, description: e.target.value }))} className="border p-2" />
+          <input
+            placeholder="Name"
+            value={newCompany.name}
+            onChange={(e) =>
+              setNewCompany((s) => ({ ...s, name: e.target.value }))
+            }
+            className="border p-2"
+          />
+          <input
+            placeholder="Slug"
+            value={newCompany.slug}
+            onChange={(e) =>
+              setNewCompany((s) => ({ ...s, slug: e.target.value }))
+            }
+            className="border p-2"
+          />
+          <input
+            placeholder="Description"
+            value={newCompany.description}
+            onChange={(e) =>
+              setNewCompany((s) => ({ ...s, description: e.target.value }))
+            }
+            className="border p-2"
+          />
         </div>
         <div className="mt-3">
-          <button onClick={createCompany} className="bg-blue-600 text-white px-4 py-2 rounded">Create</button>
+          <button
+            onClick={createCompany}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            Create
+          </button>
         </div>
       </section>
 
       <section className="bg-white p-4 rounded shadow">
         <h2 className="font-semibold mb-3">Companies</h2>
         {loading && <div>Loading...</div>}
-        {!loading && companies.length === 0 && <div className="text-gray-500">No companies found</div>}
+        {!loading && companies.length === 0 && (
+          <div className="text-gray-500">No companies found</div>
+        )}
 
         <div className="space-y-4">
           {companies.filter(Boolean).map((c: any, idx: number) => {
@@ -149,21 +240,71 @@ export default function CompaniesAdmin() {
                     <div className="text-sm mt-1">{description}</div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <button onClick={() => startAddPaper(slug)} className="text-sm text-blue-600">Add Paper</button>
-                    <button onClick={() => setManageTestsFor(slug)} className="text-sm text-green-600">Manage Tests</button>
+                    <button
+                      onClick={() => startAddPaper(slug)}
+                      className="text-sm text-blue-600"
+                    >
+                      Add Paper
+                    </button>
+
+                    <button
+                      onClick={() => setManageTestsFor(slug)}
+                      className="text-sm text-green-600"
+                    >
+                      Manage Tests
+                    </button>
+
+                    <button
+                      onClick={() => deleteCompany(slug)}
+                      className="text-sm text-red-600"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
 
                 {addingPaperFor === slug && (
                   <div className="mt-3 border-t pt-3">
                     <div className="grid grid-cols-3 gap-2">
-                      <input placeholder="Paper title" value={paperForm.title} onChange={e => setPaperForm(p => ({ ...p, title: e.target.value }))} className="border p-2" />
-                      <input placeholder="Year" type="number" value={paperForm.year as any} onChange={e => setPaperForm(p => ({ ...p, year: Number(e.target.value) }))} className="border p-2" />
-                      <input type="file" onChange={e => handleFileChange(e.target.files)} className="border p-2" />
+                      <input
+                        placeholder="Paper title"
+                        value={paperForm.title}
+                        onChange={(e) =>
+                          setPaperForm((p) => ({ ...p, title: e.target.value }))
+                        }
+                        className="border p-2"
+                      />
+                      <input
+                        placeholder="Year"
+                        type="number"
+                        value={paperForm.year as any}
+                        onChange={(e) =>
+                          setPaperForm((p) => ({
+                            ...p,
+                            year: Number(e.target.value),
+                          }))
+                        }
+                        className="border p-2"
+                      />
+                      <input
+                        type="file"
+                        onChange={(e) => handleFileChange(e.target.files)}
+                        className="border p-2"
+                      />
                     </div>
                     <div className="mt-2 flex gap-2">
-                      <button onClick={() => submitAddPaper(slug)} className="bg-blue-600 text-white px-3 py-1 rounded">Upload</button>
-                      <button onClick={cancelAddPaper} className="px-3 py-1 border rounded">Cancel</button>
+                      <button
+                        onClick={() => submitAddPaper(slug)}
+                        className="bg-blue-600 text-white px-3 py-1 rounded"
+                      >
+                        Upload
+                      </button>
+                      <button
+                        onClick={cancelAddPaper}
+                        className="px-3 py-1 border rounded"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>
                 )}
@@ -177,8 +318,15 @@ export default function CompaniesAdmin() {
       {manageTestsFor && (
         <section className="mt-6 bg-white p-4 rounded shadow">
           <div className="flex justify-between items-center mb-3">
-            <h2 className="font-semibold">Manage Tests for: {manageTestsFor}</h2>
-            <button onClick={() => setManageTestsFor(null)} className="text-sm px-3 py-1 border rounded">Close</button>
+            <h2 className="font-semibold">
+              Manage Tests for: {manageTestsFor}
+            </h2>
+            <button
+              onClick={() => setManageTestsFor(null)}
+              className="text-sm px-3 py-1 border rounded"
+            >
+              Close
+            </button>
           </div>
           <AdminCompanyTests companySlug={manageTestsFor} />
         </section>

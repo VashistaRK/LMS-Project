@@ -8,16 +8,12 @@ import {
 import { useState, useEffect } from "react";
 
 import CourseDetailsTab from "../CourseDetailsTab";
-import MediaLibraryTab from "../MediaLibraryTab";
 import CourseCurriculumTab from "../CurriculumTab";
 import { useParams } from "react-router";
 import type { CourseData } from "../../../types/course";
 import { coursesApi } from "../../../services/GlobalApi";
 import { CourseProvider } from "../../../context/CourseContext";
-// import InstructorTab from "../InstructorTab";
 import ThumbnailTab from "../ThumbnailTab";
-// import QuestionForm from "../CourseQuestions";
-// import PDFUploader from "../DocUpload";
 
 const CourseManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("details");
@@ -45,16 +41,8 @@ const CourseManagement: React.FC = () => {
         return <CourseDetailsTab />;
       case "curriculum":
         return <CourseCurriculumTab />;
-      case "media":
-        return <MediaLibraryTab />;
-      // case "QuestionForm":
-      //   return <QuestionForm />;
-      // case "Instructor":
-      //   return <InstructorTab />;
       case "Thumbnail":
         return <ThumbnailTab />;
-      // case "Docupload":
-      //   return <PDFUploader />;
       default:
         return null;
     }
@@ -109,39 +97,6 @@ const CourseManagement: React.FC = () => {
                 <Image className="w-5 h-5" />
                 <p>Thumbnail</p>
               </li>
-              {/* <li
-                className={`flex flex-row items-center justify-center p-4 gap-2 cursor-pointer ${
-                  activeTab === "QuestionForm"
-                    ? "bg-blue-50 border-b-2 border-blue-500"
-                    : "hover:bg-gray-50"
-                }`}
-                onClick={() => setActiveTab("QuestionForm")}
-              >
-                <BarChart3 className="w-5 h-5" />
-                <p>QuestionForm</p>
-              </li>
-              <li
-                className={`flex flex-row items-center justify-center p-4 gap-2 cursor-pointer ${
-                  activeTab === "Instructor"
-                    ? "bg-blue-50 border-b-2 border-blue-500"
-                    : "hover:bg-gray-50"
-                }`}
-                onClick={() => setActiveTab("Instructor")}
-              >
-                <Rocket className="w-5 h-5" />
-                <p>Instructor</p>
-              </li>
-              <li
-                className={`flex flex-row items-center justify-center p-4 gap-2 cursor-pointer ${
-                  activeTab === "Docupload"
-                    ? "bg-blue-50 border-b-2 border-blue-500"
-                    : "hover:bg-gray-50"
-                }`}
-                onClick={() => setActiveTab("Docupload")}
-              >
-                <Rocket className="w-5 h-5" />
-                <p>Instructor</p>
-              </li> */}
             </ul>
           </section>
 

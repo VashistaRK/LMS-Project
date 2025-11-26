@@ -14,14 +14,21 @@ const openai = new OpenAI({
 //
 export const uploadDocumentQuiz = async (req, res) => {
   const filePath = path.join(process.cwd(), "uploads", req.file.filename);
-  console.log("uploadDocumentQuiz called. filePath=", filePath, "originalName=", req.file?.originalname);
+  console.log(
+    "uploadDocumentQuiz called. filePath=",
+    filePath,
+    "originalName=",
+    req.file?.originalname
+  );
 
   try {
     let text = "";
 
     if (!filePath || !fs.existsSync(filePath)) {
       console.error("Uploaded file not found at", filePath);
-      return res.status(500).json({ error: "Uploaded file not found on server" });
+      return res
+        .status(500)
+        .json({ error: "Uploaded file not found on server" });
     }
 
     // Ensure we can read the file
@@ -74,7 +81,7 @@ export const uploadDocumentQuiz = async (req, res) => {
     `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o-mini-high",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
     });
@@ -134,7 +141,9 @@ export const uploadDocumentQuiz = async (req, res) => {
       }
     );
 
-  fs.unlink(filePath, (uErr) => { if (uErr) console.warn("Failed to unlink uploaded file:", uErr); });
+    fs.unlink(filePath, (uErr) => {
+      if (uErr) console.warn("Failed to unlink uploaded file:", uErr);
+    });
     return res.status(201).json({
       success: true,
       quizId: quizDoc._id,
@@ -143,9 +152,16 @@ export const uploadDocumentQuiz = async (req, res) => {
   } catch (err) {
     console.error("uploadDocumentQuiz error:", err);
     try {
-      fs.unlink(filePath, (uErr) => { if (uErr) console.warn("Failed to unlink after error:", uErr); });
+      fs.unlink(filePath, (uErr) => {
+        if (uErr) console.warn("Failed to unlink after error:", uErr);
+      });
     } catch (ignored) {}
-    res.status(500).json({ error: "Failed to process document", details: String(err?.message || err) });
+    res
+      .status(500)
+      .json({
+        error: "Failed to process document",
+        details: String(err?.message || err),
+      });
   }
 };
 
@@ -193,26 +209,26 @@ export const uploadDocumentQuestions = async (req, res) => {
     // GPT Prompt
     // -----------------------
     const prompt = `
-Extract exactly all MCQs from the following text.
+      Extract exactly all MCQs from the following text.
 
-Return ONLY JSON. No Markdown. No explanation.
+      Return ONLY JSON. No Markdown. No explanation.
 
-Format:
-[
-  {
-    "title": "Question text",
-    "options": ["A", "B", "C", "D"],
-    "correctAnswer": "A",
-    "genre": "imported"
-  }
-]
+      Format:
+      [
+        {
+          "title": "Question text",
+          "options": ["A", "B", "C", "D"],
+          "correctAnswer": "A",
+          "genre": "imported"
+        }
+      ]
 
-TEXT:
-${text}
-`;
+      TEXT:
+      ${text}
+      `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o-mini-high",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.2,
       max_tokens: 800,
@@ -221,7 +237,10 @@ ${text}
     let raw = completion.choices[0].message.content.trim();
 
     // Remove backticks / code fences
-    raw = raw.replace(/```json/g, "").replace(/```/g, "").trim();
+    raw = raw
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
     // -----------------------
     // Extract pure JSON using regex
@@ -270,10 +289,11 @@ ${text}
       added: saved.length,
       questions: saved,
     });
-
   } catch (err) {
     console.error("UPLOAD ERROR:", err);
-    return res.status(500).json({ error: "Failed to process", details: err.message });
+    return res
+      .status(500)
+      .json({ error: "Failed to process", details: err.message });
   }
 };
 
@@ -303,7 +323,7 @@ export const generateQuiz = async (req, res) => {
     `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o-mini-high",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
       max_tokens: 500,
@@ -340,7 +360,7 @@ export const generateQuiz = async (req, res) => {
 
     // format response for frontend expectations
     const questions = savedQuestions.map((q) => {
-      const idx = typeof q.correctAnswer === 'number' ? q.correctAnswer : 0;
+      const idx = typeof q.correctAnswer === "number" ? q.correctAnswer : 0;
       const letter = String.fromCharCode(65 + (idx || 0));
       return {
         id: q._id,
@@ -354,7 +374,12 @@ export const generateQuiz = async (req, res) => {
     res.status(201).json({ success: true, questions });
   } catch (err) {
     console.error("Quiz generation error:", err);
-    res.status(500).json({ error: "Failed to generate quiz", details: String(err.message || err) });
+    res
+      .status(500)
+      .json({
+        error: "Failed to generate quiz",
+        details: String(err.message || err),
+      });
   }
 };
 
@@ -369,13 +394,19 @@ export const getAllQuestions = async (req, res) => {
     if (genre) filter.genre = genre;
 
     // include options and correctAnswer in the projection to avoid undefined
-    const quizzes = await QuizQuestion.find(filter, "_id type questionText genre options correctAnswer");
+    const quizzes = await QuizQuestion.find(
+      filter,
+      "_id type questionText genre options correctAnswer"
+    );
     const formatted = quizzes.map((q) => ({
       id: q._id,
       question: q.questionText,
-      genre:q.genre,
+      genre: q.genre,
       options: q.options || [],
-      answer: (Array.isArray(q.options) && typeof q.correctAnswer === 'number') ? q.options[q.correctAnswer] : null,
+      answer:
+        Array.isArray(q.options) && typeof q.correctAnswer === "number"
+          ? q.options[q.correctAnswer]
+          : null,
     }));
     res.json(formatted);
   } catch (err) {
