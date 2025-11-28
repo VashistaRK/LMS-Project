@@ -102,7 +102,7 @@ app.use('/api/docs', docRoutes);
 
 app.use('/cart', apiLimiter, cartRoutes);
 app.use('/api/user', apiLimiter, userRoutes);
-app.use("/api/admin", apiLimiter, analysisRoutes);
+app.use("/api/analysis", apiLimiter, analysisRoutes);
 app.use('/api/questions', apiLimiter, questionRoutes);
 app.use('/api/upload', apiLimiter, uploadRoutes);
 app.use('/api/assessments', apiLimiter, assessmentRoutes);

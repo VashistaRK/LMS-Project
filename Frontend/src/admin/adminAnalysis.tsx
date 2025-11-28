@@ -36,7 +36,7 @@ interface StatsResponse {
 const api = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 async function fetchAnalysis(): Promise<StatsResponse> {
-  const res = await axios.get(`${api}/api/admin/analysis`, {
+  const res = await axios.get(`${api}/api/analysis`, {
     withCredentials: true,
   });
   return res.data;

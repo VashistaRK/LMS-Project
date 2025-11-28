@@ -6,7 +6,7 @@ import Course from '../models/Course.js';
 
 const router = express.Router();
 
-router.get("/analysis", requireAdmin, async (req, res) => {
+router.get("/", requireAdmin, async (req, res) => {
     try {
         const [users, courses] = await Promise.all([
             User.find({}), // ✅ No populate since purchasedCourses are strings

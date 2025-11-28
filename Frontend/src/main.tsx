@@ -47,6 +47,7 @@ import CompanyPage from "./pages/CompanyPage.tsx";
 import CompaniesAdmin from "./admin/Companies/CompaniesAdmin.tsx";
 import AdminQuizPage from "./admin/AdminQuestionsHandle.tsx";
 import CompanyTestTake from "./pages/CompanyTestTake.tsx";
+import AdminLayout from "./admin/AdminSidepanel.tsx";
 
 const queryClient = new QueryClient();
 
@@ -105,10 +106,12 @@ const router = createBrowserRouter([
         path: "admin/",
         element: <Admin />,
         children: [
-          { path: "", element: <AdminPanel /> },
-          { path: "students", element: <AdminMonitoringPage /> },
-          { path: "analytics", element: <AdminAnalysisPage /> },
-          { path: "FAQ", element: <AdminFaqsPage /> },
+          { path: "", element: <AdminLayout />, children: [
+            { path: "dashboard", element: <AdminPanel /> },
+            { path: "students", element: <AdminMonitoringPage /> },
+            { path: "analytics", element: <AdminAnalysisPage /> },
+            { path: "FAQ", element: <AdminFaqsPage /> },
+          ]},
           { path: "assessments", element: <AdminAssessments /> },
           {
             path: "assessments/analytics",

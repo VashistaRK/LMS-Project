@@ -73,13 +73,31 @@ const Section: React.FC<SectionProps> = ({
             <AccordionItem key={i} title={item.title} content={item.content} />
           ))}
         </div>
-        {title === "Company Preparation" && (
+        {title === "Company Preparation" ? (
           <a href="/companies" className="inline-block">
-            <button className="text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-base sm:text-lg md:text-lg bg-red-700 hover:bg-red-800/60 hover:scale-105 active:scale-95 transition-transform rounded mt-4 sm:mt-5 md:mt-6 w-full sm:w-auto">
+            <button className="text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-base sm:text-lg md:text-lg bg-red-700 hover:bg-red-800/60 hover:scale-105 active:scale-95 transition-transform rounded-4xl border border-black mt-4 sm:mt-5 md:mt-6 w-full sm:w-auto">
               Company
             </button>
           </a>
-        )}
+        ): title === "Communication Skills" ? (
+          <a href="/freshers-pratice#communication" className="inline-block">
+            <button className="text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-base sm:text-lg md:text-lg bg-zinc-700 hover:bg-zinc-800/60 hover:scale-105 active:scale-95 transition-transform rounded-4xl border border-black mt-4 sm:mt-5 md:mt-6 w-full sm:w-auto">
+              Communication Skills
+            </button>
+          </a>
+        ): title === "Logical Skills and Aptitude" ? (
+          <a href="/freshers-pratice#logical-aptitude" className="inline-block">
+            <button className="text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-base sm:text-lg md:text-lg bg-red-700 hover:bg-red-800/60 hover:scale-105 active:scale-95 transition-transform rounded-4xl border border-black mt-4 sm:mt-5 md:mt-6 w-full sm:w-auto">
+              Logical Skills
+            </button>
+          </a>
+          ) : title === "Technical Skills Development" ? (
+            <a href="/freshers-pratice#technical-skills" className="inline-block">
+              <button className="text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-base sm:text-lg md:text-lg bg-zinc-700 hover:bg-zinc-800/60 hover:scale-105 active:scale-95 transition-transform rounded-4xl border border-black mt-4 sm:mt-5 md:mt-6 w-full sm:w-auto">
+                Technical Skills
+              </button>
+            </a>
+          ) : null}
       </div>
 
       <div

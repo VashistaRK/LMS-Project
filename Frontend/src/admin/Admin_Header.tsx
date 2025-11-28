@@ -1,14 +1,10 @@
 import { useState } from "react";
 import {
-  Home,
   BookOpen,
-  Users,
-  BarChart3,
   Menu,
   X,
   ChevronDown,
   User,
-  ShieldQuestionMark,
   Library,
   Building2,
 } from "lucide-react";
@@ -22,11 +18,7 @@ const Admin_Header = () => {
   const { user, logout } = useAuthContext();
 
   const navigationItems = [
-    { name: "Dashboard", href: "/admin", icon: Home },
     { name: "Courses", href: "/admin/courses", icon: BookOpen },
-    { name: "Students", href: "/admin/students", icon: Users },
-    { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-    { name: "FAQ", href: "/admin/FAQ", icon: ShieldQuestionMark },
     { name: "assessments", href: "/admin/assessments", icon: Library },
     { name: "companies", href: "/admin/companies", icon: Building2 },
     { name: "quizMan", href: "/admin/quizMan", icon: Building2 },
@@ -48,7 +40,7 @@ const Admin_Header = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <a className="relative group" href="/">
+            <a className="relative group" href="/admin">
               <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/0 via-blue-500/10 to-purple-500/0 blur opacity-0 group-hover:opacity-100 transition" />
               <img
                 src="/images/Sunadh-Logo.png"

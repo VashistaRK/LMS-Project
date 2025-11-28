@@ -165,6 +165,20 @@ router.post('/admin/:slug/papers', requireAdmin, upload.single('file'), async (r
   }
 });
 
+// Admin: get full company with papers & tests
+router.get('/admin/:slug/full', requireAdmin, async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const comp = await Company.findOne({ slug }).lean();
+    if (!comp) return res.status(404).json({ error: 'Company not found' });
+
+    res.json(comp);   // send EVERYTHING including papers.file
+  } catch (err) {
+    console.error('Error fetching full company:', err);
+    res.status(500).json({ error: 'Failed to fetch full company' });
+  }
+});
+
 // ------------------ Admin: company-specific tests ------------------
 
 // Create or update a company test

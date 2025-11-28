@@ -3,6 +3,7 @@ import Faq from "../models/Faq.js";
 import { requireAdmin } from "../middleware/roles.js";
 import User from "../models/User.js";
 import PurchaseRequest from "../models/PurchaseRequest.js";
+import Course from "../models/Course.js";
 
 const router = express.Router();
 
@@ -102,6 +103,47 @@ router.get("/purchase-requests", requireAdmin, async (req, res) => {
     .populate("courseIds", "title");
 
   res.json({ requests });
+});
+
+router.post("/clean-invalid-purchases", requireAdmin, async (req, res) => {
+  try {
+    const users = await User.find({});
+
+    // Step 1: get all valid UUID course IDs (NOT _id)
+    const allCourses = await Course.find({}, "id");   // ← UUID field
+    const validIds = new Set(allCourses.map(c => c.id));  // UUIDs
+
+    let cleanedCount = 0;
+
+    for (const user of users) {
+      if (!Array.isArray(user.purchasedCourses)) continue;
+
+      const cleaned = user.purchasedCourses.filter(pc => {
+        // user purchase may look like: pc.id OR pc.courseId OR string
+        const uuid =
+          pc?.id ||
+          pc?.courseId ||
+          pc?.CourseId ||
+          (typeof pc === "string" ? pc : null);
+
+        return uuid && validIds.has(uuid);
+      });
+
+      if (cleaned.length !== user.purchasedCourses.length) {
+        user.purchasedCourses = cleaned;
+        await user.save();
+        cleanedCount++;
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Cleanup finished. ${cleanedCount} users updated.`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 export default router;

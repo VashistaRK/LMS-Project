@@ -12,10 +12,10 @@ const Footer = () => {
 
         {/* Quick Links */}
         <ul className="flex gap-6 text-sm">
-          <li className="hover:text-white transition-colors cursor-pointer select-none">Courses</li>
-          <li className="hover:text-white transition-colors cursor-pointer select-none">Careers</li>
-          <li className="hover:text-white transition-colors cursor-pointer select-none">Blog</li>
-          <li className="hover:text-white transition-colors cursor-pointer select-none">Contact</li>
+          <a href="/courses" className="hover:text-white transition-colors cursor-pointer select-none">Courses</a>
+          <a href="/careers" className="hover:text-white transition-colors cursor-pointer select-none">Careers</a>
+          {/* <a href="/" className="hover:text-white transition-colors cursor-pointer select-none">Blog</a> */}
+          <a href="tel:9014199096" className="hover:text-white transition-colors cursor-pointer select-none">Contact</a>
         </ul>
 
         {/* Contact */}
