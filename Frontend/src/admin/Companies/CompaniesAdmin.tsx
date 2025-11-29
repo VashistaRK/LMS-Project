@@ -32,7 +32,6 @@ export default function CompaniesAdmin() {
         setLoading(true);
         const res = await fetch(`${BASE}`, { credentials: "include" });
         const data = await res.json().catch(() => null);
-        console.log("Fetched companies:", data);
         if (cancelled) return;
         const list = Array.isArray(data)
           ? data

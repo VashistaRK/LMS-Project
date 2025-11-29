@@ -196,4 +196,6 @@
   }
 }
 
-
+.scroll-no-bounce {
+  overflow-anchor: none;
+}

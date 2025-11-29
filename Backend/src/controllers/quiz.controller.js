@@ -81,7 +81,7 @@ export const uploadDocumentQuiz = async (req, res) => {
     `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini-high",
+      model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
     });
@@ -228,7 +228,7 @@ export const uploadDocumentQuestions = async (req, res) => {
       `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini-high",
+      model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.2,
       max_tokens: 800,
@@ -323,7 +323,7 @@ export const generateQuiz = async (req, res) => {
     `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini-high",
+      model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
       max_tokens: 500,

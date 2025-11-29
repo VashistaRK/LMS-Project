@@ -550,7 +550,7 @@ const CourseCurriculumTab: React.FC = () => {
                                       Test Upload
                                     </label>
                                     {chapter.testId ? (
-                                      <p className="text-sm text-gray-600">Quiz ID: {chapter.testId}</p>
+                                      <p className="text-sm text-gray-600">Test ID: {chapter.testId}</p>
                                     ) : (
                                       <TestBuilder
                                         courseId={courseId}

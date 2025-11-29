@@ -3,6 +3,7 @@ import AssessmentTrack from "../models/AssessmentTrack.js";
 import AssessmentTest from "../models/AssessmentTest.js";
 import AssessmentAttempt from "../models/AssessmentAttempt.js";
 import QuizQuestion from "../models/quizQuestion.js";
+import CodingQuestion from "../models/codingQuestion.js";
 
 const router = Router();
 
@@ -117,14 +118,20 @@ router.post("/admin/tests", async (req, res, next) => {
       : [];
 
     // Validate all question IDs exist
+    // Validate question IDs across BOTH collections
     if (qIds.length > 0) {
-      const found = await QuizQuestion.countDocuments({
-        _id: { $in: qIds },
-      });
-      if (found !== qIds.length) {
-        return res
-          .status(400)
-          .json({ error: "One or more questionIds are invalid" });
+      const [mcqCount, codingCount] = await Promise.all([
+        QuizQuestion.countDocuments({ _id: { $in: qIds } }),
+        CodingQuestion.countDocuments({ _id: { $in: qIds } }),
+      ]);
+
+      const totalFound = mcqCount + codingCount;
+
+      if (totalFound !== qIds.length) {
+        return res.status(400).json({
+          error:
+            "One or more questionIds are invalid (not found in QuizQuestions or CodingQuestions)",
+        });
       }
     }
 
@@ -165,12 +172,20 @@ router.patch("/admin/tests/:slug/:testId", async (req, res, next) => {
         return res.status(400).json({ error: "questionIds must be an array" });
       }
       qIds = questionIds.filter(Boolean);
+      // Validate question IDs across BOTH collections
       if (qIds.length > 0) {
-        const found = await QuizQuestion.countDocuments({ _id: { $in: qIds } });
-        if (found !== qIds.length) {
-          return res
-            .status(400)
-            .json({ error: "One or more questionIds are invalid" });
+        const [mcqCount, codingCount] = await Promise.all([
+          QuizQuestion.countDocuments({ _id: { $in: qIds } }),
+          CodingQuestion.countDocuments({ _id: { $in: qIds } }),
+        ]);
+
+        const totalFound = mcqCount + codingCount;
+
+        if (totalFound !== qIds.length) {
+          return res.status(400).json({
+            error:
+              "One or more questionIds are invalid (not found in QuizQuestions or CodingQuestions)",
+          });
         }
       }
     }

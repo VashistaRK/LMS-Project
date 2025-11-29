@@ -294,7 +294,6 @@ const CourseLearningPage: React.FC = () => {
     };
 
     fetchCourseData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, user]);
 
   // Reset video error when resolved video changes

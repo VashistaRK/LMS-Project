@@ -3,14 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { startCompanyTest, submitCompanyTest } from "../services/companyTestApi";
 
-/**
- Expected startCompanyTest(slug,testId) returns:
- { testId, title, sections: [{ key, title, questions: [{ qIndex, bankId, type, question, options, points }] }] }
- submitCompanyTest(slug,testId, { responses }) expects responses shaped:
- { sectionKey: [{ bankId, value }, ...], ... }
- and returns { score, total, details: { [sectionKey]: [{ bankId, correct, submitted, correctIndex, ... }] } }
-*/
-
 export default function CompanyTestTake() {
   const { slug, testId } = useParams<{ slug?: string; testId?: string }>();
   const [meta, setMeta] = useState<any | null>(null);

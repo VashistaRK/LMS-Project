@@ -398,13 +398,13 @@ export default function AdminCompanyTests({ companySlug }: AdminCompanyTestsProp
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Label>Available ({list.length})</Label>
-            <div className="mt-2 p-3 border rounded bg-gray-50 max-h-56 overflow-y-auto">
+            <div className="mt-2 p-3 border rounded bg-gray-50 max-h-56 overflow-y-auto scroll-no-bounce">
               {list.length === 0 && <div className="text-sm text-muted-foreground">No available questions</div>}
               {list.map((q) => {
                 const id = (section.type === "mcq" ? (q as QuizQuestion)._id : (q as CodingQuestion)._id) || "";
                 const label = section.type === "mcq" ? (q as QuizQuestion).questionText : (q as CodingQuestion).title;
                 return (
-                  <div key={id || Math.random()} className="flex items-center gap-2 mb-2">
+                  <div key={id} className="flex items-center gap-2 mb-2">
                     <input
                       type="checkbox"
                       checked={section.questions.includes(id)}
