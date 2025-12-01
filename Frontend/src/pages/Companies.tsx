@@ -42,7 +42,7 @@ export default function CompaniesPage() {
             return items.map((c, idx) => (
               <div 
                 key={c?.slug ?? idx} 
-                className="bg-white rounded-lg border p-6 hover:border-red-200 hover:bg-red-50 transition-all cursor-pointer"
+                className="bg-white rounded-lg border border-b-4 border-b-red-600 p-6 hover:border-red-200 hover:bg-red-50 transition-all cursor-pointer"
                 onClick={() => c?.slug && navigate(`/companies/${c.slug}`)}
               >
                 {c ? (

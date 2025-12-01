@@ -1,7 +1,12 @@
 /* eslint-disable */
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { startAttempt, submitAttempt, getTest } from "../services/assessmentApi";
+import {
+  startAttempt,
+  submitAttempt,
+  getTest,
+} from "../services/assessmentApi";
+import TechCodingTestPage from "./TechPage";
 
 type LoadedQuestion = {
   type: "MCQ" | "Descriptive";
@@ -15,6 +20,9 @@ const baseURL = import.meta.env.VITE_API_URL;
 
 export default function TestPage() {
   const { id, testId } = useParams<{ id?: string; testId?: string }>();
+  if (id === "Tech") {
+    return <TechCodingTestPage />;
+  }
   const navigate = useNavigate();
 
   // answers keyed by displayed question index (0..n-1)
@@ -27,7 +35,9 @@ export default function TestPage() {
   const [title, setTitle] = useState<string>("");
   const [durationSec, setDurationSec] = useState<number>(0);
   const [ended, setEnded] = useState(false);
-  const [score, setScore] = useState<{ score: number; total: number } | null>(null);
+  const [score, setScore] = useState<{ score: number; total: number } | null>(
+    null
+  );
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const alertShownRef = useRef<boolean>(false);
@@ -47,6 +57,7 @@ export default function TestPage() {
       if (!id || !testId) return;
       try {
         const meta = await getTest(id, testId);
+        console.log("Test metadata", meta);
         setTitle(meta.title ?? "");
         setDurationSec(meta.durationSec ?? 0);
       } catch (err) {
@@ -108,11 +119,15 @@ export default function TestPage() {
     try {
       if (el.requestFullscreen) await el.requestFullscreen();
     } catch (fsErr) {
-      console.warn("request Fullscreen failed or blocked, continuing without fullscreen", fsErr);
+      console.warn(
+        "request Fullscreen failed or blocked, continuing without fullscreen",
+        fsErr
+      );
     }
 
     try {
       const res = await startAttempt(id, testId);
+      console.log("Started attempt", res);
       const qArr: LoadedQuestion[] = (res.questions || []).map((q: any) => ({
         type: q.type ?? "MCQ",
         question: q.question ?? "",
@@ -212,10 +227,17 @@ export default function TestPage() {
 
   const removeAntiCheatListeners = () => {
     try {
-      if (onKeyDownRef.current) document.removeEventListener("keydown", onKeyDownRef.current, true);
-      if (onVisibilityRef.current) document.removeEventListener("visibilitychange", onVisibilityRef.current);
-      if (onBlurRef.current) window.removeEventListener("blur", onBlurRef.current);
-      if (onFsChangeRef.current) document.removeEventListener("fullscreenchange", onFsChangeRef.current);
+      if (onKeyDownRef.current)
+        document.removeEventListener("keydown", onKeyDownRef.current, true);
+      if (onVisibilityRef.current)
+        document.removeEventListener(
+          "visibilitychange",
+          onVisibilityRef.current
+        );
+      if (onBlurRef.current)
+        window.removeEventListener("blur", onBlurRef.current);
+      if (onFsChangeRef.current)
+        document.removeEventListener("fullscreenchange", onFsChangeRef.current);
     } catch {
       /* ignore */
     }
@@ -237,7 +259,8 @@ export default function TestPage() {
 
     // detect unanswered questions (just check presence)
     const unanswered = questions.reduce((acc: number[], _q, idx) => {
-      const has = Object.prototype.hasOwnProperty.call(answers, idx) && isAnswered(idx);
+      const has =
+        Object.prototype.hasOwnProperty.call(answers, idx) && isAnswered(idx);
       if (!has) acc.push(idx);
       return acc;
     }, [] as number[]);
@@ -315,16 +338,22 @@ export default function TestPage() {
         {score ? (
           <div className="bg-white rounded-2xl shadow p-8 text-center">
             <div className="mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Assessment Submitted!</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Assessment Submitted!
+              </h2>
               <div className="text-4xl font-bold text-blue-600 mt-4">
                 Score: {score.score} / {score.total}
               </div>
-              <p className="text-gray-600 mt-2">Redirecting to practice list...</p>
+              <p className="text-gray-600 mt-2">
+                Redirecting to practice list...
+              </p>
             </div>
           </div>
         ) : !attemptId ? (
           <div className="bg-white rounded-2xl shadow p-6">
-            <p className="mb-4 text-gray-700">Duration: {durationSec} seconds</p>
+            <p className="mb-4 text-gray-700">
+              Duration: {durationSec} seconds
+            </p>
             <button
               onClick={doStart}
               className="inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:opacity-95 shadow"
@@ -346,7 +375,8 @@ export default function TestPage() {
 
                     // styles per Option B1:
                     // Blue = current, Green = answered, Gray = not answered
-                    const base = "w-10 h-10 rounded-full flex items-center justify-center font-medium cursor-pointer select-none";
+                    const base =
+                      "w-10 h-10 rounded-full flex items-center justify-center font-medium cursor-pointer select-none";
                     const cls = isCurrent
                       ? "bg-blue-500 text-white"
                       : answered
@@ -356,7 +386,9 @@ export default function TestPage() {
                     return (
                       <button
                         key={idx}
-                        aria-label={`Question ${idx + 1} ${answered ? "answered" : "not answered"} ${isCurrent ? "current" : ""}`}
+                        aria-label={`Question ${idx + 1} ${
+                          answered ? "answered" : "not answered"
+                        } ${isCurrent ? "current" : ""}`}
                         className={`${base} ${cls}`}
                         onClick={() => openQuestion(idx)}
                       >
@@ -367,7 +399,17 @@ export default function TestPage() {
                 </div>
 
                 <div className="mt-6">
-                  <p className="text-sm text-gray-600">Answered: <span className="font-semibold">{Object.keys(answers).filter((k) => isAnswered(Number(k))).length}</span> / {questions.length}</p>
+                  <p className="text-sm text-gray-600">
+                    Answered:{" "}
+                    <span className="font-semibold">
+                      {
+                        Object.keys(answers).filter((k) =>
+                          isAnswered(Number(k))
+                        ).length
+                      }
+                    </span>{" "}
+                    / {questions.length}
+                  </p>
                 </div>
               </div>
             </aside>
@@ -383,7 +425,9 @@ export default function TestPage() {
                       <h3 className="text-lg font-semibold text-gray-900">
                         Q{currentIndex + 1}. {questions[currentIndex]?.question}
                       </h3>
-                      <p className="text-sm text-gray-500 mt-1">Points: {questions[currentIndex]?.points ?? 0}</p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Points: {questions[currentIndex]?.points ?? 0}
+                      </p>
                     </div>
 
                     {questions[currentIndex]?.type === "MCQ" && (
@@ -391,7 +435,10 @@ export default function TestPage() {
                         {questions[currentIndex]?.options?.map((opt, i) => {
                           const checked = answers[currentIndex] === i;
                           return (
-                            <label key={i} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer">
+                            <label
+                              key={i}
+                              className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer"
+                            >
                               <input
                                 type="radio"
                                 name={`q-${currentIndex}`}
@@ -412,7 +459,9 @@ export default function TestPage() {
                         rows={6}
                         placeholder="Write your answer here..."
                         value={(answers[currentIndex] as string) || ""}
-                        onChange={(e) => handleDesc(currentIndex, e.target.value)}
+                        onChange={(e) =>
+                          handleDesc(currentIndex, e.target.value)
+                        }
                       />
                     )}
 
@@ -422,7 +471,11 @@ export default function TestPage() {
                         <button
                           onClick={goPrev}
                           disabled={currentIndex === 0}
-                          className={`px-4 py-2 rounded ${currentIndex === 0 ? "bg-gray-200 text-gray-500" : "bg-gray-800 text-white"}`}
+                          className={`px-4 py-2 rounded ${
+                            currentIndex === 0
+                              ? "bg-gray-200 text-gray-500"
+                              : "bg-gray-800 text-white"
+                          }`}
                         >
                           Previous
                         </button>
@@ -430,28 +483,32 @@ export default function TestPage() {
                         <button
                           onClick={goNext}
                           disabled={currentIndex === questions.length - 1}
-                          className={`px-4 py-2 rounded ${currentIndex === questions.length - 1 ? "bg-gray-200 text-gray-500" : "bg-gray-800 text-white"}`}
+                          className={`px-4 py-2 rounded ${
+                            currentIndex === questions.length - 1
+                              ? "bg-gray-200 text-gray-500"
+                              : "bg-gray-800 text-white"
+                          }`}
                         >
                           Next
                         </button>
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => {
-                            // quick jump to first unanswered (if any), else confirm submit
-                            const firstUnanswered = questions.findIndex((_, idx) => !isAnswered(idx));
-                            if (firstUnanswered !== -1) {
-                              openQuestion(firstUnanswered);
-                            } else {
-                              const ok = window.confirm("All questions answered. Submit now?");
-                              if (ok) handleSubmit();
-                            }
-                          }}
-                          className="px-4 py-2 rounded bg-blue-600 text-white"
-                        >
-                          {Object.keys(answers).filter((k) => isAnswered(Number(k))).length < questions.length ? "Go to first unanswered" : "Submit"}
-                        </button>
+                        {currentIndex < questions.length -1 && (
+                          <button
+                            onClick={() => {
+                              const firstUnanswered = questions.findIndex(
+                                (_, idx) => !isAnswered(idx)
+                              );
+                              if (firstUnanswered !== -1) {
+                                openQuestion(firstUnanswered);
+                              }
+                            }}
+                            className="px-4 py-2 rounded bg-blue-600 text-white"
+                          >
+                            Go to first unanswered
+                          </button>
+                        )}
 
                         <button
                           onClick={handleSubmit}

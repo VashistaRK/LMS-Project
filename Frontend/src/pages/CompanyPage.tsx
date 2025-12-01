@@ -427,7 +427,7 @@ export default function CompanyPage() {
                       {t.testId} •{" "}
                       {(t.sections || [])
                         .map(
-                          (s: any) => `${s.key}:${(s.questionIds || []).length}`
+                          (s: any) => `${s.key}:${(s.questionIds || []).length}`.toUpperCase()
                         )
                         .join(" • ")}
                     </p>

@@ -1,3 +1,4 @@
+/* eslint-disable */
 // src/pages/test/TestPage.tsx
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";

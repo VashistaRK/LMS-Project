@@ -14,7 +14,7 @@ const AnswerSchema = new mongoose.Schema(
 const QuestionSnapshotSchema = new mongoose.Schema(
   {
     qIndex: { type: Number, required: true },
-    type: { type: String, enum: ['MCQ', 'Descriptive'], required: true },
+    type: { type: String, enum: ['MCQ', 'Coding'], required: true },
     question: { type: String, required: true },
     options: [{ type: String }],
     // canonical answer (could be string or numeric index depending on how test stored)

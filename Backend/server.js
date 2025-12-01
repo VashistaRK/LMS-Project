@@ -35,7 +35,7 @@ import companyRoutes from './src/routes/company.route.js';
 import Faq from './src/models/Faq.js';
 import Review from './src/models/Reviews.js';
 import testRoutes from './src/routes/Test.route.js';
-
+import judge0Routes from "./src/routes/judge0.js";
 
 const app = express();
 
@@ -106,6 +106,7 @@ app.use("/api/analysis", apiLimiter, analysisRoutes);
 app.use('/api/questions', apiLimiter, questionRoutes);
 app.use('/api/upload', apiLimiter, uploadRoutes);
 app.use('/api/assessments', apiLimiter, assessmentRoutes);
+app.use("/api/judge0", judge0Routes);
 app.use("/api/colleges", apiLimiter, collegeRoutes);
 app.use("/api/code", apiLimiter, codeRoutes);
 app.use('/api/notifications', apiLimiter, notificationRoutes);

@@ -333,6 +333,7 @@ router.post("/tracks/:slug/tests/:testId/start", async (req, res, next) => {
   try {
     const { slug, testId } = req.params;
 
+    // 1. Find Test
     const test = await AssessmentTest.findOne({
       trackSlug: slug,
       testId,
@@ -342,56 +343,96 @@ router.post("/tracks/:slug/tests/:testId/start", async (req, res, next) => {
       return res.status(404).json({ error: "Test not found" });
     }
 
-    const qDocs = await QuizQuestion.find({
-      _id: { $in: test.questionIds },
-    }).lean();
+    // 2. Load MCQ + Coding
+    const [mcqDocs, codingDocs] = await Promise.all([
+      QuizQuestion.find({ _id: { $in: test.questionIds } }).lean(),
+      CodingQuestion.find({ _id: { $in: test.questionIds } }).lean(),
+    ]);
 
-    const map = new Map(qDocs.map((q) => [String(q._id), q]));
+    const allDocs = [...mcqDocs, ...codingDocs];
+    const map = new Map(allDocs.map((q) => [String(q._id), q]));
 
+    // 3. Build Full Snapshot
     const questionsSnapshot = test.questionIds
       .map((id, index) => {
         const q = map.get(String(id));
         if (!q) return null;
 
-        return {
-          qIndex: index,
-          type: q.type === "mcq" ? "MCQ" : "Descriptive",
-          question: q.questionText || q.title || "",
-          options: q.options || [],
-          answer: q.type === "mcq" ? q.correctAnswer : null,
-          points:
-            q.meta?.points && !isNaN(Number(q.meta.points))
-              ? Number(q.meta.points)
-              : 1,
-        };
+        const isMCQ = q.type === "mcq";
+        const isCoding = !!q.starterCode && !!q.functionName;
+
+        if (isMCQ) {
+          return {
+            qIndex: index,
+            type: "MCQ",
+            question: q.questionText, // REQUIRED FIELD
+            options: q.options || [],
+            answer: q.correctAnswer ?? null, // MUST MATCH SCHEMA FIELD NAME
+            points:
+              q.meta?.points && !isNaN(Number(q.meta.points))
+                ? Number(q.meta.points)
+                : 1,
+          };
+        }
+
+        if (isCoding) {
+          return {
+            qIndex: index,
+            type: "Coding",
+            question: q.title, // REQUIRED FIELD (ADDED)
+            description: q.description,
+            examples: q.examples || [],
+            constraints: q.constraints || "",
+            starterCode: q.starterCode,
+            functionName: q.functionName,
+            testCases: q.testCases || [],
+            difficulty: q.difficulty || "Easy",
+            hints: q.hints || [],
+            points: 5,
+          };
+        }
+
+        return null;
       })
       .filter(Boolean);
 
-    const sanitized = questionsSnapshot.map(
-      ({ qIndex, type, question, options, points }) => ({
-        qIndex,
-        type,
-        question,
-        options,
-        points,
-      })
-    );
+    // 4. Frontend Friendly Preview
+    // const sanitized = questionsSnapshot.map((snap) => {
+    //   if (snap.type === "MCQ") {
+    //     return {
+    //       qIndex: snap.qIndex,
+    //       type: "MCQ",
+    //       question: snap.question,
+    //       options: snap.options,
+    //       points: snap.points,
+    //     };
+    //   }
 
+    //   return {
+    //     qIndex: snap.qIndex,
+    //     type: "Coding",
+    //     question: snap.title,
+    //     points: snap.points,
+    //   };
+    // });
+
+    // 5. Create Attempt
     const attempt = await AssessmentAttempt.create({
       userId: req.user?._id || null,
       trackSlug: slug,
       testId,
       durationSec: test.durationSec,
-      questionsSnapshot,
+      questionsSnapshot, // FULL SNAPSHOT SAVED HERE
       answers: [],
       status: "active",
     });
 
+    // 6. Response
     res.json({
       attemptId: attempt._id,
       durationSec: test.durationSec,
       title: test.title,
-      questions: sanitized,
+      questions: questionsSnapshot,
     });
   } catch (e) {
     next(e);

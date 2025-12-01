@@ -321,8 +321,6 @@ router.post("/:slug/tests/:testId/start", async (req, res) => {
     const test = (comp.tests || []).find((t) => t.testId === testId);
     if (!test) return res.status(404).json({ error: "Test not found" });
 
-    // fetch all referenced questions from bank, map by id for quick lookup
-    // fetch all referenced questions from bank, map by id for quick lookup
     const allIds = [];
     for (const s of test.sections) allIds.push(...(s.questionIds || []));
 
@@ -340,14 +338,43 @@ router.post("/:slug/tests/:testId/start", async (req, res) => {
         .map((qid, idx) => {
           const q = map.get(String(qid));
           if (!q) return null;
-          return {
-            qIndex: null, // will be filled per-section on client
+
+          const base = {
+            qIndex: null, // filled later on the client
             bankId: q._id,
-            type: q.type === "mcq" ? "MCQ" : "Descriptive",
+            type:
+              q.type === "mcq"
+                ? "MCQ"
+                : !!q.starterCode && !!q.functionName
+                ? "Coding"
+                : "Descriptive",
             question: q.questionText,
-            options: q.type === "mcq" ? q.options || [] : [],
-            correctAnswer: q.type === "mcq" ? q.correctAnswer : undefined, // include correctAnswer for frontend evaluation
             points: s.pointsPerQuestion || 1,
+          };
+
+          // --- MCQ ---
+          if (q.type === "mcq") {
+            return {
+              ...base,
+              options: q.options || [],
+              correctAnswer: q.correctAnswer, // MCQ only
+            };
+          }
+
+          // --- CODING ---
+          if (!!q.starterCode && !!q.functionName) {
+            return {
+              ...base,
+              starterCode: q.starterCode || "",
+              input: q.input || "",
+              expectedOutput: q.expectedOutput || "",
+            };
+          }
+
+          // --- DESCRIPTIVE ---
+          return {
+            ...base,
+            sampleAnswer: q.sampleAnswer || "",
           };
         })
         .filter(Boolean);

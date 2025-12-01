@@ -25,7 +25,6 @@ import Admin from "./admin/Admin.tsx";
 import { RequireAdmin } from "./RequireInstructor.tsx";
 import CourseLearningPage from "./pages/[courseId]/CourseLearner.tsx";
 import MyLearning from "./pages/MyLearing.tsx";
-import QuizPage from "./pages/[quizId]/CourseTest.tsx";
 import TestPage1 from "./pages/[testId]/TestPage1.tsx";
 import AdminPanel from "./admin/AdminPanel.tsx";
 import CollegeAdminPage from "./admin/[collegeId]/CollegeAdminPage.tsx";
@@ -48,6 +47,7 @@ import CompaniesAdmin from "./admin/Companies/CompaniesAdmin.tsx";
 import AdminQuizPage from "./admin/AdminQuestionsHandle.tsx";
 import CompanyTestTake from "./pages/CompanyTestTake.tsx";
 import AdminLayout from "./admin/AdminSidepanel.tsx";
+import ScrollToTop from "./scrolltotop.tsx";
 
 const queryClient = new QueryClient();
 
@@ -85,7 +85,6 @@ const router = createBrowserRouter([
           { path: "/profile", element: <ProfilePage /> },
           { path: "my-courses/:courseId", element: <CourseLearningPage /> },
           { path: "my-courses/test/:testId", element: <TestPage1 /> },
-          { path: "my-courses/:quizId/:courseId", element: <QuizPage /> },
           { path: "freshers-pratice/test/:id/:testId", element: <TestPage /> },
           { path: "companies/:slug", element: <CompanyPage /> },
           {
@@ -139,6 +138,7 @@ createRoot(document.getElementById("root")!).render(
       <AuthProvider>
         <SocketProvider>
           <ParallaxProvider>
+            <ScrollToTop />
             <RouterProvider router={router} />
             <NotificationToast />
           </ParallaxProvider>

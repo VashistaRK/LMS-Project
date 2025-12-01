@@ -194,7 +194,7 @@ const CareerPreparation: React.FC = () => {
               "Develop proficiency in HTML, CSS, modern frameworks, and API integration for full-stack development capabilities.",
           },
         ]}
-        image="images/technical.jpg"
+        image="images/technical.png"
       />
 
       {/* Company Preparation */}

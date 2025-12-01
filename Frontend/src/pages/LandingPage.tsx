@@ -210,13 +210,15 @@ export default function LandingPage() {
               </p>
 
               {/* Buttons */}
-              <nav className="mt-6 flex gap-4">
+              <nav className="mt-6">
+                <a href="/courses" className="flex gap-4">
                 <button className="p-2 md:p-3 rounded-full text-xs sm:text-sm bg-[#E10600] text-white hover:bg-[#B00000] hover:scale-110 hover:shadow-[0_0_15px_#FF2E2E] transition-all duration-300">
                   Explore courses
                 </button>
                 <button className="p-2 sm:p-3 border border-[#E10600] rounded-full text-xs sm:text-sm bg-white text-[#1B1B1B] font-semibold hover:bg-[#E10600] hover:text-white hover:scale-110 transition-all duration-300">
                   Start learning now
                 </button>
+                </a>
               </nav>
             </motion.aside>
 
