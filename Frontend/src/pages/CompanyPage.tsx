@@ -1,9 +1,7 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
-
-const Base = import.meta.env.VITE_API_URL || "";
 
 /* --- types --- */
 type Paper = {
@@ -21,253 +19,56 @@ type CompanyType = {
 };
 
 /* --- PDF viewer component (kept but small improvements) --- */
-function PDFViewer({
-  pdfUrl,
-  showControls = true,
-  className,
-  style,
-}: {
-  pdfUrl: string;
-  showControls?: boolean;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [scale, setScale] = useState<number | "fit">(1);
+function PDFViewer({ pdfUrl }: { pdfUrl: string }) {
+  const [finalUrl, setFinalUrl] = useState<string>("");
 
-  // fetch the PDF as blob and create object URL (includes credentials)
   useEffect(() => {
     if (!pdfUrl) {
-      setBlobUrl(null);
-      setError(null);
+      setFinalUrl("");
       return;
     }
 
-    const ac = new AbortController();
-    let mounted = true;
+    // Case 1: Base64 PDF (data URL)
+    if (pdfUrl.startsWith("data:")) {
+      setFinalUrl(pdfUrl+"#toolbar=0&navpanes=0&scrollbar=0");
+      return;
+    }
+
+    // Case 2: Remote PDF → convert to Blob
     let objectUrl: string | null = null;
 
-    (async () => {
-      setLoading(true);
-      setError(null);
+    const loadPDF = async () => {
       try {
-        const res = await fetch(pdfUrl, {
-          credentials: "include",
-          signal: ac.signal,
-        });
-        if (!res.ok) throw new Error(`Failed to load PDF (${res.status})`);
+        const res = await fetch(pdfUrl, { credentials: "include" });
         const blob = await res.blob();
         objectUrl = URL.createObjectURL(blob);
-        if (!mounted) {
-          // cleanup if unmounted
-          URL.revokeObjectURL(objectUrl);
-          return;
-        }
-        setBlobUrl(objectUrl);
-      } catch (err: any) {
-        if (err.name === "AbortError") return;
-        console.error("PDF fetch error:", err);
-        setError(err?.message || "Failed to load PDF");
-        setBlobUrl(null);
-      } finally {
-        if (mounted) setLoading(false);
+        setFinalUrl(objectUrl);
+      } catch (e) {
+        console.error("PDF load error", e);
       }
-    })();
+    };
+
+    loadPDF();
 
     return () => {
-      mounted = false;
-      ac.abort();
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [pdfUrl]);
 
-  const downloadUrl = blobUrl ?? pdfUrl;
+  if (!finalUrl) {
+    return <div className="p-4 text-gray-500">No document</div>;
+  }
 
   return (
-    <div className={className} style={{ ...style }}>
-      {showControls && (
-        <div className="flex items-center gap-2 mb-2">
-          <div className="flex items-center gap-1">
-            <button
-              className="px-3 py-1 border rounded bg-white"
-              onClick={() =>
-                setScale((s) =>
-                  s === "fit"
-                    ? 0.75
-                    : Math.max(0.3, +(Number(s) - 0.25).toFixed(2))
-                )
-              }
-              title="Zoom out"
-            >
-              −
-            </button>
-            <div className="px-3 py-1 border rounded text-sm bg-white">
-              Zoom:{" "}
-              {typeof scale === "number" ? (scale * 100).toFixed(0) : "Fit"}
-            </div>
-            <button
-              className="px-3 py-1 border rounded bg-white"
-              onClick={() =>
-                setScale((s) =>
-                  s === "fit" ? 1.25 : +(Number(s) + 0.25).toFixed(2)
-                )
-              }
-              title="Zoom in"
-            >
-              +
-            </button>
-            <button
-              className="px-3 py-1 border rounded bg-white"
-              onClick={() => setScale(1)}
-              title="Reset zoom"
-            >
-              100%
-            </button>
-            <button
-              className="px-3 py-1 border rounded bg-white"
-              onClick={() => setScale("fit")}
-              title="Fit width"
-            >
-              Fit
-            </button>
-          </div>
-
-          <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-            <a
-              href={downloadUrl}
-              target="_blank"
-              rel="noreferrer"
-              download
-              className="px-3 py-1 border rounded bg-white text-sm"
-            >
-              Download
-            </a>
-            <a
-              href={downloadUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="px-3 py-1 border rounded bg-white text-sm"
-            >
-              Open
-            </a>
-          </div>
-        </div>
-      )}
-
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          minHeight: 300,
-          borderRadius: 6,
-          overflow: "hidden",
-          border: "1px solid #e5e7eb",
-        }}
-      >
-        {loading && (
-          <div style={{ padding: 20, textAlign: "center", color: "#374151" }}>
-            Loading PDF…
-          </div>
-        )}
-        {error && (
-          <div style={{ padding: 20, textAlign: "center", color: "#b91c1c" }}>
-            {error}
-          </div>
-        )}
-
-        {!loading && !error && (
-          <>
-            {(() => {
-              if (!blobUrl && !pdfUrl) {
-                return (
-                  <div
-                    style={{
-                      padding: 20,
-                      textAlign: "center",
-                      color: "#6b7280",
-                    }}
-                  >
-                    No document
-                  </div>
-                );
-              }
-
-              const src = blobUrl ?? pdfUrl;
-              const isFit = scale === "fit";
-              const wrapperStyle: React.CSSProperties = {
-                width: "100%",
-                height: 720,
-                overflow: "auto",
-              };
-              const iframeStyle: React.CSSProperties = isFit
-                ? { width: "100%", height: "100%", border: "none" }
-                : {
-                    width: "100%",
-                    height: "100%",
-                    border: "none",
-                    transform: `scale(${
-                      typeof scale === "number" ? scale : 1
-                    })`,
-                    transformOrigin: "top left",
-                  };
-
-              return (
-                <div style={wrapperStyle}>
-                  <iframe
-                    title="PDF Viewer"
-                    src={src}
-                    style={iframeStyle}
-                    sandbox="allow-same-origin allow-scripts allow-forms"
-                  />
-                </div>
-              );
-            })()}
-          </>
-        )}
-      </div>
+    <div className="w-full overflow-auto border rounded-lg" style={{ height: "720px" }}>
+      <embed
+        src={finalUrl}
+        type="application/pdf"
+        width="100%"
+        height="100%"
+      />
     </div>
   );
-}
-/* --- helper to build relative download URL --- */
-const makeDownloadUrl = (slug: string | undefined, paperId: string) => {
-  // Use relative path so cookies are sent (same origin). Avoid using an absolute baseURL.
-  return `${Base}/api/companies/${encodeURIComponent(
-    slug ?? ""
-  )}/papers/${encodeURIComponent(paperId)}/download`;
-};
-
-/* --- helper to fetch binary and trigger download (works with auth & headers) --- */
-async function downloadPaperByFetch(
-  url: string,
-  fallbackFilename = "paper.pdf"
-) {
-  try {
-    const res = await fetch(url, { credentials: "include" });
-    if (!res.ok) throw new Error(`Download failed (${res.status})`);
-
-    const blob = await res.blob();
-
-    // Try to get filename from content-disposition header
-    const cd = res.headers.get("content-disposition") || "";
-    let filename = fallbackFilename;
-    const match = /filename\*?=(?:UTF-8'')?["']?([^;"']+)/i.exec(cd);
-    if (match && match[1]) filename = decodeURIComponent(match[1]);
-
-    // create object URL and click an anchor
-    const urlObj = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = urlObj;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(urlObj), 3000);
-  } catch (err) {
-    console.error("downloadPaperByFetch error:", err);
-    throw err;
-  }
 }
 
 /* --- Main Page --- */
@@ -341,18 +142,14 @@ export default function CompanyPage() {
     );
   }
 
-  /* normalize papers and ensure id is string */
-  const papers = (company.papers || []).map((p: any) => {
-    const fileObj = p.file || p.files || null;
-
-    return {
-      _id: p._id ? String(p._id) : "",
-      title: p.title || p.paperTitle || "Untitled",
-      year: Number(p.year) || Number(p.paperYear) || 0,
-      filename:
-        fileObj?.filename || p.filename || p.originalName || "document.pdf",
-    };
-  });
+  const papers = (company.papers || []).map((p: any) => ({
+    _id: p._id,
+    title: p.title,
+    year: p.year,
+    base64: p?.file?.data ? p.file.data.toString("base64") : null,
+    contentType: p?.file?.contentType || "application/pdf",
+    filename: p?.file?.filename || "paper.pdf",
+  }));
 
   const papersByYear = papers.reduce(
     (acc: Record<string, (typeof papers)[0][]>, p) => {
@@ -426,8 +223,10 @@ export default function CompanyPage() {
                     <p className="text-xs text-gray-500 mt-1">
                       {t.testId} •{" "}
                       {(t.sections || [])
-                        .map(
-                          (s: any) => `${s.key}:${(s.questionIds || []).length}`.toUpperCase()
+                        .map((s: any) =>
+                          `${s.key}:${
+                            (s.questionIds || []).length
+                          }`.toUpperCase()
                         )
                         .join(" • ")}
                     </p>
@@ -479,56 +278,52 @@ export default function CompanyPage() {
                   </div>
                   <div className="p-6">
                     <div className="space-y-3">
-                      {papersByYear[year].map((p) => {
-                        const pid = p._id || "";
-                        return (
-                          <div
-                            key={pid || p.title}
-                            className="flex items-center justify-between gap-4 p-4 rounded-lg border hover:border-red-200 hover:bg-red-50 transition-all"
-                          >
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-gray-900 mb-1">
-                                {p.title}
-                              </h4>
-                              <p className="text-xs text-gray-500">
-                                File: {p.filename || "document"} • ID: {pid}
-                              </p>
-                            </div>
-                            <div className="flex gap-2 flex-shrink-0">
-                              {pid ? (
-                                <>
-                                  <button
-                                    onClick={async () => {
-                                      // download via fetch to include credentials and ensure filename
-                                      try {
-                                        await downloadPaperByFetch(
-                                          makeDownloadUrl(slug, pid),
-                                          p.filename || "paper.pdf"
-                                        );
-                                      } catch (err) {
-                                        alert("Download failed");
-                                      }
-                                    }}
-                                    className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
-                                  >
-                                    Download
-                                  </button>
-                                  <button
-                                    onClick={() => setSelectedPaperId(pid)}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
-                                  >
-                                    Preview
-                                  </button>
-                                </>
-                              ) : (
-                                <div className="text-sm text-gray-500">
-                                  Unavailable
-                                </div>
-                              )}
-                            </div>
+                      {papersByYear[year].map((p) => (
+                        <div
+                          key={p._id}
+                          className="flex items-center justify-between gap-4 p-4 rounded-lg border hover:border-red-200 hover:bg-red-50 transition-all"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-gray-900 mb-1">
+                              {p.title}
+                            </h4>
+                            <p className="text-xs text-gray-500">
+                              File: {p.filename}
+                            </p>
                           </div>
-                        );
-                      })}
+
+                          <div className="flex gap-2">
+                            {/* --- DOWNLOAD (base64) --- */}
+                            {p.base64 ? (
+                              <a
+                                href={`data:${p.contentType};base64,${p.base64}`}
+                                download={p.filename}
+                                className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
+                              >
+                                Download
+                              </a>
+                            ) : (
+                              <span className="text-gray-500 text-sm">
+                                Unavailable
+                              </span>
+                            )}
+
+                            {/* --- PREVIEW IN IFRAME --- */}
+                            {p.base64 && (
+                              <button
+                                onClick={() =>
+                                  setSelectedPaperId(
+                                    `data:${p.contentType};base64,${p.base64}`
+                                  )
+                                }
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+                              >
+                                Preview
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -557,14 +352,6 @@ export default function CompanyPage() {
                 Document Preview
               </h3>
               <div>
-                <a
-                  className="mr-2 text-sm text-gray-600 underline"
-                  href={makeDownloadUrl(slug, selectedPaperId)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open original
-                </a>
                 <button
                   onClick={() => setSelectedPaperId(null)}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
@@ -574,10 +361,7 @@ export default function CompanyPage() {
               </div>
             </div>
             <div className="p-6">
-              <PDFViewer
-                pdfUrl={makeDownloadUrl(slug, selectedPaperId)}
-                showControls
-              />
+              <PDFViewer pdfUrl={selectedPaperId || ""} />
             </div>
           </div>
         )}

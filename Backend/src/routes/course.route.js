@@ -392,4 +392,96 @@ router.put("/:courseId/unassign", requireAdmin, async (req, res) => {
   }
 });
 
+/**
+ * Add a review to a course
+ * POST /api/courses/:courseId/reviews
+ */
+router.post("/:courseId/reviews", async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const { name, avatar, rating, comment } = req.body;
+
+    // Basic validations
+    if (!name || !rating) {
+      return res.status(400).json({
+        error: "Both 'name' and 'rating' fields are required",
+      });
+    }
+
+    const numericRating = Number(rating);
+    if (isNaN(numericRating) || numericRating < 1 || numericRating > 5) {
+      return res.status(400).json({
+        error: "Rating must be a number between 1 and 5",
+      });
+    }
+
+    const course = await Course.findOne({ id: courseId });
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    // New review object
+    const newReview = {
+      name,
+      avatar: avatar ?? "",
+      rating: numericRating,
+      date: new Date().toISOString(),
+      comment: comment ?? "",
+      helpful: 0,
+    };
+
+    // Push into database
+    course.reviews.push(newReview);
+
+    // Update review count
+    course.reviewCount = course.reviews.length;
+
+    // Update average rating
+    const totalRating = course.reviews.reduce(
+      (sum, r) => sum + (Number(r.rating) || 0),
+      0
+    );
+    course.rating = Number((totalRating / course.reviews.length).toFixed(1));
+
+    await course.save();
+
+    return res.status(201).json({
+      message: "Review added successfully",
+      review: newReview,
+      rating: course.rating,
+      reviewCount: course.reviewCount,
+    });
+  } catch (err) {
+    console.error("ADD REVIEW ERROR:", err);
+    return res.status(500).json({
+      error: "Failed to add review",
+      details: err.message || String(err),
+    });
+  }
+});
+
+/**
+ * Get all reviews for a specific course
+ * GET /api/courses/:courseId/reviews
+ */
+router.get("/:courseId/reviews", async (req, res) => {
+  try {
+    const { courseId } = req.params;
+
+    const course = await Course.findOne({ id: courseId });
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    return res.status(200).json({
+      reviews: course.reviews || [],
+      reviewCount: course.reviewCount || 0,
+      rating: course.rating || 0,
+    });
+  } catch (error) {
+    console.error("FETCH REVIEWS ERROR:", error);
+    res.status(500).json({ message: "Failed to fetch reviews" });
+  }
+});
+
 export default router;

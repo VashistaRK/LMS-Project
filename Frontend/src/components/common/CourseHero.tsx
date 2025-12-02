@@ -1,6 +1,6 @@
 // src/components/CourseHero.tsx
 import React, { useMemo } from "react";
-import { Star, Users, Clock, BookOpen } from "lucide-react";
+import { Star, Users, BookOpen } from "lucide-react";
 import type { CourseData } from "../../types/course";
 import getThumbnailUrl from "../../utils/getThumbnailUrl";
 
@@ -48,13 +48,14 @@ const CourseHero: React.FC<Props> = ({ course, className = "" }) => {
           <Users className="w-5 h-5 text-blue-600" />
           <span>{course.studentCount?.toLocaleString() ?? "0"} students</span>
         </div>
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <Clock className="w-5 h-5 text-indigo-600" />
           <span>{course.duration}</span>
-        </div>
+        </div> */}
         <div className="flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-green-600" />
-          <span>{course.chapterCount} lessons</span>
+          <span>{course.sections?.reduce((acc, s) => acc + (s.chapters?.length || 0), 0)} lessons</span>
+          {/* <span>{course.chapterCount} lessons</span> */}
         </div>
       </div>
     </div>

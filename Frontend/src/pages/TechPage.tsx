@@ -37,6 +37,15 @@ export default function TechCodingTestPage() {
   // fetch attempt & questions
   useEffect(() => {
     async function init() {
+      const el = document.documentElement;
+      try {
+        if (el.requestFullscreen) await el.requestFullscreen();
+      } catch (fsErr) {
+        console.warn(
+          "request Fullscreen failed or blocked, continuing without fullscreen",
+          fsErr
+        );
+      }
       try {
         const data = await startAttempt(id!, testId!); // uses your frontend service
         // Data format from your backend: { attemptId, durationSec, title, questions: [...] }

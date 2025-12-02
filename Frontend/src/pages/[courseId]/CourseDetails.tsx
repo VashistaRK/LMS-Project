@@ -6,7 +6,6 @@ import type { CourseData } from "../../types/course";
 import CourseTabs from "../../components/common/CourseTabs";
 import CourseOverview from "../../components/common/CourseOverview";
 import CourseCurriculum from "../../components/common/CourseCurriculum";
-import CourseInstructor from "../../components/common/CourseInstructor";
 import CourseSidebar from "../../components/common/CourseSidebar";
 import CourseHero from "../../components/common/CourseHero";
 import FaqList from "../../components/FaqList";
@@ -50,9 +49,7 @@ const CourseDetailsPage: React.FC = () => {
               {activeTab === "curriculum" && (
                 <CourseCurriculum sections={course.sections} />
               )}
-              {activeTab === "instructor" && (
-                <CourseInstructor instructor={course.instructor} />
-              )}
+              
               {activeTab === "reviews" && (
                 <ReviewsList
                   courseId={courseId ?? ""}

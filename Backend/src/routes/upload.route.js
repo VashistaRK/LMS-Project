@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-import { uploadDocumentQuestions } from "../controllers/quiz.controller.js";
+import { generateQuiz, uploadDocumentQuestions } from "../controllers/quiz.controller.js";
 
 const router = express.Router();
 
@@ -31,6 +31,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Route
+// 🧩 Auto-generate quiz from content
+router.post("/generate", generateQuiz);
 router.post("/upload-doc", upload.single("doc"), uploadDocumentQuestions);
 
 export default router;

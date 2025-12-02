@@ -80,12 +80,10 @@ const router = createBrowserRouter([
         element: <RequireAuth />, // acts as guard
         children: [
           { path: "cart", element: <Cart /> },
-          { path: "/my-learning", element: <MyLearningWrapper /> },
+
           { path: "notifications", element: <NotificationsPage /> },
           { path: "/profile", element: <ProfilePage /> },
-          { path: "my-courses/:courseId", element: <CourseLearningPage /> },
-          { path: "my-courses/test/:testId", element: <TestPage1 /> },
-          { path: "freshers-pratice/test/:id/:testId", element: <TestPage /> },
+          { path: "/my-learning", element: <MyLearningWrapper /> },
           { path: "companies/:slug", element: <CompanyPage /> },
           {
             path: "companies/:slug/tests/:testId",
@@ -93,6 +91,14 @@ const router = createBrowserRouter([
           },
         ],
       },
+    ],
+  },
+  {
+    element: <RequireAuth />, // acts as guard
+    children: [
+      { path: "my-courses/:courseId", element: <CourseLearningPage /> },
+      { path: "my-courses/test/:testId", element: <TestPage1 /> },
+       { path: "freshers-pratice/test/:id/:testId", element: <TestPage /> },
     ],
   },
 
@@ -105,12 +111,16 @@ const router = createBrowserRouter([
         path: "admin/",
         element: <Admin />,
         children: [
-          { path: "", element: <AdminLayout />, children: [
-            { path: "dashboard", element: <AdminPanel /> },
-            { path: "students", element: <AdminMonitoringPage /> },
-            { path: "analytics", element: <AdminAnalysisPage /> },
-            { path: "FAQ", element: <AdminFaqsPage /> },
-          ]},
+          {
+            path: "",
+            element: <AdminLayout />,
+            children: [
+              { path: "dashboard", element: <AdminPanel /> },
+              { path: "students", element: <AdminMonitoringPage /> },
+              { path: "analytics", element: <AdminAnalysisPage /> },
+              { path: "FAQ", element: <AdminFaqsPage /> },
+            ],
+          },
           { path: "assessments", element: <AdminAssessments /> },
           {
             path: "assessments/analytics",

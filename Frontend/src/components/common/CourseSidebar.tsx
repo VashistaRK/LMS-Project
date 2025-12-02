@@ -10,11 +10,11 @@ type Props = {
   className?: string;
 };
 
-const formatCurrency = (val: number) =>
-  val.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+// const formatCurrency = (val: number) =>
+//   val.toLocaleString(undefined, {
+//     minimumFractionDigits: 2,
+//     maximumFractionDigits: 2,
+//   });
 
 const CourseSidebar: React.FC<Props> = ({
   course,
@@ -24,10 +24,10 @@ const CourseSidebar: React.FC<Props> = ({
   const { data: cartItems = [] } = useCart();
   const addToCartMutation = useAddToCart();
 
-  const priceNum = course.price;
-  const discountNum = course.discountPrice;
-  const saving = Math.max(0, priceNum - discountNum);
-  const percent = priceNum > 0 ? Math.round((saving / priceNum) * 100) : 0;
+  // const priceNum = course.price;
+  // const discountNum = course.discountPrice;
+  // const saving = Math.max(0, priceNum - discountNum);
+  // const percent = priceNum > 0 ? Math.round((saving / priceNum) * 100) : 0;
 
   const handleEnroll = () => {
     const alreadyInCart = cartItems.some((item) => item.id === course.id);
@@ -51,7 +51,7 @@ const CourseSidebar: React.FC<Props> = ({
     <aside
       className={`bg-white/90 backdrop-blur-xl rounded-xl shadow-2xl p-6 sticky top-10 border border-gray-100 ${className}`}
     >
-      <div className="text-center mb-6">
+      {/* <div className="text-center mb-6">
         <div className="flex items-baseline justify-center gap-2 mb-2">
           <span className="text-3xl font-bold text-gray-900">
             ₹{formatCurrency(priceNum)}
@@ -67,7 +67,7 @@ const CourseSidebar: React.FC<Props> = ({
             Save ₹{formatCurrency(saving)} ({percent}% off)
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Enroll Now acts as Add to Cart */}
       <button

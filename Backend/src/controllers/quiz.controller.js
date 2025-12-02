@@ -156,12 +156,10 @@ export const uploadDocumentQuiz = async (req, res) => {
         if (uErr) console.warn("Failed to unlink after error:", uErr);
       });
     } catch (ignored) {}
-    res
-      .status(500)
-      .json({
-        error: "Failed to process document",
-        details: String(err?.message || err),
-      });
+    res.status(500).json({
+      error: "Failed to process document",
+      details: String(err?.message || err),
+    });
   }
 };
 
@@ -324,15 +322,30 @@ export const generateQuiz = async (req, res) => {
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      max_tokens: 500,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a quiz generator. RETURN ONLY VALID JSON. No comments, no markdown, no explanations.",
+        },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.5,
+      max_tokens: 2000,
     });
 
+    // Clean raw content
     let raw = completion.choices[0].message.content.trim();
-    if (raw.startsWith("```")) raw = raw.replace(/```json|```/g, "").trim();
+    raw = raw.replace(/```json|```/g, "").trim();
 
-    const quizArray = JSON.parse(raw);
+    // Parse with recovery
+    let quizArray;
+    try {
+      quizArray = JSON.parse(raw);
+    } catch (err) {
+      console.log("JSON parse failed. Raw output:", raw);
+      throw new Error("Invalid JSON from AI");
+    }
 
     // Normalize and validate quiz items
     const toSave = quizArray.map((q) => {
@@ -374,12 +387,10 @@ export const generateQuiz = async (req, res) => {
     res.status(201).json({ success: true, questions });
   } catch (err) {
     console.error("Quiz generation error:", err);
-    res
-      .status(500)
-      .json({
-        error: "Failed to generate quiz",
-        details: String(err.message || err),
-      });
+    res.status(500).json({
+      error: "Failed to generate quiz",
+      details: String(err.message || err),
+    });
   }
 };
 

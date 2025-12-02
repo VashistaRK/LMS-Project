@@ -27,13 +27,11 @@ import codeRoutes from "./src/routes/code.route.js";
 import notificationRoutes from './src/routes/notification.route.js';
 import analysisRoutes from './src/routes/analysis.route.js';
 import faqRoutes from './src/routes/Faq.route.js';
-import reviewRoutes from './src/routes/Review.route.js';
 import adminRoutes from './src/routes/admin.route.js';
 import assessmentRoutes from './src/routes/assessment.route.js';
 import docRoutes from './src/routes/doc.route.js';
 import companyRoutes from './src/routes/company.route.js';
 import Faq from './src/models/Faq.js';
-import Review from './src/models/Reviews.js';
 import testRoutes from './src/routes/Test.route.js';
 import judge0Routes from "./src/routes/judge0.js";
 
@@ -112,7 +110,6 @@ app.use("/api/code", apiLimiter, codeRoutes);
 app.use('/api/notifications', apiLimiter, notificationRoutes);
 app.use('/api/companies', apiLimiter, companyRoutes);
 app.use("/api/faqs", apiLimiter, faqRoutes);
-app.use("/api/reviews", apiLimiter, reviewRoutes);
 app.use("/api/admin", apiLimiter, adminRoutes);
 
 // Health check endpoint

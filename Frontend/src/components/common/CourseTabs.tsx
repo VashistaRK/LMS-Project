@@ -8,7 +8,6 @@ interface CourseTabsProps {
 const tabs = [
   { id: "overview", label: "Overview" },
   { id: "curriculum", label: "Curriculum" },
-  { id: "instructor", label: "Instructor" },
   { id: "reviews", label: "Reviews" },
   { id: "faq", label: "FAQ" },
 ];

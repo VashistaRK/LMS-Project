@@ -193,6 +193,11 @@ const CourseCurriculumTab: React.FC = () => {
 
     setLoading(true);
 
+    formData.chapterCount = formData.sections?.reduce(
+      (acc, section) => acc + (section.chapters?.length || 0),
+      0
+    ) || 0;
+
     try {
       const response = await coursesApi.update(courseId, {
         sections: formData.sections || [],

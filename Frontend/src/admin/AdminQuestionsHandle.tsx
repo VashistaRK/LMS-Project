@@ -156,6 +156,7 @@ const CodingQuestionModal = ({ isOpen, initial, onClose, onSave }: any) => {
 
   const submit = () => {
     onSave(form);
+     alert("Added Questions to Question Bank Sucessfully✅");
   };
 
   return (

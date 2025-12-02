@@ -18,8 +18,6 @@ import {
   ChevronRight,
   ChevronDown,
   Home,
-  Star,
-  Users,
   MoreHorizontal,
 } from "lucide-react";
 import { useAuthContext } from "../../context/AuthProvider";
@@ -85,11 +83,9 @@ const resolveVideoSource = (url?: string): VideoSource => {
     return { type: "direct", playable: url, preview: "" };
   }
 
-  // Fallback - treat as other and return URL as playable (caller decides)
   return { type: "other", playable: url, preview: "" };
 };
 
-// Small hook to memoize resolution
 const useVideoSource = (url?: string) => {
   return useMemo(() => resolveVideoSource(url), [url]);
 };
@@ -116,7 +112,6 @@ const convertThumbnail = (thumbnail: any) => {
 
 const baseURL = import.meta.env.VITE_API_URL;
 
-// --- Component ---
 const CourseLearningPage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const [course, setCourse] = useState<CourseData | null>(null);
@@ -131,7 +126,7 @@ const CourseLearningPage: React.FC = () => {
   const [completedChapters, setCompletedChapters] = useState<string[]>([]);
   const [scores, setScores] = useState<{ [quizId: string]: number }>({});
   const { user } = useAuthContext();
-  ///////////////
+
   const [quizOpen, setQuizOpen] = useState(false);
   const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
   const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
@@ -153,7 +148,7 @@ const CourseLearningPage: React.FC = () => {
   };
 
   const generateQuiz = async (chapter: Chapters, course: CourseData) => {
-    const res = await fetch(`${baseURL}/api/questions/generate`, {
+    const res = await fetch(`${baseURL}/api/upload/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -162,15 +157,13 @@ const CourseLearningPage: React.FC = () => {
       }),
     });
     const data = await res.json();
-    setQuizQuestions(data.questions);
-    console.log("quiz questions:", data);
+    setQuizQuestions(data.questions ?? []);
     setQuizOpen(true);
     document.body.style.overflow = "hidden";
   };
 
-  // --- Quiz Handling ---
   const handleAnswer = (questionIndex: number, optionIndex: number) => {
-    const optionLetter = String.fromCharCode(65 + optionIndex); // 65 -> A, 66 -> B ...
+    const optionLetter = String.fromCharCode(65 + optionIndex);
     setUserAnswers((prev) => ({
       ...prev,
       [questionIndex]: optionLetter,
@@ -182,19 +175,14 @@ const CourseLearningPage: React.FC = () => {
 
     let score = 0;
     const answers = quizQuestions.map((q, i) => {
-      const userAnswer = userAnswers[i]; // "A" | "B" | ...
-
-      // Determine expected answer letter
+      const userAnswer = userAnswers[i];
       let expectedLetter = q.correctAnswerLetter;
       if (!expectedLetter && q.correctAnswerText && Array.isArray(q.options)) {
         const idx = q.options.findIndex((opt: any) => String(opt) === String(q.correctAnswerText));
         if (idx >= 0) expectedLetter = String.fromCharCode(65 + idx);
       }
-
       const isCorrect = userAnswer && expectedLetter ? userAnswer === expectedLetter : false;
-
       if (isCorrect) score++;
-
       return {
         question: q.question,
         userAnswer,
@@ -205,17 +193,13 @@ const CourseLearningPage: React.FC = () => {
 
     setQuizResults({ score, answers });
 
-    // Save score to backend
     if (user?.sub && courseId && chapter?.title) {
       try {
         await markChapterCompleted(user.sub, courseId, [
           ...completedChapters,
           chapter.title,
         ]);
-        setScores((prev) => ({
-          ...prev,
-          [chapter.title]: score,
-        }));
+        setScores((prev) => ({ ...prev, [chapter.title]: score }));
       } catch (err) {
         console.error("Failed to save quiz score:", err);
       }
@@ -223,22 +207,19 @@ const CourseLearningPage: React.FC = () => {
     document.body.style.overflow = "auto";
   };
 
-  //////////////////
-  // --- Toggle Section in Sidebar ---
   const toggleSection = (index: number) => {
     setExpandedSections((prev) =>
       prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
     );
   };
 
-  // --- Mark Chapter Complete ---
   const markChapterComplete = async (chapterTitle: string) => {
     if (chapter) {
-      setLoadingQuiz(true); // block UI
+      setLoadingQuiz(true);
       try {
-        await generateQuiz(chapter, course!); // show AI quiz popup
+        await generateQuiz(chapter, course!);
       } finally {
-        setLoadingQuiz(false); // always clear
+        setLoadingQuiz(false);
       }
     }
     const updatedChapters = Array.from(new Set([...completedChapters, chapterTitle]));
@@ -254,7 +235,6 @@ const CourseLearningPage: React.FC = () => {
     }
   };
 
-  // --- Fetch Course & User Data ---
   useEffect(() => {
     const fetchCourseData = async () => {
       if (!courseId) return console.warn("No course ID provided");
@@ -273,7 +253,6 @@ const CourseLearningPage: React.FC = () => {
           }
         }
 
-        // Auto-expand first section
         setExpandedSections([0]);
 
         const firstChapter = res.sections?.[0]?.chapters?.[0];
@@ -296,12 +275,10 @@ const CourseLearningPage: React.FC = () => {
     fetchCourseData();
   }, [courseId, user]);
 
-  // Reset video error when resolved video changes
   useEffect(() => {
     setVideoError(false);
   }, [video.playable, video.preview, video.type]);
 
-  // --- Chapter Selection ---
   const onSelectChapter = (selected: Chapters) => {
     if (selected.type === "quiz") {
       return (window.location.href = `/my-courses/test/${selected.testId}`);
@@ -313,36 +290,18 @@ const CourseLearningPage: React.FC = () => {
     setChapter(selected);
     setVideoError(false);
 
-    // PDF notes
     if ((selected as any).notesId) {
       const doc = (course?.sections || [])
         .flatMap((s) => s.chapters || [])
         .find((ch) => ch.notesId === (selected as any).notesId);
       const pdfNote = (doc as any)?.notes?.find?.(
-        (n: any) =>
-          typeof n.content === "string" &&
-          n.content.startsWith("/uploads/notes/")
+        (n: any) => typeof n.content === "string" && n.content.startsWith("/uploads/notes/")
       );
       setPdfUrl(pdfNote?.content || "");
     } else {
       setPdfUrl("");
     }
   };
-
-  const currentChapterIndex = () => {
-    if (!course || !chapter) return 0;
-    let index = 0;
-    for (const section of course.sections || []) {
-      for (const ch of section.chapters || []) {
-        if (ch === chapter) return index;
-        index++;
-      }
-    }
-    return 0;
-  };
-
-  const totalChapters =
-    course?.sections?.reduce((acc, section) => acc + (section.chapters?.length || 0), 0) || 0;
 
   if (loading) {
     return (
@@ -366,95 +325,69 @@ const CourseLearningPage: React.FC = () => {
     );
   }
 
-  // --- JSX ---
   return (
     <div className="min-h-screen font-Quick bg-gradient-to-br from-white via-[#fff6f6] to-white">
       {/* Header */}
-      <header className="bg-gradient-to-r from-[#C21817] to-[#A51515] top-0 z-50 text-white">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-4">
+      <header className="bg-gradient-to-r from-[#C21817] to-[#A51515] fixed w-full top-0 z-50 text-white shadow">
+        {/* <div className="max-w-7xl mx-auto flex items-center gap-4 px-4 py-3 justify-between"> */}
+          <div className="flex items-center gap-3 px-4 py-3 justify-between">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 hover:bg-gray-700 rounded-lg transition-colors"
+              className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+              aria-label="Toggle menu"
             >
               {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
 
-            <div className="flex items-center gap-3">
-              <img src="/images/Sunadh-Logo.png" alt="Sunadh" className="h-12 w-28" />
-              <nav className="hidden sm:flex items-center gap-2 text-sm">
-                <a href="/my-learning" className="flex items-center gap-1 text-white hover:text-gray-300">
-                  <Home size={16} />
-                  My Learning
-                </a>
-                <ChevronRight size={16} />
-                <span className="truncate max-w-[200px]">{course.title}</span>
-              </nav>
-            </div>
+            <img src="/images/Sunadh-Logo.png" alt="Sunadh" className="h-10 w-24 object-contain" />
+
+            <nav className="hidden sm:flex items-center gap-2 text-sm">
+              <a href="/my-learning" className="flex items-center gap-1 text-white hover:text-gray-300">
+                <Home size={16} />
+                My Learning
+              </a>
+              <ChevronRight size={16} />
+              <span className="truncate max-w-[200px]">{course.title}</span>
+            </nav>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <Star size={16} className="text-yellow-400" />
-                <span>4.8</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Users size={16} />
-                <span>1,234 students</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <div className="w-32 bg-gradient-to-r from-[#C21817] to-[#A51515] rounded-full h-2">
-                <div
-                  className="bg-white h-2 rounded-full transition-all duration-300"
-                  style={{
-                    width: `${(currentChapterIndex() / totalChapters) * 100}%`,
-                  }}
-                />
-              </div>
-              <span className="text-sm">
-                {currentChapterIndex()}/{totalChapters}
-              </span>
-            </div>
-          </div>
-        </div>
+          {/* <div className="hidden md:flex items-center gap-4 text-sm">
+            {/* placeholder for future stats or actions */}
+          {/* </div> */}
+        {/* </div>  */}
       </header>
 
-      {/* Body */}
-      <div className="flex">
+      {/* spacing for fixed header */}
+      <div className="h-16" />
+
+      <div className="flex flex-col lg:flex-row">
         {/* Sidebar */}
-        <aside className="fixed lg:sticky lg:top-0 left-0 h-[calc(100vh-64px)] w-80 bg-white border border-gray-100 shadow-xl overflow-hidden">
+        <aside
+          className={`fixed lg:sticky lg:top-16 left-0 z-40 h-[calc(100vh-64px)] w-72 bg-white border border-gray-100 shadow-xl overflow-hidden transform transition-transform duration-300 ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          }`}
+        >
           <div className="flex flex-col h-full text-center">
             <div className="p-4">
               <h3 className="font-extrabold text-lg mb-1">Course Content</h3>
               <p className="text-sm">
-                {course.sections?.length || 0} sections •{" "}
-                {course.sections?.reduce((acc, s) => acc + (s.chapters?.length || 0), 0)} lectures
+                {course.sections?.length || 0} sections • {course.sections?.reduce((acc, s) => acc + (s.chapters?.length || 0), 0)} lectures
               </p>
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar">
               {course.sections?.map((section, sectionIndex) => (
-                <div key={`section-${sectionIndex}`} className="border-b border-gray-700 last:border-b-0">
+                <div key={`section-${sectionIndex}`} className="border-b border-gray-200 last:border-b-0">
                   <button
-                    className={`w-full text-left p-4 ${expandedSections.includes(sectionIndex) ? "bg-gradient-to-r from-[#C21817] to-[#A51515] text-white" : ""
-                      } hover:bg-red-50 transition-colors flex items-center justify-between group`}
+                    className={`w-full text-left p-4 ${expandedSections.includes(sectionIndex) ? "bg-gradient-to-r from-[#C21817] to-[#A51515] text-white" : ""} hover:bg-red-50 transition-colors flex items-center justify-between group`}
                     onClick={() => toggleSection(sectionIndex)}
+                    aria-expanded={expandedSections.includes(sectionIndex)}
                   >
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm mb-1 truncate">
-                        Section {sectionIndex + 1}: {section.title}
-                      </h4>
-                      <p className="text-xs">
-                        {section.lectureCount} • {section.duration}
-                      </p>
+                      <h4 className="font-medium text-sm mb-1 truncate">Section {sectionIndex + 1}: {section.title}</h4>
+                      <p className="text-xs">{section.lectureCount} • {section.duration}</p>
                     </div>
-                    <ChevronDown
-                      size={16}
-                      className={`group-hover:text-white transition-all ${expandedSections.includes(sectionIndex) ? "rotate-180" : ""}`}
-                    />
+                    <ChevronDown size={16} className={`group-hover:text-white transition-all ${expandedSections.includes(sectionIndex) ? "rotate-180" : ""}`} />
                   </button>
 
                   {expandedSections.includes(sectionIndex) && (
@@ -466,9 +399,12 @@ const CourseLearningPage: React.FC = () => {
                         return (
                           <button
                             key={`chapter-${sectionIndex}-${chIndex}`}
-                            onClick={() => onSelectChapter(ch)}
-                            className={`w-full text-left p-3 pl-6 flex items-center gap-3 hover:bg-red-100 transition-all relative ${isActive ? "bg-red-100 border-r-8 border-red-300" : ""
-                              }`}
+                            onClick={() => {
+                              onSelectChapter(ch);
+                              // close sidebar on mobile after selecting
+                              if (sidebarOpen) setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left p-3 pl-4 sm:pl-6 flex items-center gap-2 sm:gap-3 hover:bg-red-100 transition-all relative ${isActive ? "bg-red-100 border-r-8 border-red-300" : ""}`}
                           >
                             <div className="flex-shrink-0">
                               {isCompleted ? (
@@ -486,9 +422,7 @@ const CourseLearningPage: React.FC = () => {
                                 {ch.type === "quiz" || ch.type === "assignment" ? (
                                   <span className="text-[#9B111E]">Score: {scores[ch.testId ?? ""] ?? 0}</span>
                                 ) : (
-                                  <>
-                                    <span>{ch.duration}</span>
-                                  </>
+                                  <span>{ch.duration}</span>
                                 )}
                               </div>
                             </div>
@@ -503,58 +437,69 @@ const CourseLearningPage: React.FC = () => {
           </div>
         </aside>
 
+        {/* backdrop for mobile when sidebar open */}
+        {sidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-40 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+
         {/* Main Content */}
         <main className="flex-1 min-h-screen bg-white">
           {/* Video Section */}
-          <div className="relative p-12 w-full min-h-[70vh] flex items-center justify-center">
-            {pdfUrl ? (
-              <NotesDisplay notesId={chapter?.notesId} manualNotes={chapter?.notes || []} className="min-h-[70vh]" />
-            ) : video.type === "direct" && !videoError ? (
-              <video
-                key={video.playable}
-                src={video.playable}
-                controls
-                controlsList="nodownload"
-                poster={thumbnailUrl}
-                className="min-w-full min-h-[70vh] object-contain"
-                onError={() => setVideoError(true)}
-                onEnded={() => chapter?.title && markChapterComplete(chapter.title)}
-              />
-            ) : video.type === "youtube" || video.type === "drive" ? (
-              <iframe
-                title="Video preview"
-                src={video.type === "youtube" ? video.playable : video.preview}
-                allow="autoplay; encrypted-media; fullscreen"
-                allowFullScreen
-                className="min-w-full min-h-[70vh]"
-              />
-            ) : thumbnailUrl ? (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <img src={thumbnailUrl} alt="Course Thumbnail" className="min-w-md min-h-64 object-contain mb-4 rounded-lg" />
-                <p>Preview not available</p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <BookOpen size={48} className="text-gray-600 mb-4" />
-                <p>No video content available</p>
-              </div>
-            )}
+          <div className="relative p-4 sm:p-8 w-full min-h-[60vh] flex items-center justify-center">
+            <div className="w-full max-w-6xl">
+              {pdfUrl ? (
+                <div className="w-full">
+                  <NotesDisplay notesId={chapter?.notesId} manualNotes={chapter?.notes || []} className="min-h-[50vh]" />
+                </div>
+              ) : video.type === "direct" && !videoError ? (
+                <div className="w-full aspect-video bg-black rounded-lg overflow-hidden">
+                  <video
+                    key={video.playable}
+                    src={video.playable}
+                    controls
+                    controlsList="nodownload"
+                    poster={thumbnailUrl}
+                    className="w-full h-full object-contain"
+                    onError={() => setVideoError(true)}
+                    onEnded={() => chapter?.title && markChapterComplete(chapter.title)}
+                  />
+                </div>
+              ) : video.type === "youtube" || video.type === "drive" ? (
+                <div className="w-full aspect-video bg-black rounded-lg overflow-hidden">
+                  <iframe
+                    title="Video preview"
+                    src={video.type === "youtube" ? video.playable : video.preview}
+                    allow="autoplay; encrypted-media; fullscreen"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                </div>
+              ) : thumbnailUrl ? (
+                <div className="flex flex-col items-center justify-center h-64 text-center">
+                  <img src={thumbnailUrl} alt="Course Thumbnail" className="max-w-full h-44 object-contain mb-4 rounded-lg" />
+                  <p>Preview not available</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-64 text-center">
+                  <BookOpen size={48} className="text-gray-600 mb-4" />
+                  <p>No video content available</p>
+                </div>
+              )}
 
-            {/* Video Overlay */}
-            <div className="absolute bottom-4 right-4 flex gap-2">
-              <button className="bg-black bg-opacity-70 hover:bg-opacity-90 p-2 rounded-lg transition-all">
-                <MoreHorizontal size={20} className="text-white" />
-              </button>
+              {/* Video Overlay */}
+              <div className="absolute bottom-6 right-6 flex gap-2">
+                <button className="bg-black bg-opacity-70 hover:bg-opacity-90 p-2 rounded-lg transition-all">
+                  <MoreHorizontal size={20} className="text-white" />
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Chapter & Course Details */}
           <div className="text-gray-900">
-            <div className="max-w-4xl mx-auto p-6">
+            <div className="max-w-4xl mx-auto p-4 sm:p-6">
               {chapter && (
-                <div className="rounded-2xl shadow-xl p-6 mb-6 border border-gray-100 bg-white flex items-start justify-between">
+                <div className="rounded-2xl shadow-xl p-4 sm:p-6 mb-6 border border-gray-100 bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">{chapter.title}</h1>
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{chapter.title}</h1>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                       <div className="flex items-center gap-1">
                         <Clock size={16} />
@@ -567,15 +512,18 @@ const CourseLearningPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => chapter.title && markChapterComplete(chapter.title)}
-                    className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors bg-gradient-to-r from-[#C21817] to-[#A51515] shadow-md"
-                  >
-                    <CheckCircle2 size={16} />
-                    Mark Complete
-                  </button>
+                  <div className="mt-2 sm:mt-0">
+                    <button
+                      onClick={() => chapter.title && markChapterComplete(chapter.title)}
+                      className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors bg-gradient-to-r from-[#C21817] to-[#A51515] shadow-md"
+                    >
+                      <CheckCircle2 size={16} />
+                      Mark Complete
+                    </button>
+                  </div>
                 </div>
               )}
+
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
                 <CourseDetails course={course} chapter={chapter} />
               </div>
@@ -584,21 +532,18 @@ const CourseLearningPage: React.FC = () => {
         </main>
       </div>
 
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />}
-
-      {/* handle quiz */}
+      {/* handle quiz - responsive modal */}
       {quizOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-white rounded-xl w-[650px] max-h-[90vh] shadow-lg p-8 overflow-y-auto border border-gray-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] shadow-lg p-6 overflow-y-auto border border-gray-200">
             {!quizResults ? (
               <>
-                <h2 className="text-3xl font-semibold mb-6 text-center text-gray-900 tracking-tight">Quick Knowledge Check</h2>
+                <h2 className="text-2xl sm:text-3xl font-semibold mb-4 text-center text-gray-900 tracking-tight">Quick Knowledge Check</h2>
 
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {quizQuestions.map((q, i) => (
-                    <div key={i} className="bg-gray-50 p-5 rounded-lg border border-gray-200">
-                      <p className="font-medium text-gray-800 mb-4 text-lg">{i + 1}. {q.question}</p>
+                    <div key={i} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <p className="font-medium text-gray-800 mb-3 text-base sm:text-lg">{i + 1}. {q.question}</p>
 
                       <div className="grid grid-cols-1 gap-3">
                         {q.options.map((opt: any, idx: number) => {
@@ -619,36 +564,34 @@ const CourseLearningPage: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="mt-8 flex justify-center">
-                  <button onClick={submitQuiz} className="bg-[#9B111E] hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-lg shadow-sm transition-colors text-lg">
+                <div className="mt-6 flex justify-center">
+                  <button onClick={submitQuiz} className="bg-[#9B111E] hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg shadow-sm transition-colors text-base">
                     Submit Quiz
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <h2 className="text-3xl font-semibold mb-6 text-center text-gray-900 tracking-tight">Your Results</h2>
-                <p className="mb-6 text-center text-xl">
+                <h2 className="text-2xl sm:text-3xl font-semibold mb-4 text-center text-gray-900 tracking-tight">Your Results</h2>
+                <p className="mb-4 text-center text-lg">
                   Score: <span className="font-bold text-green-600">{quizResults.score}/{quizQuestions.length}</span>
                 </p>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {quizResults.answers.map((a, i) => (
-                    <div key={i} className="p-4 rounded-lg border bg-gray-50">
-                      <p className="font-medium text-gray-800 mb-2">{a.question}</p>
+                    <div key={i} className="p-3 rounded-lg border bg-gray-50">
+                      <p className="font-medium text-gray-800 mb-1">{a.question}</p>
                       <p>
                         Your Answer: <span className={`${a.isCorrect ? "text-green-600" : "text-[#9B111E]"} font-semibold`}>{a.userAnswer || "Not answered"}</span>
                       </p>
                       {!a.isCorrect && (
-                        <p className="text-gray-600">
-                          Correct Answer: <span className="font-semibold">{a.correctAnswer}</span>
-                        </p>
+                        <p className="text-gray-600">Correct Answer: <span className="font-semibold">{a.correctAnswer}</span></p>
                       )}
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-10 flex justify-center">
+                <div className="mt-6 flex justify-center">
                   <button
                     onClick={() => {
                       setQuizOpen(false);
@@ -656,7 +599,7 @@ const CourseLearningPage: React.FC = () => {
                       setUserAnswers({});
                       goToNextChapter();
                     }}
-                    className="bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-lg shadow-sm text-lg transition-colors"
+                    className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg shadow-sm text-base transition-colors"
                   >
                     Continue to Next Chapter
                   </button>

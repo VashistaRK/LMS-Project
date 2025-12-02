@@ -3,7 +3,6 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import {
-  generateQuiz,
   getAllQuestions,
   getQuestionById,
   createQuestion,
@@ -30,9 +29,6 @@ const upload = multer({ dest: uploadDir });
 router.get("/", getAllQuestions);
 
 router.get("/quiz/:quizId", getQuizById);
-
-// 🧩 Auto-generate quiz from content
-router.post("/generate", generateQuiz);
 // genres
 router.get("/genres", getGenres);
 

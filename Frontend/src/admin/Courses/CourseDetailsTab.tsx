@@ -301,7 +301,7 @@ const CourseDetailsTab: React.FC = () => {
               ))}
             </select>
           </div>
-          {/* Price */}
+          {/* // Price
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Price ($)
@@ -317,7 +317,7 @@ const CourseDetailsTab: React.FC = () => {
               step="0.01"
             />
           </div>
-          {/* Discount Price */}
+          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Discount Price ($)
@@ -332,7 +332,7 @@ const CourseDetailsTab: React.FC = () => {
               min="0"
               step="0.01"
             />
-          </div>
+          </div> */}
           {/* Duration */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -374,43 +374,6 @@ const CourseDetailsTab: React.FC = () => {
               type="number"
               name="exerciseCount"
               value={formData.exerciseCount || ""}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          {/* exerciseCount */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Chapter Count
-            </label>
-            <input
-              type="number"
-              name="chapterCount"
-              value={formData.chapterCount || ""}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Rating
-            </label>
-            <input
-              type="number"
-              name="rating"
-              value={formData.rating || ""}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              reviewCount
-            </label>
-            <input
-              type="number"
-              name="reviewCount"
-              value={formData.reviewCount || ""}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
             />
