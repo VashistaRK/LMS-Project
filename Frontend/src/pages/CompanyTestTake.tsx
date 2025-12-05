@@ -5,7 +5,7 @@ import {
   startCompanyTest,
   submitCompanyTest,
 } from "../services/companyTestApi";
-import TechCodingTestPage from "./TechPage";
+import CodingQuestion from "./CodingQuestion";
 
 export default function CompanyTestTake() {
   const { slug, testId } = useParams<{ slug?: string; testId?: string }>();
@@ -583,7 +583,21 @@ export default function CompanyTestTake() {
                           )}
                         </div>
                       ) : currentQuestion.type === "Coding" ? (
-                        <TechCodingTestPage />
+                        <CodingQuestion
+                          question={currentQuestion}
+                          savedValue={getSubmittedValue(
+                            currentSectionObj.key,
+                            currentQuestion.bankId
+                          )}
+                          setAnswer={(val) =>
+                            setAnswer(
+                              currentSectionObj.key,
+                              currentQuestion.bankId,
+                              val
+                            )
+                          }
+                          result={result}
+                        />
                       ) : (
                         <div>
                           <textarea

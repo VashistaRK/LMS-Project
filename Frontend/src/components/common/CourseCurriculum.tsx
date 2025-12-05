@@ -13,7 +13,8 @@ import {
    🔹 URL HELPERS
 ----------------------------------------- */
 
-type PreviewUrls = {
+export type VideoSource = {
+  type: "youtube" | "drive" | "direct" | "other" | "none";
   playable: string;
   preview: string;
 };
@@ -22,60 +23,53 @@ type PreviewUrls = {
 const extractDriveId = (url?: string): string | null => {
   if (!url) return null;
   const patterns = [
-    /\/d\/([a-zA-Z0-9_-]+)\//,
-    /[?&]id=([a-zA-Z0-9_-]+)/,
-    /\/file\/d\/([a-zA-Z0-9_-]+)$/ 
+    /\/d\/([a-zA-Z0-9_-]+)\//, // /file/d/ID/
+    /[?&]id=([a-zA-Z0-9_-]+)/, // ?id=ID or &id=ID
+    /\/file\/d\/([a-zA-Z0-9_-]+)$/, // /file/d/ID
+    /\/uc\?export=download&id=([a-zA-Z0-9_-]+)/, // /uc?export=download&id=ID
   ];
   for (const re of patterns) {
-    const m = url.match(re);
-    if (m && m[1]) return m[1];
-  }
-  return null;
-};
-
-/* Extract YouTube Video ID */
-const extractYoutubeId = (url?: string): string | null => {
-  if (!url) return null;
-
-  const patterns = [
-    /youtube\.com\/.*v=([^&]+)/,
-    /youtu\.be\/([^?]+)/,
-    /youtube\.com\/embed\/([^?]+)/,
-  ];
-
-  for (const re of patterns) {
-    const m = url.match(re);
-    if (m && m[1]) {
-      return m[1];
-    }
+    const match = url.match(re);
+    if (match?.[1]) return match[1];
   }
   return null;
 };
 
 /* Convert ANY video URL to preview/play URL */
-const resolveVideoUrl = (url?: string): PreviewUrls => {
-  if (!url) return { playable: "", preview: "" };
+const resolveVideoSource = (url?: string): VideoSource => {
+  if (!url) return { type: "none", playable: "", preview: "" };
 
-  // 1️⃣ YouTube
-  const ytId = extractYoutubeId(url);
-  if (ytId) {
+  // 1. YouTube (watch?v=, youtu.be/, embed/)
+  const ytRegex =
+    /(?:youtube\.com\/.*v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/;
+  const ytMatch = url.match(ytRegex);
+  if (ytMatch) {
+    const id = ytMatch[1];
     return {
-      playable: `https://www.youtube.com/embed/${ytId}`,
-      preview: `https://www.youtube.com/embed/${ytId}`,
+      type: "youtube",
+      playable: `https://www.youtube.com/embed/${id}`,
+      preview: "",
     };
   }
 
-  // 2️⃣ Google Drive
+  // 2. Google Drive
   const driveId = extractDriveId(url);
   if (driveId) {
     return {
+      type: "drive",
       playable: `https://drive.google.com/uc?export=download&id=${driveId}`,
       preview: `https://drive.google.com/file/d/${driveId}/preview`,
     };
   }
 
-  // 3️⃣ Direct video links (mp4, etc.)
-  return { playable: url, preview: url };
+  // 3. Direct video extension (.mp4, .webm, .mov, etc.)
+  const exts = [".mp4", ".mov", ".webm", ".ogg", ".m4v"];
+  const lower = url.toLowerCase();
+  if (exts.some((ext) => lower.endsWith(ext))) {
+    return { type: "direct", playable: url, preview: "" };
+  }
+
+  return { type: "other", playable: url, preview: "" };
 };
 
 /* -----------------------------------------
@@ -86,11 +80,13 @@ const CourseCurriculum: React.FC<{ sections: Sections[] }> = ({
   sections,
 }) => {
   const [openSection, setOpenSection] = useState<number | null>(0);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewVideo, setPreviewVideo] = useState<VideoSource | null>(null);
+  const [videoError, setVideoError] = useState(false);
 
   const handlePreview = (videoURL: string) => {
-    const { preview } = resolveVideoUrl(videoURL);
-    setPreviewUrl(preview);
+    const videoSource = resolveVideoSource(videoURL);
+    setPreviewVideo(videoSource);
+    setVideoError(false);
     document.body.style.overflow = "hidden";
   };
 
@@ -190,22 +186,41 @@ const CourseCurriculum: React.FC<{ sections: Sections[] }> = ({
       </div>
 
       {/* Preview Modal */}
-      {previewUrl && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-          <div className="relative w-11/12 max-w-3xl aspect-video bg-black rounded-lg overflow-hidden">
-            <iframe
-              src={previewUrl}
-              className="w-full h-full"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-            />
+      {previewVideo && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden">
+            {previewVideo.type === "direct" && !videoError ? (
+              <video
+                key={previewVideo.playable}
+                src={previewVideo.playable}
+                controls
+                controlsList="nodownload"
+                className="w-full h-full object-contain"
+                onError={() => setVideoError(true)}
+              />
+            ) : previewVideo.type === "youtube" || previewVideo.type === "drive" ? (
+              <iframe
+                title="Video preview"
+                src={previewVideo.type === "youtube" ? previewVideo.playable : previewVideo.preview}
+                allow="autoplay; encrypted-media; fullscreen"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-white">
+                <PlayCircle className="w-16 h-16 mb-4 opacity-50" />
+                <p>Preview not available</p>
+              </div>
+            )}
 
             <button
               onClick={() => {
-                setPreviewUrl(null);
+                setPreviewVideo(null);
+                setVideoError(false);
                 document.body.style.overflow = "auto";
               }}
-              className="absolute top-3 right-3 text-white text-xl"
+              className="absolute top-3 right-3 text-white bg-black/50 hover:bg-black/70 rounded-full p-2 transition-colors"
+              aria-label="Close preview"
             >
               ✕
             </button>
