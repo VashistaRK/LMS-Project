@@ -176,7 +176,7 @@ export default function TestPage1() {
 
   return (
     <div className="min-h-screen p-6 bg-gray-50">
-      <div className="max-w-6xl mx-auto space-y-4">
+      <div className="max-w-7xl mx-auto space-y-4">
         <header className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">{test.title}</h1>

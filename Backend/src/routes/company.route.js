@@ -368,6 +368,11 @@ router.post("/:slug/tests/:testId/start", async (req, res) => {
               starterCode: q.starterCode || "",
               input: q.input || "",
               expectedOutput: q.expectedOutput || "",
+              description: q.description || "",
+              testCases: q.testCases || [],
+              constraints: q.constraints || "",
+              hint: q.hint || "",
+              question: q.question || "",
             };
           }
 

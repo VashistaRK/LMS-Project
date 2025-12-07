@@ -13,10 +13,13 @@ type QuestionSnapshot = {
   answer?: any;
   points?: number;
   starterCode?: string;
+  testCases?: { input: string; output: string }[];
   input?: string;
   expectedOutput?: string;
   title?: string;
   description?: string;
+  constraints?: string;
+  hints?: string[];
 };
 
 export default function TechCodingTestPage() {
@@ -45,8 +48,8 @@ export default function TechCodingTestPage() {
         const data = await startAttempt(id!, testId!);
         setAttemptId(data.attemptId || null);
 
-        const coding = (data.questions || []).filter(
-          (q: any) => q.type?.includes("Coding")
+        const coding = (data.questions || []).filter((q: any) =>
+          q.type?.includes("Coding")
         );
 
         const normalized = coding.map((q: any, idx: number) => ({
@@ -56,8 +59,11 @@ export default function TechCodingTestPage() {
           starterCode: q.starterCode || q.starter || "",
           input: q.input || "",
           expectedOutput: q.expectedOutput ?? q.output ?? null,
+          testCases: q.testCases || [],
           title: q.title,
           description: q.description || "",
+          constraints: q.constraints || "",
+          hints: q.hints || [],
         }));
 
         setCodingQs(normalized);
@@ -81,45 +87,71 @@ export default function TechCodingTestPage() {
     setRunResult(null);
   };
 
-  // Main runCode using JUDGE0
   const runCode = useCallback(async () => {
     if (!codingQs[active]) return;
 
     setRunning(true);
     setRunResult(null);
 
+    const testCases = codingQs[active].testCases || [];
+    const results: any[] = [];
+
     try {
-      const payload = {
-        source_code: code,
-        language_id: languageId,
-        stdin: codingQs[active].input || "",
-        expected_output: codingQs[active].expectedOutput ?? null,
-      };
+      for (let i = 0; i < testCases.length; i++) {
+        const tc = testCases[i];
 
-      // Judge0 run API
-      const url = `${JUDGE0_URL}/submissions?base64_encoded=false&fields=stdout,stderr,status,compile_output,expected_output,time,memory&wait=true`;
+        const payload = {
+          source_code: code,
+          language_id: languageId,
+          stdin: tc.input,
+          expected_output: tc.output,
+        };
 
-      const r = await axios.post(url, payload, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+        const url = `${JUDGE0_URL}/submissions?base64_encoded=false&fields=stdout,stderr,status,compile_output,expected_output,time,memory&wait=true`;
 
-      const result = r.data;
-      console.log("Run result:", result);
+        const r = await axios.post(url, payload, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      // Compare expected output
-      if (codingQs[active].expectedOutput != null) {
+        const output = r.data;
+
         const clean = (x: string) => x?.trim();
-        result.passed =
-          clean(result.stdout) ===
-          clean(codingQs[active].expectedOutput || "");
+
+        const passed =
+          clean(output.stdout) === clean(tc.output) &&
+          !output.stderr &&
+          !output.compile_output;
+
+        results.push({
+          index: i + 1,
+          input: tc.input,
+          expected: tc.output,
+          received: output.stdout,
+          passed,
+          stderr: output.stderr,
+          compile: output.compile_output,
+          status: output.status,
+        });
+
+        // If compile error → no need to continue running next testcases
+        if (output.compile_output) break;
       }
 
-      setRunResult(result);
+      // Global status
+      const allPassed = results.every((r) => r.passed);
+
+      setRunResult({
+        allPassed,
+        results,
+      });
     } catch (err) {
       console.error(err);
-      setRunResult({ error: "Execution failed", details: err });
+      setRunResult({
+        error: "Execution failed",
+        details: err,
+      });
     } finally {
       setRunning(false);
     }
@@ -178,22 +210,42 @@ export default function TechCodingTestPage() {
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
         {/* Question Panel */}
         <div className="border rounded p-4 overflow-y-auto">
-          <h2 className="text-xl font-bold mb-2">
-            {q.title || `Question ${active + 1}`}
+          <h2 className="text-lg font-semibold mb-2">
+            {`Question ${active + 1}`}
           </h2>
-          <div className="prose whitespace-pre-wrap mb-4">
+          <div className="text-xl font-bold mb-2">
             {q.question || q.description}
           </div>
+          <div className="prose whitespace-pre-wrap mb-4">{q.description}</div>
 
-          <h4 className="font-semibold">Input</h4>
-          <pre className="bg-gray-100 p-2 rounded">
-            {q.input || "<no input>"}
-          </pre>
+          {q.testCases ? (
+            q.testCases.map((tc, i) => (
+              <div key={i} className="mb-2">
+                <h4 className="font-semibold">Input</h4>
+                <pre className="bg-gray-100 p-2 rounded">{tc.input}</pre>
+                <h4 className="mt-3 font-semibold">Expected Output</h4>
+                <pre className="bg-gray-100 p-2 rounded">{tc.output}</pre>
+              </div>
+            ))
+          ) : (
+            <p>No test cases provided.</p>
+          )}
 
-          <h4 className="mt-3 font-semibold">Expected Output</h4>
-          <pre className="bg-gray-100 p-2 rounded">
-            {q.expectedOutput ?? "<none>"}
-          </pre>
+          <h4 className="font-semibold">Constrains:</h4>
+          <p className="bg-gray-100 p-2 rounded">{q.constraints}</p>
+          <h4 className="font-semibold mt-4">Hints:</h4>
+
+          {q.hints && q.hints.length > 0 ? (
+            <ul className="list-disc ml-6 mt-2">
+              {q.hints.map((hint: string, i: number) => (
+                <li key={i} className="p-2 rounded mb-2">
+                  {hint}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 italic">No hints provided.</p>
+          )}
         </div>
 
         {/* Editor + Result */}
@@ -242,46 +294,69 @@ export default function TechCodingTestPage() {
             </div>
 
             {runResult ? (
-              <>
-                <div className="mb-2">
-                  <strong>Status:</strong>{" "}
-                  {runResult.status?.description ||
-                    runResult.status?.message ||
-                    JSON.stringify(runResult.status)}
-                </div>
-
-                {runResult.stdout && (
-                  <pre className="bg-white p-2 rounded">
-                    {runResult.stdout}
-                  </pre>
-                )}
-
-                {runResult.stderr && (
-                  <pre className="bg-white p-2 rounded text-red-500">
-                    {runResult.stderr}
-                  </pre>
-                )}
-
-                {runResult.compile_output && (
-                  <pre className="bg-white p-2 rounded text-orange-500">
-                    {runResult.compile_output}
-                  </pre>
-                )}
-
-                {q.expectedOutput != null && (
+              runResult.error ? (
+                <div className="text-red-600">{runResult.error}</div>
+              ) : (
+                <>
                   <div
-                    className={`mt-2 px-3 py-2 rounded ${
-                      runResult.passed
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
+                    className={`p-2 rounded mb-3 font-semibold ${
+                      runResult.allPassed
+                        ? "bg-green-200 text-green-800"
+                        : "bg-red-200 text-red-800"
                     }`}
                   >
-                    {runResult.passed
-                      ? "Test Case Passed"
-                      : "Test Case Failed"}
+                    {runResult.allPassed
+                      ? "All Test Cases Passed 🎉"
+                      : "Some Test Cases Failed ❌"}
                   </div>
-                )}
-              </>
+
+                  {runResult.results.map((tc: any, i: number) => (
+                    <div key={i} className="mb-4 p-3 rounded border bg-white">
+                      <div className="font-semibold mb-1">
+                        Test Case {tc.index} →{" "}
+                        {tc.passed ? (
+                          <span className="text-green-600">Passed</span>
+                        ) : (
+                          <span className="text-red-600">Failed</span>
+                        )}
+                      </div>
+
+                      <div>
+                        <strong>Input:</strong>
+                        <pre className="bg-gray-100 p-2 rounded">
+                          {tc.input}
+                        </pre>
+                      </div>
+
+                      <div className="mt-2">
+                        <strong>Expected:</strong>
+                        <pre className="bg-gray-100 p-2 rounded">
+                          {tc.expected}
+                        </pre>
+                      </div>
+
+                      <div className="mt-2">
+                        <strong>Received:</strong>
+                        <pre className="bg-gray-100 p-2 rounded">
+                          {tc.received}
+                        </pre>
+                      </div>
+
+                      {tc.stderr && (
+                        <pre className="bg-red-100 text-red-600 p-2 rounded mt-2">
+                          {tc.stderr}
+                        </pre>
+                      )}
+
+                      {tc.compile && (
+                        <pre className="bg-orange-100 text-orange-700 p-2 rounded mt-2">
+                          {tc.compile}
+                        </pre>
+                      )}
+                    </div>
+                  ))}
+                </>
+              )
             ) : (
               <div className="text-gray-500">Run code to see output.</div>
             )}

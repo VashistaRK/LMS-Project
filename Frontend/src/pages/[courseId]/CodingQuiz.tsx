@@ -1,24 +1,17 @@
 /*eslint-disable*/
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Editor from "@monaco-editor/react";
 import {
   Play,
   Terminal,
   CheckCircle,
   XCircle,
   Clock,
-  Trophy,
-  Settings,
-  Sun,
-  Moon,
-  Maximize2,
-  Minimize2,
   RefreshCw,
   Send,
   Eye,
   EyeOff,
 } from "lucide-react";
-// import { useParams } from "react-router";
-// import { useMutation, useQuery } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
 
 interface TestCase {
@@ -64,17 +57,13 @@ export default function LeetCodeQuiz({
   onSave: (res: any) => void;
   onFinish: () => void;
 }) {
-  // const { quizId } = useParams<{ quizId: string }>();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [code, setCode] = useState<string>("");
   const [output, setOutput] = useState<string>("");
   const [results, setResults] = useState<Result[]>([]);
-  const [activeTab, setActiveTab] = useState<
-    "description" | "editorial" | "submissions" | "discussions"
-  >("description");
-  const [testTab, setTestTab] = useState<"testcase" | "result">("testcase");
-  const [darkMode, setDarkMode] = useState(true);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [testTab, ] = useState<"testcase" | "result">("result");
+  const [darkMode, ] = useState(true);
+  const [isFullscreen, ] = useState(false);
   const [showHints, setShowHints] = useState(false);
   const [currentHint, setCurrentHint] = useState(0);
   const [fontSize, setFontSize] = useState(14);
@@ -90,24 +79,62 @@ export default function LeetCodeQuiz({
     { id: 60, label: "Go", value: "go" },
     { id: 68, label: "PHP", value: "php" },
   ];
+  const getTemplate = (langId: number) => {
+    switch (langId) {
+      case 71: // Python
+        return `import sys\n\ndef solve():\n    # read from stdin and write to stdout\n    data = sys.stdin.read().strip()\n    # process input\n    print(data)\n\nif __name__ == \"__main__\":\n    solve()`;
+      case 63: // JavaScript
+        return `const fs = require('fs');\nfunction solve(input) {\n  // write your solution here\n  console.log(input.trim());\n}\n\nconst input = fs.readFileSync(0, 'utf8');\nsolve(input);`;
+      case 74: // TypeScript
+        return `import fs from 'fs';\nfunction solve(input: string): void {\n  // write your solution here\n  console.log(input.trim());\n}\n\nconst input = fs.readFileSync(0, 'utf8');\nsolve(input);`;
+      case 62: // Java
+        return `import java.io.*;\nimport java.util.*;\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        Scanner sc = new Scanner(System.in);\n        StringBuilder sb = new StringBuilder();\n        while (sc.hasNextLine()) {\n            sb.append(sc.nextLine());\n            if (sc.hasNextLine()) sb.append('\n');\n        }\n        System.out.println(sb.toString().trim());\n    }\n}`;
+      case 54: // C++
+        return `#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    string s, line;\n    bool first = true;\n    while (std::getline(cin, line)) {\n        if (!first) cout << "\\n";\n        cout << line;\n        first = false;\n    }\n    return 0;\n}`;
+      case 52: // C
+        return `#include <stdio.h>\nint main(){\n    char buf[4096];\n    size_t n = fread(buf,1,sizeof(buf)-1,stdin);\n    if (n>0) { buf[n]=0; printf("%s", buf); }\n    return 0;\n}`;
+      case 60: // Go
+        return `package main\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"os\"\n)\nfunc main(){\n    in := bufio.NewReader(os.Stdin)\n    data, _ := in.ReadString('\x00')\n    // fallback: read all\n    bs, _ := io.ReadAll(os.Stdin)\n    if len(bs)>0 { fmt.Print(string(bs)) }\n}`;
+      case 68: // PHP
+        return `<?php\n$input = trim(stream_get_contents(STDIN));\n// write your solution here\necho $input;\n?>`;
+      default:
+        return "";
+    }
+  };
 
-  // const { data: question, isLoading, error } = useQuery<Question>({
-  //   queryKey: ["coding-quiz", quizId],
-  //   queryFn: async () => {
-  //     const res = await fetch(`${API}/api/code/${quizId}`);
-  //     if (!res.ok) throw new Error("Failed to load question");
-  //     return res.json();
-  //   },
-  //   enabled: !!quizId,
-  // });
+  const mapToMonacoLanguage = (langId: number) => {
+    switch (langId) {
+      case 71:
+        return "python";
+      case 63:
+        return "javascript";
+      case 74:
+        return "typescript";
+      case 62:
+        return "java";
+      case 54:
+        return "cpp";
+      case 52:
+        return "c";
+      case 60:
+        return "go";
+      case 68:
+        return "php";
+      default:
+        return "plaintext";
+    }
+  };
+
+  const handleLanguageChange = (e: any) => {
+    const id = Number(e.target.value);
+    setSelectedLang(id);
+    if (!code || code.trim() === "") {
+      setCode(getTemplate(id));
+    }
+  };
+
 
   const question: Question | undefined = questions[currentIndex];
-
-  useEffect(() => {
-    if (question?.starterCode) {
-      setCode(question.starterCode);
-    }
-  }, [question]);
 
   const runMutation = useMutation({
     mutationFn: async (payload: {
@@ -157,7 +184,10 @@ export default function LeetCodeQuiz({
         const payload = {
           source_code: code,
           language_id: selectedLang,
-          stdin: tc.input || "",
+          stdin:
+            tc.input !== undefined && tc.input !== null
+              ? String(tc.input) + (String(tc.input).endsWith("\n") ? "" : "\n")
+              : "",
           expected_output: tc.output || "",
         };
 
@@ -178,23 +208,15 @@ export default function LeetCodeQuiz({
         const r = await res.json();
         console.log("Run result for test case:", r);
 
-        // Judge0 status codes:
-        // 1: In Queue, 2: Processing, 3: Accepted, 4-11: Various errors
         const statusId = r.status?.id;
         const isAccepted = statusId === 3;
-
-        // Clean and compare outputs
         const clean = (x: string | null | undefined) => (x || "").trim().replace(/\r\n/g, "\n");
         const actualOutput = clean(r.stdout);
         const expectedOutput = clean(tc.output);
-
-        // Check if output matches expected (only if status is Accepted)
         const outputMatches = isAccepted && actualOutput === expectedOutput;
         
-        // Determine if test passed
         const pass = isAccepted && outputMatches && !r.stderr && !r.compile_output;
 
-        // Get error message if any
         let errorMsg = "";
         if (!isAccepted) {
           const statusDesc = r.status?.description || "Unknown error";
@@ -246,7 +268,10 @@ export default function LeetCodeQuiz({
         const payload = {
           source_code: code,
           language_id: selectedLang,
-          stdin: tc.input || "",
+          stdin:
+            tc.input !== undefined && tc.input !== null
+              ? String(tc.input) + (String(tc.input).endsWith("\n") ? "" : "\n")
+              : "",
           expected_output: tc.output || "",
         };
 
@@ -267,23 +292,17 @@ export default function LeetCodeQuiz({
         const r = await res.json();
         console.log("Submit result:", r);
 
-        // Judge0 status codes:
-        // 1: In Queue, 2: Processing, 3: Accepted, 4-11: Various errors
         const statusId = r.status?.id;
         const isAccepted = statusId === 3;
 
-        // Clean and compare outputs
         const clean = (x: string | null | undefined) => (x || "").trim().replace(/\r\n/g, "\n");
         const actualOutput = clean(r.stdout);
         const expectedOutput = clean(tc.output);
 
-        // Check if output matches expected (only if status is Accepted)
         const outputMatches = isAccepted && actualOutput === expectedOutput;
         
-        // Determine if test passed
         const pass = isAccepted && outputMatches && !r.stderr && !r.compile_output;
 
-        // Get error message if any
         let errorMsg = "";
         if (!isAccepted) {
           const statusDesc = r.status?.description || "Unknown error";
@@ -322,7 +341,6 @@ export default function LeetCodeQuiz({
       allPassed ? "All test cases passed! 🎉" : "Some test cases failed ❌"
     );
 
-    // save result for this question
     onSave({
       sectionIndex,
       questionIndex: currentIndex,
@@ -330,7 +348,6 @@ export default function LeetCodeQuiz({
       results: finalResults,
     });
 
-    // move to next question or finish
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
@@ -358,32 +375,6 @@ export default function LeetCodeQuiz({
   const textClass = darkMode ? "text-gray-100" : "text-gray-900";
   const mutedTextClass = darkMode ? "text-gray-400" : "text-gray-600";
 
-  // if (isLoading) {
-  //   return (
-  //     <div
-  //       className={`${bgClass} ${textClass} min-h-screen flex items-center justify-center`}
-  //     >
-  //       <div className="flex items-center space-x-2">
-  //         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
-  //         <span>Loading question...</span>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // if (error) {
-  //   return (
-  //     <div
-  //       className={`${bgClass} ${textClass} min-h-screen flex items-center justify-center`}
-  //     >
-  //       <div className="text-center">
-  //         <div className="text-red-500 text-xl mb-2">Error</div>
-  //         <div className="text-gray-400">Failed to load question</div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   if (!question) {
     return (
       <div
@@ -400,83 +391,16 @@ export default function LeetCodeQuiz({
     <div
       className={`${bgClass} ${textClass} min-h-screen transition-colors duration-200`}
     >
-      {/* Header */}
       <div
-        className={`${cardClass} border-b px-4 py-3 flex items-center justify-between`}
+        className={`min-h-screen flex`}
       >
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <Terminal className="w-6 h-6 text-red-500" />
-            <span className="font-bold text-lg">Sunadh Code</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <Trophy className="w-4 h-4 text-yellow-500" />
-            <span className="text-sm">Premium</span>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className={`p-2 rounded-lg ${
-              darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
-            } transition-colors`}
-          >
-            {darkMode ? (
-              <Sun className="w-4 h-4" />
-            ) : (
-              <Moon className="w-4 h-4" />
-            )}
-          </button>
-
-          <button
-            onClick={() => setIsFullscreen(!isFullscreen)}
-            className={`p-2 rounded-lg ${
-              darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
-            } transition-colors`}
-          >
-            {isFullscreen ? (
-              <Minimize2 className="w-4 h-4" />
-            ) : (
-              <Maximize2 className="w-4 h-4" />
-            )}
-          </button>
-
-          <Settings className="w-4 h-4 cursor-pointer hover:text-gray-400" />
-        </div>
-      </div>
-
-      <div
-        className={`${
-          isFullscreen ? "h-[calc(100vh-60px)]" : "h-[calc(100vh-60px)]"
-        } flex`}
-      >
-        {/* Left Panel - Problem Description */}
         <div
           className={`${
             isFullscreen ? "w-0 overflow-hidden" : "w-1/2"
           } ${cardClass} border-r transition-all duration-300`}
         >
-          <div className="flex border-b">
-            {["description", "editorial", "submissions", "discussions"].map(
-              (tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab as any)}
-                  className={`px-4 py-3 text-sm font-medium capitalize border-b-2 transition-colors ${
-                    activeTab === tab
-                      ? "border-red-500 text-red-500"
-                      : "border-transparent hover:text-gray-400"
-                  }`}
-                >
-                  {tab}
-                </button>
-              )
-            )}
-          </div>
 
           <div className="p-6 overflow-auto h-full">
-            {activeTab === "description" && (
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center justify-between mb-4">
@@ -629,41 +553,6 @@ export default function LeetCodeQuiz({
                   </div>
                 )}
               </div>
-            )}
-            {activeTab === "editorial" && (
-              <div className="space-y-4">
-                <h2 className="text-xl font-bold">Solution</h2>
-                <div
-                  className={`p-4 rounded-lg ${
-                    darkMode
-                      ? "bg-blue-900/20 border border-blue-800"
-                      : "bg-blue-50 border border-blue-200"
-                  }`}
-                >
-                  <p className="text-sm">
-                    The key insight is to use a hash map to store numbers we've
-                    seen and their indices. For each number, we check if its
-                    complement (target - current number) exists in our map.
-                  </p>
-                </div>
-              </div>
-            )}
-            {activeTab === "submissions" && (
-              <div className="space-y-4">
-                <h2 className="text-xl font-bold">My Submissions</h2>
-                <p className={mutedTextClass}>
-                  No submissions yet. Submit your solution to see it here!
-                </p>
-              </div>
-            )}
-            {activeTab === "discussions" && (
-              <div className="space-y-4">
-                <h2 className="text-xl font-bold">Discussions</h2>
-                <p className={mutedTextClass}>
-                  Join the discussion about this problem!
-                </p>
-              </div>
-            )}
           </div>
         </div>
 
@@ -681,7 +570,7 @@ export default function LeetCodeQuiz({
               <select
                 className="p-2 border bg-black rounded w-40"
                 value={selectedLang}
-                onChange={(e) => setSelectedLang(Number(e.target.value))}
+                onChange={handleLanguageChange}
               >
                 {LANGUAGES.map((lang) => (
                   <option key={lang.value} value={lang.id}>
@@ -710,7 +599,7 @@ export default function LeetCodeQuiz({
 
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => setCode(question.starterCode || "")}
+                onClick={() => setCode(getTemplate(selectedLang) || "")}
                 className={`p-2 rounded ${
                   darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
                 } transition-colors`}
@@ -732,81 +621,40 @@ export default function LeetCodeQuiz({
 
           {/* Code Editor */}
           <div className="flex-1 relative">
-            <div
-              className="h-full font-mono"
+            <div className="h-full"
               style={{
                 backgroundColor: darkMode ? "#1e1e1e" : "#ffffff",
-                fontSize: `${fontSize}px`,
                 lineHeight: "1.6",
               }}
             >
-              <textarea
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className={`w-full h-full p-4 resize-none border-none outline-none ${
-                  darkMode
-                    ? "bg-gray-900 text-gray-100"
-                    : "bg-white text-gray-900"
-                } font-mono`}
-                style={{ fontSize: `${fontSize}px` }}
-                spellCheck={false}
-                placeholder="// Write your code here..."
-              />
-            </div>
+                <Editor
+                  height="100%"
+                  value={code}
+                  theme={darkMode ? "vs-dark" : "light"}
+                  language={mapToMonacoLanguage(selectedLang)}
+                  options={{
+                    minimap: { enabled: false },
+                    fontSize: fontSize,
+                    automaticLayout: true,
+                    wordWrap: 'on',
+                    folding: true,
+                    scrollBeyondLastLine: false,
+                  }}
+                  onChange={(value) => setCode(value || "")}
+                />
+              </div>
           </div>
 
           {/* Test Cases / Results Panel */}
           <div className={`${cardClass} border-t h-64`}>
-            <div className="flex border-b">
-              <button
-                onClick={() => setTestTab("testcase")}
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                  testTab === "testcase"
-                    ? "border-red-500 text-red-500"
-                    : "border-transparent hover:text-gray-400"
-                }`}
-              >
-                Testcase
-              </button>
-              <button
-                onClick={() => setTestTab("result")}
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                  testTab === "result"
-                    ? "border-red-500 text-red-500"
-                    : "border-transparent hover:text-gray-400"
-                }`}
-              >
+            <div className="flex items-center border-b px-4 py-2">
+              <span className="px-4 py-2 text-sm font-medium border-b-2 border-red-500">
                 Test Result
-              </button>
+              </span>
             </div>
 
             <div className="p-4 h-full overflow-auto">
-              {testTab === "testcase" && (
-                <div className="space-y-3">
-                  {question.testCases && question.testCases.length > 0 ? (
-                    question.testCases.map((tc, i) => (
-                      <div
-                        key={i}
-                        className={`p-3 rounded ${
-                          darkMode ? "bg-gray-700" : "bg-gray-100"
-                        }`}
-                      >
-                        <div className="text-sm font-mono">
-                          <div className={mutedTextClass}>Input:</div>
-                          <div className="mb-2">{tc.input}</div>
-                          <div className={mutedTextClass}>output:</div>
-                          <div>{tc.output}</div>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className={`text-center ${mutedTextClass} py-8`}>
-                      <Terminal className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                      <p>No test cases available</p>
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Testcase listing removed — show results only by default */}
 
               {testTab === "result" && (
                 <div className="space-y-3">
