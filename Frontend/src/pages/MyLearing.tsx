@@ -121,19 +121,24 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
 
   // Overall completion as average of individual course progress (0-100)
   const totalProgress = courses.reduce((acc, c) => acc + (c.progress || 0), 0);
-  const completionRate = courses.length > 0 ? Math.round(totalProgress / courses.length) : 0;
+  const completionRate =
+    courses.length > 0 ? Math.round(totalProgress / courses.length) : 0;
 
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-[70vh]">
-        <p className="text-lg text-gray-600 animate-pulse">Loading courses...</p>
+        <p className="text-lg text-gray-600 animate-pulse">
+          Loading courses...
+        </p>
       </div>
     );
 
   if (!courses.length)
     return (
       <div className="flex justify-center items-center min-h-[70vh]">
-        <p className="text-gray-500 text-lg">You haven’t enrolled in any courses yet.</p>
+        <p className="text-gray-500 text-lg">
+          You haven’t enrolled in any courses yet.
+        </p>
       </div>
     );
 
@@ -163,8 +168,8 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
               cx="80"
               cy="80"
             />
-              <circle
-                className="text-red-500"
+            <circle
+              className="text-red-500"
               strokeWidth="10"
               strokeLinecap="round"
               stroke="currentColor"
@@ -176,11 +181,28 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
               strokeDashoffset={2 * Math.PI * 60 * (1 - completionRate / 100)}
             />
           </svg>
-            <span className="absolute text-xl font-bold text-red-600">
+          <span className="absolute text-xl font-bold text-red-600">
             {completionRate}%
           </span>
         </aside>
       </header>
+
+      {/* ---------------- WHATSAPP FLOATING BUTTON ---------------- */}
+      <a
+        href="https://chat.whatsapp.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center transition-all"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+          className="w-8 h-8"
+        >
+          <path d="M20.52 3.48A11.87 11.87 0 0012 0a11.87 11.87 0 00-8.52 3.48A11.87 11.87 0 000 12a11.87 11.87 0 001.64 6L0 24l6.2-1.63A11.87 11.87 0 0012 24a11.87 11.87 0 008.52-3.48A11.87 11.87 0 0024 12a11.87 11.87 0 00-3.48-8.52zM12 22a9.93 9.93 0 01-5.06-1.39l-.36-.21-3.68.97 1-3.51-.23-.37A9.92 9.92 0 1122 12a10 10 0 01-10 10zm5.12-7.23c-.28-.14-1.64-.81-1.89-.9s-.44-.14-.63.14-.72.9-.89 1.09-.33.21-.61.07a8.14 8.14 0 01-2.39-1.47 9 9 0 01-1.66-2.07c-.17-.28 0-.43.13-.57s.28-.33.42-.5a1.91 1.91 0 00.28-.47.51.51 0 000-.48c-.07-.14-.63-1.5-.86-2.06s-.46-.48-.63-.49h-.54a1 1 0 00-.71.33 3 3 0 00-.93 2.22 5.28 5.28 0 001.11 2.83 12.06 12.06 0 009.39 5.6 2.66 2.66 0 001.81-.74 2.21 2.21 0 00.5-1.41c0-.38-.05-.61-.23-.75s-.49-.21-.77-.35z" />
+        </svg>
+      </a>
 
       {/* ----------- CONTINUE LEARNING SECTION ----------- */}
       <section className="mb-8">
@@ -259,7 +281,9 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
             <button
               onClick={() => setViewMode("grid")}
               className={`p-2 rounded shadow ${
-                viewMode === "grid" ? "bg-red-600 text-white" : "bg-gray-100 text-gray-600"
+                viewMode === "grid"
+                  ? "bg-red-600 text-white"
+                  : "bg-gray-100 text-gray-600"
               }`}
             >
               <LayoutGrid size={18} />
@@ -267,7 +291,9 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
             <button
               onClick={() => setViewMode("list")}
               className={`p-2 rounded shadow ${
-                viewMode === "list" ? "bg-red-600 text-white" : "bg-gray-100 text-gray-600"
+                viewMode === "list"
+                  ? "bg-red-600 text-white"
+                  : "bg-gray-100 text-gray-600"
               }`}
             >
               <List size={18} />
@@ -294,7 +320,13 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
       </div>
 
       {/* ---------------- COURSES GRID/LIST ---------------- */}
-      <div className={`grid gap-6 mt-10 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
+      <div
+        className={`grid gap-6 mt-10 ${
+          viewMode === "grid"
+            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+            : "grid-cols-1"
+        }`}
+      >
         {paginatedCourses.map((course) => {
           const thumbUrl = getThumbnailUrl(course);
           const instructorNames = getInstructorNames(course);
@@ -325,13 +357,19 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
                     {course.title}
                   </h2>
                   <p className="text-sm text-gray-500 mb-2">
-                    {instructorNames || "Instructor"} • {course.difficulty ?? "All"} • {course.duration ?? ""}
+                    {instructorNames || "Instructor"} •{" "}
+                    {course.difficulty ?? "All"} • {course.duration ?? ""}
                   </p>
                   {viewMode === "list" && (
-                    <p className="text-gray-600 mb-2">{(course as any).shortDescription}</p>
+                    <p className="text-gray-600 mb-2">
+                      {(course as any).shortDescription}
+                    </p>
                   )}
                   <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                    <div className="bg-red-500 h-1 rounded-full transition-all" style={{ width: `${course.progress}%` }} />
+                    <div
+                      className="bg-red-500 h-1 rounded-full transition-all"
+                      style={{ width: `${course.progress}%` }}
+                    />
                   </div>
                   <p className="text-xs text-gray-600 mt-1">
                     {course.progress}% complete

@@ -48,6 +48,7 @@ import AdminQuizPage from "./admin/AdminQuestionsHandle.tsx";
 import CompanyTestTake from "./pages/CompanyTestTake.tsx";
 import AdminLayout from "./admin/AdminSidepanel.tsx";
 import ScrollToTop from "./scrolltotop.tsx";
+import SuperAdmin from "./admin/SuperAdmin.tsx";
 
 const queryClient = new QueryClient();
 
@@ -119,6 +120,7 @@ const router = createBrowserRouter([
               { path: "students", element: <AdminMonitoringPage /> },
               { path: "analytics", element: <AdminAnalysisPage /> },
               { path: "FAQ", element: <AdminFaqsPage /> },
+              { path: "super-admin", element: <SuperAdmin /> },
             ],
           },
           { path: "assessments", element: <AdminAssessments /> },

@@ -146,4 +146,66 @@ router.post("/clean-invalid-purchases", requireAdmin, async (req, res) => {
   }
 });
 
+// --------------------------
+// GET ALL USERS (Admin Only)
+// --------------------------
+router.get("/users", requireAdmin, async (req, res) => {
+  try {
+    const users = await User.find({})
+      .select("-password") // never expose passwords
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, users });
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+// --------------------------------------------------
+// UPDATE USER (Admin) – name, email, role, status etc
+// --------------------------------------------------
+router.patch("/users/:id", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    // Prevent dangerous fields from being updated accidentally
+    const allowedFields = [
+      "name",
+      "email",
+      "role",
+      "isActive",
+      "purchasedCourses",
+      "phone",
+    ];
+
+    const safeUpdate = {};
+    Object.keys(updates).forEach((key) => {
+      if (allowedFields.includes(key)) {
+        safeUpdate[key] = updates[key];
+      }
+    });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $set: safeUpdate },
+      { new: true }
+    ).select("-password");
+
+    if (!updatedUser)
+      return res.status(404).json({ error: "User not found" });
+
+    res.json({
+      success: true,
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;

@@ -14,6 +14,7 @@ type LoadedQuestion = {
   options?: string[];
   points?: number;
   qIndex?: number; // index inside attempt snapshot
+  correctAnswer?: number; // correct answer index from backend (answer field)
 };
 
 const baseURL = import.meta.env.VITE_API_URL;
@@ -38,6 +39,8 @@ export default function TestPage() {
   const [score, setScore] = useState<{ score: number; total: number } | null>(
     null
   );
+  const [resultDetails, setResultDetails] = useState<any[] | null>(null);
+  const [showAnswers, setShowAnswers] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const alertShownRef = useRef<boolean>(false);
@@ -134,6 +137,7 @@ export default function TestPage() {
         options: Array.isArray(q.options) ? q.options : [],
         points: q.points ?? 0,
         qIndex: q.qIndex ?? undefined,
+        correctAnswer: q.answer ?? undefined,
       }));
 
       setQuestions(qArr);
@@ -272,7 +276,6 @@ export default function TestPage() {
       if (!ok) return;
     }
 
-    // build payload matching server expectation: qIndex (server qIndex) OR position index
     // server expected qIndex: attempts snapshot used qIndex when creating attempt; but submitAttempt in your code uses qIndex numbers referencing snapshot index
     // Here we send qIndex as the displayed index (0..n-1)
     const payload = Object.keys(answers).map((qIndexStr) => ({
@@ -282,20 +285,55 @@ export default function TestPage() {
 
     try {
       const res = await submitAttempt(attemptId, payload);
-      // exit fullscreen
+      setEnded(true);
+      alertShownRef.current = true;
+      removeAntiCheatListeners();
+
+      // exit fullscreen (best-effort)
       if (document.fullscreenElement) {
         try {
           await document.exitFullscreen();
         } catch {}
       }
+
       setScore({ score: res.score ?? 0, total: res.total ?? 0 });
-      removeAntiCheatListeners();
-      // Navigate after a short delay to allow user to see the score
-      setTimeout(() => {
-        try {
-          navigate("/freshers-pratice");
-        } catch {}
-      }, 3000);
+
+      // Evaluate answers using correctAnswer from question data
+      // The correctAnswer field is already loaded with each question (from line 140)
+      const details = (questions || []).map((q, idx) => {
+        const submitted = answers[idx];
+        const correct = q.correctAnswer; // Use correctAnswer from question data
+        
+        // For MCQ: compare submitted option index with correct answer index
+        // For Descriptive: no auto-evaluation (manual grading)
+        let isCorrect = false;
+        if (q.type === "MCQ") {
+          // Both should be numbers (option indices)
+          if (typeof submitted === "number" && typeof correct === "number") {
+            isCorrect = submitted === correct;
+          } else if (submitted !== undefined && correct !== undefined) {
+            // Fallback: compare as strings
+            isCorrect = String(submitted) === String(correct);
+          }
+        }
+        // Descriptive questions are not auto-evaluated
+
+        return {
+          index: idx,
+          question: q.question,
+          type: q.type,
+          options: q.options ?? [],
+          points: q.points ?? 0,
+          submitted,
+          correct,
+          isCorrect,
+        };
+      });
+
+      setResultDetails(details);
+
+      // show results & answers UI instead of redirecting
+      setShowAnswers(true);
     } catch (err) {
       console.error("Submit failed", err);
       alert("Failed to submit attempt. Please try again.");
@@ -335,25 +373,9 @@ export default function TestPage() {
           <p className="text-sm text-gray-600 mt-1">Category: {id ?? "—"}</p>
         </div>
 
-        {score ? (
-          <div className="bg-white rounded-2xl shadow p-8 text-center">
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Assessment Submitted!
-              </h2>
-              <div className="text-4xl font-bold text-blue-600 mt-4">
-                Score: {score.score} / {score.total}
-              </div>
-              <p className="text-gray-600 mt-2">
-                Redirecting to practice list...
-              </p>
-            </div>
-          </div>
-        ) : !attemptId ? (
+        {!attemptId ? (
           <div className="bg-white rounded-2xl shadow p-6">
-            <p className="mb-4 text-gray-700">
-              Duration: {durationSec} seconds
-            </p>
+            <p className="mb-4 text-gray-700">Duration: {durationSec} seconds</p>
             <button
               onClick={doStart}
               className="inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:opacity-95 shadow"
@@ -362,7 +384,38 @@ export default function TestPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-12 gap-6">
+          <>
+            {score && (
+              <div className="bg-white rounded-2xl shadow p-6 mb-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      Assessment Submitted
+                    </h2>
+                    <div className="text-3xl font-bold text-blue-600 mt-2">
+                      {score.score} / {score.total}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      Results shown below — correct options are highlighted.
+                    </div>
+                  </div>
+                  <div>
+                    <button
+                      onClick={() => {
+                        try {
+                          navigate("/freshers-pratice");
+                        } catch {}
+                      }}
+                      className="px-4 py-2 rounded bg-blue-600 text-white font-medium hover:opacity-95"
+                    >
+                      Back to practice
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-12 gap-6">
             {/* Left Sidebar: Questions list */}
             <aside className="col-span-3">
               <div className="sticky top-6">
@@ -370,25 +423,43 @@ export default function TestPage() {
 
                 <div className="flex flex-wrap gap-2">
                   {questions.map((_q, idx) => {
-                    const answered = isAnswered(idx);
                     const isCurrent = idx === currentIndex;
+                    const detail = resultDetails && Array.isArray(resultDetails)
+                      ? resultDetails[idx]
+                      : null;
 
-                    // styles per Option B1:
-                    // Blue = current, Green = answered, Gray = not answered
+                    // Determine coloring: when results are shown, use correctness; otherwise use answered/current
                     const base =
                       "w-10 h-10 rounded-full flex items-center justify-center font-medium cursor-pointer select-none";
-                    const cls = isCurrent
-                      ? "bg-blue-500 text-white"
-                      : answered
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-200 text-gray-700";
+
+                    let cls = "bg-gray-200 text-gray-700";
+                    if (showAnswers && detail) {
+                      // Use isCorrect field from evaluation
+                      if (detail.isCorrect === true) {
+                        cls = "bg-green-500 text-white";
+                      } else if (detail.isCorrect === false) {
+                        cls = "bg-red-500 text-white";
+                      } else if (typeof detail.submitted !== "undefined") {
+                        // Descriptive or unanswered
+                        cls = "bg-gray-300 text-gray-700";
+                      } else {
+                        cls = "bg-gray-200 text-gray-700";
+                      }
+                    } else {
+                      const answered = isAnswered(idx);
+                      cls = isCurrent
+                        ? "bg-blue-500 text-white"
+                        : answered
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 text-gray-700";
+                    }
+
+                    if (isCurrent) cls += " ring-2 ring-offset-1 ring-blue-300";
 
                     return (
                       <button
                         key={idx}
-                        aria-label={`Question ${idx + 1} ${
-                          answered ? "answered" : "not answered"
-                        } ${isCurrent ? "current" : ""}`}
+                        aria-label={`Question ${idx + 1}`}
                         className={`${base} ${cls}`}
                         onClick={() => openQuestion(idx)}
                       >
@@ -434,19 +505,56 @@ export default function TestPage() {
                       <div className="flex flex-col gap-3">
                         {questions[currentIndex]?.options?.map((opt, i) => {
                           const checked = answers[currentIndex] === i;
+                          const det = resultDetails && Array.isArray(resultDetails)
+                            ? resultDetails[currentIndex]
+                            : null;
+                          const correctIndex = det && typeof det.correct !== 'undefined' && det.correct !== null ? Number(det.correct) : undefined;
+                          const userSubmitted = typeof det?.submitted !== 'undefined' && det.submitted !== null ? Number(det.submitted) : (typeof answers[currentIndex] !== 'undefined' ? Number(answers[currentIndex]) : undefined);
+                          const isCorrectOption = correctIndex === i;
+                          const isUserAnswer = userSubmitted === i;
+                          const isWrongAnswer = isUserAnswer && !isCorrectOption;
+
+                          let optionClass = "flex items-center gap-4 p-4 rounded-lg border-2 transition-all";
+                          if (showAnswers && det) {
+                            if (isCorrectOption) {
+                              optionClass += " bg-green-50 border-green-400";
+                            } else if (isWrongAnswer) {
+                              optionClass += " bg-red-50 border-red-400";
+                            } else {
+                              optionClass += " bg-gray-50 border-gray-200";
+                            }
+                          } else {
+                            optionClass += checked 
+                              ? " bg-blue-50 border-blue-400 cursor-pointer" 
+                              : " bg-white border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer";
+                          }
+
                           return (
-                            <label
-                              key={i}
-                              className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer"
-                            >
+                            <label key={i} className={optionClass}>
                               <input
                                 type="radio"
                                 name={`q-${currentIndex}`}
-                                value={i}
                                 checked={checked}
                                 onChange={() => handleMCQ(currentIndex, i)}
+                                disabled={showAnswers}
+                                className="w-5 h-5 text-blue-600"
                               />
-                              <span>{opt}</span>
+                              <div className="flex-1">
+                                <div className="font-medium text-gray-800">
+                                  <span className="font-bold mr-2">{String.fromCharCode(65 + i)}.</span>
+                                  {opt}
+                                </div>
+                              </div>
+                              {showAnswers && det && (
+                                <div className="flex items-center gap-2">
+                                  {isCorrectOption && (
+                                    <span className="text-green-600 font-bold text-sm">✓ Correct Answer</span>
+                                  )}
+                                  {isWrongAnswer && (
+                                    <span className="text-red-600 font-bold text-sm">✗ Your Answer (Wrong)</span>
+                                  )}
+                                </div>
+                              )}
                             </label>
                           );
                         })}
@@ -454,15 +562,23 @@ export default function TestPage() {
                     )}
 
                     {questions[currentIndex]?.type === "Descriptive" && (
-                      <textarea
-                        className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                        rows={6}
-                        placeholder="Write your answer here..."
-                        value={(answers[currentIndex] as string) || ""}
-                        onChange={(e) =>
-                          handleDesc(currentIndex, e.target.value)
-                        }
-                      />
+                      <div>
+                        <textarea
+                          className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                          rows={6}
+                          placeholder="Write your answer here..."
+                          value={(answers[currentIndex] as string) || ""}
+                          onChange={(e) =>
+                            handleDesc(currentIndex, e.target.value)
+                          }
+                          disabled={showAnswers}
+                        />
+                        {showAnswers && (
+                          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+                            ⚠ This question requires manual grading and is not included in the auto-calculated score.
+                          </div>
+                        )}
+                      </div>
                     )}
 
                     {/* Nav buttons */}
@@ -523,6 +639,7 @@ export default function TestPage() {
               </div>
             </main>
           </div>
+          </>
         )}
       </div>
     </div>

@@ -1,4 +1,5 @@
-import { Home, Users, BarChart3, ShieldQuestionMark } from "lucide-react";
+import { useAuthContext } from "@/context/AuthProvider";
+import { Home, Users, BarChart3, ShieldQuestionMark, User } from "lucide-react";
 import { Link, Outlet } from "react-router-dom";
 
 const sidebarItems = [
@@ -9,6 +10,7 @@ const sidebarItems = [
 ];
 
 export default function AdminLayout() {
+   const { user } = useAuthContext();
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
@@ -26,6 +28,15 @@ export default function AdminLayout() {
               {item.name}
             </Link>
           ))}
+          {user && user.role==="Master_ADMIN" && (
+            <Link
+              to="/admin/super-admin"
+              className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 transition-all font-medium text-gray-700"
+            >
+              <User className="w-5 h-5" />
+              Super Admin
+            </Link>
+          )}
         </nav>
       </aside>
 

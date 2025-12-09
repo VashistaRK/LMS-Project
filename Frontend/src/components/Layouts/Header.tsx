@@ -166,11 +166,11 @@ export default function Header() {
       {/* Landing page: floating header until first scroll, then hide entirely */}
       <AnimatePresence>
         {isLanding && !hasScrolledOnce && (
-          <motion.header key="landing-header" className={`fixed w-full z-50 transition-all duration-500 bg-red-700/70 backdrop-blur-xl py-4 border border-white/20`}>
+          <motion.header key="landing-header" className={`fixed w-full z-50 transition-all duration-500 bg-zinc-600 backdrop-blur-xl py-4 border border-white/20`}>
             <div className="min-w-full mx-auto px-6">
               <div className="flex justify-between items-center h-16">
                 <a href="/" className="flex items-center space-x-2">
-                  <img src="images/Sunadh-Logo.png" alt="Logo" className="h-10 w-auto select-none pointer-events-none" />
+                  <img src="images/Sunadh-Logo.png" alt="Logo" className="h-20 w-auto select-none pointer-events-none" />
                 </a>
 
                 <nav className="hidden md:flex items-center space-x-3 font-bold text-white">
@@ -178,6 +178,7 @@ export default function Header() {
                   <a href="/freshers-pratice" className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"><Library className="w-4 h-4 mr-2" /> Freshers Ready</a>
                   <a href="/courses" className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"><GraduationCap className="w-4 h-4 mr-2" /> Courses</a>
                   <a href="/my-learning" className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"><BookOpen className="w-4 h-4 mr-2" /> My Learning</a>
+                  <a href="https://resume-forge-eight.vercel.app/" className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"><BookOpen className="w-4 h-4 mr-2" /> Resumes</a>
                 </nav>
 
                 {Controls}
