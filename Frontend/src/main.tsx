@@ -49,6 +49,8 @@ import CompanyTestTake from "./pages/CompanyTestTake.tsx";
 import AdminLayout from "./admin/AdminSidepanel.tsx";
 import ScrollToTop from "./scrolltotop.tsx";
 import SuperAdmin from "./admin/SuperAdmin.tsx";
+import ResumesPage from "./pages/ResumesPage.tsx";
+import AdminResumesPage from "./admin/AdminResumes.tsx";
 
 const queryClient = new QueryClient();
 
@@ -81,7 +83,7 @@ const router = createBrowserRouter([
         element: <RequireAuth />, // acts as guard
         children: [
           { path: "cart", element: <Cart /> },
-
+          { path: "resumes", element: <ResumesPage /> },
           { path: "notifications", element: <NotificationsPage /> },
           { path: "/profile", element: <ProfilePage /> },
           { path: "/my-learning", element: <MyLearningWrapper /> },
@@ -121,6 +123,7 @@ const router = createBrowserRouter([
               { path: "analytics", element: <AdminAnalysisPage /> },
               { path: "FAQ", element: <AdminFaqsPage /> },
               { path: "super-admin", element: <SuperAdmin /> },
+              { path: "resumes", element: <AdminResumesPage /> },
             ],
           },
           { path: "assessments", element: <AdminAssessments /> },

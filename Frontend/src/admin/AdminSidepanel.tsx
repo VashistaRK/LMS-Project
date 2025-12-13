@@ -7,6 +7,7 @@ const sidebarItems = [
   { name: "Students", href: "/admin/students", icon: Users },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "FAQ", href: "/admin/FAQ", icon: ShieldQuestionMark },
+  { name: "Resumes", href: "/admin/resumes", icon: ShieldQuestionMark },
 ];
 
 export default function AdminLayout() {

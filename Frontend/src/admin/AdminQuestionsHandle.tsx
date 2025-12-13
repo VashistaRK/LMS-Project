@@ -989,34 +989,61 @@ export default function AdminQuizPage() {
 
               {/* PAGINATION BUTTONS */}
               <div className="flex justify-between items-center px-6 py-4 bg-gray-50 border-t">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
-                    currentPage === 1
-                      ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                      : "text-red-600 border-red-300 hover:bg-red-50"
-                  }`}
-                >
-                  Previous
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(1)}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                      currentPage === 1
+                        ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                        : "text-red-600 border-red-300 hover:bg-red-50"
+                    }`}
+                  >
+                    First
+                  </button>
+
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                      currentPage === 1
+                        ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                        : "text-red-600 border-red-300 hover:bg-red-50"
+                    }`}
+                  >
+                    Previous
+                  </button>
+                </div>
 
                 <span className="text-sm text-gray-700">
-                  Page <strong>{currentPage}</strong> of{" "}
-                  <strong>{totalPages}</strong>
+                  Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
                 </span>
 
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
-                    currentPage === totalPages
-                      ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                      : "text-red-600 border-red-300 hover:bg-red-50"
-                  }`}
-                >
-                  Next
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                      currentPage === totalPages
+                        ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                        : "text-red-600 border-red-300 hover:bg-red-50"
+                    }`}
+                  >
+                    Next
+                  </button>
+
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(totalPages)}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                      currentPage === totalPages
+                        ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                        : "text-red-600 border-red-300 hover:bg-red-50"
+                    }`}
+                  >
+                    Last
+                  </button>
+                </div>
               </div>
             </div>
           </>
@@ -1169,34 +1196,61 @@ export default function AdminQuizPage() {
               </div>
             )}
             <div className="flex justify-between items-center px-6 py-4 bg-gray-50 border-t">
-              <button
-                disabled={currentCodePage === 1}
-                onClick={() => setCurrentCodePage(currentCodePage - 1)}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
-                  currentCodePage === 1
-                    ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                    : "text-red-600 border-red-300 hover:bg-red-50"
-                }`}
-              >
-                Previous
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  disabled={currentCodePage === 1}
+                  onClick={() => setCurrentCodePage(1)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                    currentCodePage === 1
+                      ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                      : "text-red-600 border-red-300 hover:bg-red-50"
+                  }`}
+                >
+                  First
+                </button>
+
+                <button
+                  disabled={currentCodePage === 1}
+                  onClick={() => setCurrentCodePage(currentCodePage - 1)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                    currentCodePage === 1
+                      ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                      : "text-red-600 border-red-300 hover:bg-red-50"
+                  }`}
+                >
+                  Previous
+                </button>
+              </div>
 
               <span className="text-sm text-gray-700">
-                Page <strong>{currentCodePage}</strong> of{" "}
-                <strong>{totalCodePages}</strong>
+                Page <strong>{currentCodePage}</strong> of <strong>{totalCodePages}</strong>
               </span>
 
-              <button
-                disabled={currentCodePage === totalCodePages}
-                onClick={() => setCurrentCodePage(currentCodePage + 1)}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
-                  currentCodePage === totalCodePages
-                    ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                    : "text-red-600 border-red-300 hover:bg-red-50"
-                }`}
-              >
-                Next
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  disabled={currentCodePage === totalCodePages}
+                  onClick={() => setCurrentCodePage(currentCodePage + 1)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                    currentCodePage === totalCodePages
+                      ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                      : "text-red-600 border-red-300 hover:bg-red-50"
+                  }`}
+                >
+                  Next
+                </button>
+
+                <button
+                  disabled={currentCodePage === totalCodePages}
+                  onClick={() => setCurrentCodePage(totalCodePages)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold border ${
+                    currentCodePage === totalCodePages
+                      ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                      : "text-red-600 border-red-300 hover:bg-red-50"
+                  }`}
+                >
+                  Last
+                </button>
+              </div>
             </div>
           </div>
         )}

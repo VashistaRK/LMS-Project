@@ -96,4 +96,45 @@ router.get("/:docId", async (req, res) => {
   }
 });
 
+// 📋 Get all resumes
+router.get("/resumes/list/all", async (req, res) => {
+  try {
+    const resumes = await Doc.find(
+      { pdfData: { $exists: true, $ne: null } },
+      { pdfData: 0, content: 0, notes: 0 }
+    ).lean();
+
+    const formatted = resumes.map((doc) => ({
+      _id: doc._id,
+      docId: doc.docId,
+      pdfSize: doc.pdfSize || 0,
+      pdfCompressedSize: doc.pdfCompressedSize || 0,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+      pdfUrl: `/docs/${encodeURIComponent(doc.docId)}/pdf`,
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error("❌ Fetch resumes error:", err);
+    res.status(500).json({ error: "Failed to fetch resumes" });
+  }
+});
+
+// 🗑️ Delete a resume
+router.delete("/:docId", async (req, res) => {
+  try {
+    const { docId } = req.params;
+    const result = await Doc.findOneAndDelete({ docId });
+
+    if (!result)
+      return res.status(404).json({ error: "Resume not found" });
+
+    res.json({ message: "✅ Resume deleted successfully", docId });
+  } catch (err) {
+    console.error("❌ Delete error:", err);
+    res.status(500).json({ error: "Failed to delete resume" });
+  }
+});
+
 export default router;

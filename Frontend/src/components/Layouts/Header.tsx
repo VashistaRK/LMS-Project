@@ -178,7 +178,7 @@ export default function Header() {
                   <a href="/freshers-pratice" className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"><Library className="w-4 h-4 mr-2" /> Freshers Ready</a>
                   <a href="/courses" className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"><GraduationCap className="w-4 h-4 mr-2" /> Courses</a>
                   <a href="/my-learning" className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"><BookOpen className="w-4 h-4 mr-2" /> My Learning</a>
-                  <a href="https://resume-forge-eight.vercel.app/" className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"><BookOpen className="w-4 h-4 mr-2" /> Resumes</a>
+                  <a href="/resumes" className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"><BookOpen className="w-4 h-4 mr-2" /> Resumes</a>
                 </nav>
 
                 {Controls}
@@ -202,6 +202,7 @@ export default function Header() {
                 <a href="/freshers-pratice" className="flex items-center px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-xl transition"><Library className="w-4 h-4 mr-2" /> Freshers Ready</a>
                 <a href="/courses" className="flex items-center px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-xl transition"><GraduationCap className="w-4 h-4 mr-2" /> Courses</a>
                 <a href="/my-learning" className="flex items-center px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-xl transition"><BookOpen className="w-4 h-4 mr-2" /> My Learning</a>
+                <a href="/resumes" className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"><BookOpen className="w-4 h-4 mr-2" /> Resumes</a>
               </nav>
 
               {Controls}
