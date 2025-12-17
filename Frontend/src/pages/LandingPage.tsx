@@ -19,25 +19,29 @@ const categories = [
     icon: <Database className="text-[#B00000] text-2xl" />,
     title: "AI + Data",
     desc: "Work smarter (and harder) with artificial intelligence and keep up with Cloud + Data trends.",
-    extra: "Explore machine learning, data engineering, and AI-driven analytics to transform raw data into actionable insights.",
+    extra:
+      "Explore machine learning, data engineering, and AI-driven analytics to transform raw data into actionable insights.",
   },
   {
     icon: <Code className="text-[#B00000] text-2xl" />,
     title: "Software dev",
     desc: "Build fluency in languages like C#, Java, Angular, and JavaScript and learn to develop efficiently.",
-    extra: "Master modern frameworks, agile methodologies, and DevOps practices to deliver scalable, maintainable software.",
+    extra:
+      "Master modern frameworks, agile methodologies, and DevOps practices to deliver scalable, maintainable software.",
   },
   {
     icon: <Cloud className="text-[#B00000] text-2xl" />,
     title: "Cloud + IT Ops",
     desc: "From AWS to Google Cloud and everything in between, expand your cloud expertise.",
-    extra: "Gain hands-on experience with cloud infrastructure, container orchestration, and continuous integration pipelines.",
+    extra:
+      "Gain hands-on experience with cloud infrastructure, container orchestration, and continuous integration pipelines.",
   },
   {
     icon: <ShieldCheck className="text-[#B00000] text-2xl" />,
     title: "Security",
     desc: "Stop cyber attacks in their tracks and secure critical skills to keep data safe.",
-    extra: "Learn threat modeling, penetration testing, and compliance standards to protect digital assets effectively.",
+    extra:
+      "Learn threat modeling, penetration testing, and compliance standards to protect digital assets effectively.",
   },
 ];
 
@@ -64,7 +68,6 @@ export default function LandingPage() {
   const scaleSectionRef = useRef<HTMLDivElement>(null);
   const videoScrollerRef = useRef<HTMLDivElement>(null);
 
-
   const scroll = (direction: "left" | "right") => {
     const el = videoScrollerRef.current;
     if (!el) return;
@@ -77,7 +80,6 @@ export default function LandingPage() {
     "https://www.youtube.com/embed/Lv1ABw3RPwc?si=PHJd53FTA73ssqdx",
     "https://www.youtube.com/embed/w6C_ABHXMZU?si=YAEpmOZCDcoE5SVd",
   ];
-
 
   // Use the scale section as the scroll container for better control
   const { scrollYProgress } = useScroll({
@@ -93,16 +95,16 @@ export default function LandingPage() {
     [0.3, 1, 1, 0.8]
   );
 
- // useEffect(() => {
-    // Better mobile detection with resize handling
-    //const checkMobile = () => {
-    //  setIsMobile(window.innerWidth < 1200);
-    //};
+  // useEffect(() => {
+  // Better mobile detection with resize handling
+  //const checkMobile = () => {
+  //  setIsMobile(window.innerWidth < 1200);
+  //};
 
-    //checkMobile();
-    //window.addEventListener("resize", checkMobile);
+  //checkMobile();
+  //window.addEventListener("resize", checkMobile);
 
-    //return () => window.removeEventListener("resize", checkMobile);
+  //return () => window.removeEventListener("resize", checkMobile);
   //}, []);
 
   const getCategoryExtraContent = (title: string) => {
@@ -124,15 +126,57 @@ export default function LandingPage() {
     <ParallaxProvider>
       <div className="text-gray-800 flex flex-col items-center font-Quick overflow-hidden">
         {/* Hero Section */}
-        <section className="relative w-full min-h-screen overflow-hidden flex items-start justify-center">
-          <video
-            className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
-            src="videos/bgg.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-          />
+        <section className="relative w-full mt-10 min-h-screen overflow-hidden flex items-start justify-center">
+          <div className="relative mx-auto max-w-[85rem] px-6 py-28">
+            <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
+              {/* Left Content */}
+              <div className="space-y-8">
+                <span className="inline-flex items-center rounded-full border border-red-400/30 bg-red-500/10 px-4 py-1 text-sm text-red-500">
+                  AI‑Powered Learning & Career Guidance
+                </span>
+
+                <h1 className="text-4xl font-bold leading-tight sm:text-5xl xl:text-6xl">
+                  Learn Smarter. <br />
+                  <span className="bg-gradient-to-r from-red-800 to-red-400 bg-clip-text text-transparent">
+                    Build Your Career Faster.
+                  </span>
+                </h1>
+
+                <p className="max-w-xl text-lg text-gray-800">
+                  Join the premier self-paced learning ecosystem designed for
+                  ambitious professionals — it mentors you.
+                  <br /> Master technical skills, refine soft skills, and
+                  connect with industry-leading employers. Learn with AI tutors,
+                  get personalized roadmaps, build job‑ready resumes, and
+                  connect your learning directly to real career opportunities.
+                </p>
+
+                <div className="flex flex-wrap gap-4">
+                  <button className="rounded-2xl bg-red-600 px-8 py-4 font-semibold shadow-lg transition text-gray-200 hover:bg-red-500">
+                    Start Learning for Free
+                  </button>
+                  <button className="rounded-2xl border border-white/20 px-8 py-4 font-semibold text-white transition hover:bg-white/10">
+                    Explore Career Paths
+                  </button>
+                </div>
+
+                {/* Trust Points */}
+                <div className="flex flex-wrap gap-6 pt-6 text-sm text-zinc-800">
+                  <div>🎓 Guided Learning Paths</div>
+                  <div>🤖 AI Chatbot Mentor</div>
+                  <div>📄 Resume & Interview Prep</div>
+                  <div>💼 Job‑Ready Skill Mapping</div>
+                </div>
+              </div>
+
+              {/* Right Visual Card */}
+              <div className="relative">
+                <div className="rounded-xl border-t-2 border-l-2 border-t-red-500 border-l-red-500 bg-white/5 p-8 shadow-lg backdrop-blur-xl">
+                  <img src="images/working.jpeg" alt="working" />
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Scroll-linked Hero Text with Scale Effect */}
@@ -144,7 +188,10 @@ export default function LandingPage() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 1 }}
         >
-          <motion.div style={{ scale, opacity }} className="relative bg-red-700 text-white w-full">
+          <motion.div
+            style={{ scale, opacity }}
+            className="relative bg-red-700 text-white w-full"
+          >
             <h2 className="text-2xl sm:text-4xl lg:text-5xl text-center font-semibold leading-relaxed">
               A complete LMS to take you from beginner to job‑ready
             </h2>
@@ -169,7 +216,9 @@ export default function LandingPage() {
                   className="bg-red-50 p-8 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 cursor-pointer group"
                 >
                   <div className="mb-6 text-[#B00000]">{c.icon}</div>
-                  <h3 className="text-2xl text-[#B00000] font-bold mb-3">{c.title}</h3>
+                  <h3 className="text-2xl text-[#B00000] font-bold mb-3">
+                    {c.title}
+                  </h3>
                   <p className="text-black text-base leading-relaxed">
                     {c.desc} {getCategoryExtraContent(c.title)}
                   </p>
@@ -184,10 +233,9 @@ export default function LandingPage() {
           <ArchSection />
         </section>
         {/* <ParallaxBusiness /> */}
-        <CareerPreparation/>
+        <CareerPreparation />
         <section className="w-full min-h-screen bg-gradient-to-br from-[#1B1B1B] via-[#2D2D2D] to-[#1B1B1B] flex items-center justify-center px-4 sm:px-8">
           <div className="relative flex flex-col sm:flex-row text-white justify-between items-center backdrop-blur-lg bg-[#FFFFFF]/10 rounded-3xl p-8 sm:p-16 shadow-lg max-w-7xl md:min-w-7xl border border-[#E5E5E5]/30">
-
             {/* Left Text Section */}
             <motion.aside
               initial={{ opacity: 0, x: -200 }}
@@ -204,20 +252,21 @@ export default function LandingPage() {
               </h2>
 
               <p className="text-lg font-semibold max-w-lg text-start text-[#E5E5E5]">
-                Master in-demand skills with guided paths, hands-on labs, mock interviews, and career services.
-                Our LMS blends expert-led content with projects and assessments so you build a portfolio employers trust
-                and the confidence to crack interviews.
+                Master in-demand skills with guided paths, hands-on labs, mock
+                interviews, and career services. Our LMS blends expert-led
+                content with projects and assessments so you build a portfolio
+                employers trust and the confidence to crack interviews.
               </p>
 
               {/* Buttons */}
               <nav className="mt-6">
                 <a href="/courses" className="flex gap-4">
-                <button className="p-2 md:p-3 rounded-full text-xs sm:text-sm bg-[#E10600] text-white hover:bg-[#B00000] hover:scale-110 hover:shadow-[0_0_15px_#FF2E2E] transition-all duration-300">
-                  Explore courses
-                </button>
-                <button className="p-2 sm:p-3 border border-[#E10600] rounded-full text-xs sm:text-sm bg-white text-[#1B1B1B] font-semibold hover:bg-[#E10600] hover:text-white hover:scale-110 transition-all duration-300">
-                  Start learning now
-                </button>
+                  <button className="p-2 md:p-3 rounded-full text-xs sm:text-sm bg-[#E10600] text-white hover:bg-[#B00000] hover:scale-110 hover:shadow-[0_0_15px_#FF2E2E] transition-all duration-300">
+                    Explore courses
+                  </button>
+                  <button className="p-2 sm:p-3 border border-[#E10600] rounded-full text-xs sm:text-sm bg-white text-[#1B1B1B] font-semibold hover:bg-[#E10600] hover:text-white hover:scale-110 transition-all duration-300">
+                    Start learning now
+                  </button>
                 </a>
               </nav>
             </motion.aside>
@@ -245,8 +294,8 @@ export default function LandingPage() {
               Future‑proof your skills with guided, practical learning
             </h2>
             <p className="max-w-2xl text-center mb-12">
-              Structured paths, expert mentorship, and hands‑on projects help you
-              move from theory to real‑world application—so you can showcase
+              Structured paths, expert mentorship, and hands‑on projects help
+              you move from theory to real‑world application—so you can showcase
               job‑ready skills and stand out in interviews.
             </p>
             <motion.div
@@ -278,9 +327,12 @@ export default function LandingPage() {
         <section className="bg-gray-900 py-16 w-full text-white">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-10">
-              <h2 className="text-3xl sm:text-4xl font-bold mb-3">Career guidance that actually helps</h2>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-3">
+                Career guidance that actually helps
+              </h2>
               <p className="text-gray-300 max-w-2xl mx-auto">
-                Short, practical guidance paired with curated videos to help you make confident, job‑ready decisions.
+                Short, practical guidance paired with curated videos to help you
+                make confident, job‑ready decisions.
               </p>
             </div>
             <div className="relative w-full max-w-7xl mx-auto py-8">
@@ -322,7 +374,12 @@ export default function LandingPage() {
               </button>
             </div>
             <div className="flex items-center justify-center">
-              <a href="/carrer-guidence" className="rounded-xl p-4 bg-red-700 text-xl text-white">View All Content</a>
+              <a
+                href="/carrer-guidence"
+                className="rounded-xl p-4 bg-red-700 text-xl text-white"
+              >
+                View All Content
+              </a>
             </div>
           </div>
         </section>
