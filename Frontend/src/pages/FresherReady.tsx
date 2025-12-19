@@ -28,10 +28,44 @@ export default function FreshersReady() {
   }, []);
 
   const tabs = [
-    { key: "communication", label: "Communication", id: "communication" },
-    { key: "aptitude", label: "Logical & Aptitude", id: "logical-aptitude" },
-    { key: "technical", label: "Technical Skills", id: "technical-skills" },
+    {
+      key: "communication",
+      label: "Communication",
+      id: "communication",
+    },
+    {
+      key: "aptitude",
+      label: "Logical & Aptitude",
+      id: "logical-aptitude",
+    },
+    {
+      key: "technical",
+      label: "Technical Skills",
+      id: "technical-skills",
+    },
   ];
+
+  // Per-tab color settings (hex used for inline styles, tailwind-safe classes for fallbacks)
+  const tabStyles: Record<
+    string,
+    { hex: string; tailwindBg: string; tailwindText: string }
+  > = {
+    communication: {
+      hex: "#7B1FA2",
+      tailwindBg: "bg-purple-700",
+      tailwindText: "#DDA7FA",
+    },
+    technical: {
+      hex: "#0B74DE",
+      tailwindBg: "bg-blue-600",
+      tailwindText: "#A7BFFA",
+    },
+    aptitude: {
+      hex: "#16A34A",
+      tailwindBg: "bg-green-600",
+      tailwindText: "#ABFAA7",
+    },
+  };
 
   const [activeTab, setActiveTab] = useState<string>(tabs[0].key);
   const [items, setItems] = useState<any[]>([]);
@@ -48,7 +82,7 @@ export default function FreshersReady() {
   // Category-specific content
   const categoryContent: Record<
     string,
-    { intro: string; tips: string[]; why: string }
+    { intro: string; tips: string[]; why: string; img: string }
   > = {
     communication: {
       intro:
@@ -61,6 +95,7 @@ export default function FreshersReady() {
         "Build emotional intelligence - Read the room and adapt your communication style",
         "Embrace feedback - Constructive criticism helps refine your communication approach",
       ],
+      img: "images/abstract_communication_concept.png",
     },
     aptitude: {
       intro:
@@ -73,6 +108,7 @@ export default function FreshersReady() {
         "Time management - Learn to solve problems efficiently under pressure",
         "Learn from mistakes - Each error is an opportunity to strengthen your approach",
       ],
+      img: "images/abstract_logic_and_aptitude_concept.png",
     },
     technical: {
       intro:
@@ -85,6 +121,7 @@ export default function FreshersReady() {
         "Develop debugging skills - Finding and fixing errors is as important as writing code",
         "Create personal projects - Practical application solidifies your knowledge",
       ],
+      img: "images/abstract_technology_concept.png",
     },
   };
 
@@ -141,37 +178,71 @@ export default function FreshersReady() {
   }, [tabs]);
 
   const content = categoryContent[activeTab];
+  const activeStyle = tabStyles[activeTab] || tabStyles.communication;
+  const activeHex = activeStyle.hex;
+  const activeTailwindText = activeStyle.tailwindText;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-[#fff6f6] to-white">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#C21817] to-[#A51515] text-white">
-        <div className="max-w-6xl mx-auto px-8 py-16">
-          <div className="text-center">
-            <h1 className="text-5xl font-bold mb-4 tracking-tight">
-              Fresher Readiness Program
-            </h1>
-            <p className="text-xl text-red-50 max-w-2xl mx-auto">
-              Master essential skills through comprehensive practice tests and
-              expert guidance
-            </p>
+      <div
+        className="bg-cover bg-center"
+        style={{ backgroundImage: `url(${content.img})` }}
+      >
+        <div className="py-16 md:py-32 bg-gradient-to-r from-black/60 to-black/0">
+          <div className="mx-auto px-8 max-w-7xl">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div>
+                <h1
+                  className="text-4xl md:text-5xl font-bold mb-3 tracking-tight"
+                  style={{ color: activeTailwindText }}
+                >
+                  Fresher Readiness Program
+                </h1>
+                <p
+                  className="text-lg md:text-xl text-gray-100/90 max-w-2xl"
+                  style={{ color: `${activeTailwindText}dd` }}
+                >
+                  Master essential skills through comprehensive practice tests
+                  and expert guidance
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span
+                  className="px-4 py-2 rounded-full text-4xl font-bold"
+                  style={{
+                    backgroundColor: `${activeTailwindText}22`,
+                    color: activeTailwindText,
+                    border: `1px solid ${activeTailwindText}`,
+                  }}
+                >
+                  {tabs.find((t) => t.key === activeTab)?.label}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-8 py-12">
-        {/* Tab Navigation */}
-        <div className="mb-12">
-          <div className="bg-white rounded-2xl shadow-xl p-2 flex flex-col md:flex-row md:inline-flex gap-2">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Tabs */}
+        <div className="mb-10">
+          <div className="bg-white rounded-2xl shadow-lg p-2 inline-flex gap-2">
             {tabs.map((t) => (
               <button
                 key={t.key}
                 id={t.id}
                 onClick={() => setActiveTab(t.key)}
-                className={`px-8 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                style={
                   activeTab === t.key
-                    ? "bg-gradient-to-r from-[#C21817] to-[#A51515] text-white shadow-lg shadow-red-200 scale-105"
-                    : "text-gray-700 hover:bg-gray-50"
+                    ? { backgroundColor: tabStyles[t.key]?.hex ?? activeHex }
+                    : undefined
+                }
+                className={`px-6 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+                  activeTab === t.key
+                    ? "text-white shadow"
+                    : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
                 {t.label}
@@ -180,170 +251,125 @@ export default function FreshersReady() {
           </div>
         </div>
 
-        {itemsError && (
-          <div className="mb-6 bg-red-50 border-l-4 border-[#C21817] p-4 rounded-lg">
-            <p className="text-red-800 font-medium">{itemsError}</p>
-          </div>
-        )}
-
-        {/* Category Introduction */}
-        {content && (
-          <div className="mb-12 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-            <div className="bg-gradient-to-r from-red-50 to-white p-8 border-b border-red-100">
-              <div className="flex items-start gap-4">
-                <div className="w-2 h-16 bg-gradient-to-b from-[#C21817] to-red-400 rounded-full"></div>
-                <div className="flex-1">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-3">
+        {/* Main Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+          {/* LEFT — CONTENT (2/5) */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Intro Card */}
+            {content && (
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-100">
+                <div className="p-6 border-b">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
                     {content.why}
                   </h2>
-                  <p className="text-lg text-gray-700 leading-relaxed">
+                  <p className="text-gray-700 leading-relaxed">
                     {content.intro}
                   </p>
                 </div>
-              </div>
-            </div>
 
-            <div className="p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <span className="w-8 h-8 bg-[#C21817] text-white rounded-lg flex items-center justify-center text-sm">
-                  ✓
-                </span>
-                Tips to Master This Skill
-              </h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                {content.tips.map((tip, idx) => (
-                  <div key={idx} className="flex gap-3 items-start group">
-                    <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-[#C21817] transition-colors">
-                      <span className="text-[#C21817] text-xs font-bold group-hover:text-white">
+                <div className="p-6 space-y-4">
+                  <h3 className="font-semibold text-gray-900">
+                    Tips to Master
+                  </h3>
+                  {content.tips.map((tip, idx) => (
+                    <div key={idx} className="flex gap-3">
+                      <span
+                        className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold"
+                        style={{ backgroundColor: activeHex }}
+                      >
                         {idx + 1}
                       </span>
+                      <p className="text-gray-700 text-sm">{tip}</p>
                     </div>
-                    <p className="text-gray-700 leading-relaxed">{tip}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Track Details from API */}
-        {trackDetails && trackDetails.content && (
-          <div className="mb-12 bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {trackDetails.title}
-            </h2>
-            {trackDetails.description && (
-              <p className="text-gray-600 mb-6 text-lg">
-                {trackDetails.description}
-              </p>
-            )}
-            <div
-              className="prose max-w-none text-gray-700 border-t border-gray-100 pt-6"
-              dangerouslySetInnerHTML={{ __html: trackDetails.content }}
-            />
-          </div>
-        )}
-
-        {/* Practice Tests Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-1 w-12 bg-gradient-to-r from-[#C21817] to-red-400 rounded-full"></div>
-            <h2 className="text-3xl font-bold text-gray-900">Practice Tests</h2>
-          </div>
-          <p className="text-gray-600 text-lg mb-8">
-            Challenge yourself with our curated practice tests designed to help
-            you excel
-          </p>
-        </div>
-
-        {/* Test Cards Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(loadingItems ? Array.from({ length: 6 }) : items).map(
-            (it: any, idx: number) => (
-              <div
-                key={it?.testId ?? idx}
-                id={it?.testId ? `test-card-${it.testId}` : undefined}
-                onClick={() =>
-                  it?.testId &&
-                  navigate(
-                    `/freshers-pratice/test/${
-                      it.trackSlug ?? resolveSlugForTab(activeTab)
-                    }/${it.testId}`
-                  )
-                }
-                className="group bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 cursor-pointer transform hover:-translate-y-1"
-              >
-                <div className="h-2 bg-gradient-to-r from-[#C21817] to-red-400"></div>
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#C21817] transition-colors leading-tight">
-                      {it?.title ?? (
-                        <span className="block h-6 bg-gray-200 rounded animate-pulse w-3/4"></span>
-                      )}
-                    </h3>
-                  </div>
-
-                  {it ? (
-                    <>
-                      <div className="flex items-center gap-3 text-sm text-gray-600 mb-4">
-                        <span className="flex items-center gap-1">
-                          <span className="w-2 h-2 bg-[#C21817] rounded-full"></span>
-                          {it.type || "Practice"}
-                        </span>
-                        <span>•</span>
-                        <span>
-                          {typeof it?.questionsCount === "number"
-                            ? it.questionsCount
-                            : Array.isArray(it?.questions)
-                            ? it.questions.length
-                            : "—"}{" "}
-                          questions
-                        </span>
-                      </div>
-
-                      <div className="flex gap-2 flex-wrap">
-                        <span className="text-xs bg-red-50 text-[#A51515] px-3 py-1.5 rounded-full font-medium border border-red-100">
-                          ⏱ Timed
-                        </span>
-                        <span className="text-xs bg-gray-50 text-gray-700 px-3 py-1.5 rounded-full font-medium border border-gray-200">
-                          📝 Practice Mode
-                        </span>
-                      </div>
-
-                      <div className="mt-4 pt-4 border-t border-gray-100">
-                        <span className="text-[#C21817] text-sm font-semibold group-hover:gap-2 flex items-center gap-1 transition-all">
-                          Start Test
-                          <span className="group-hover:translate-x-1 transition-transform">
-                            →
-                          </span>
-                        </span>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
-                      <div className="h-8 bg-gray-200 rounded animate-pulse w-full"></div>
-                    </div>
-                  )}
+                  ))}
                 </div>
               </div>
-            )
-          )}
-        </div>
+            )}
 
-        {!loadingItems && items.length === 0 && !itemsError && (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">📝</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No Tests Available
-            </h3>
-            <p className="text-gray-600">
-              Check back soon for new practice tests in this category.
-            </p>
+            {/* Track Details */}
+            {trackDetails && trackDetails.content && (
+              <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+                <h3 className="text-xl font-bold mb-3">{trackDetails.title}</h3>
+                {trackDetails.description && (
+                  <p className="text-gray-600 mb-4">
+                    {trackDetails.description}
+                  </p>
+                )}
+                <div
+                  className="prose max-w-none text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: trackDetails.content }}
+                />
+              </div>
+            )}
           </div>
-        )}
+
+          {/* RIGHT — PRACTICE TESTS (3/5) */}
+          <div className="lg:col-span-3">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Practice Tests
+              </h2>
+              <p className="text-gray-600">
+                Test your skills with curated assessments
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6">
+              {(loadingItems ? Array.from({ length: 4 }) : items).map(
+                (it: any, idx: number) => (
+                  <div
+                    key={it?.testId ?? idx}
+                    onClick={() =>
+                      it?.testId &&
+                      navigate(
+                        `/freshers-pratice/test/${
+                          it.trackSlug ?? resolveSlugForTab(activeTab)
+                        }/${it.testId}`
+                      )
+                    }
+                    className="cursor-pointer bg-white rounded-xl border border-gray-100 shadow hover:shadow-lg transition-all"
+                  >
+                    <div
+                      className="h-1"
+                      style={{ backgroundColor: activeHex }}
+                    />
+                    <div className="p-5">
+                      <h3 className="font-bold text-gray-900 mb-2">
+                        {it?.title ?? (
+                          <div className="h-5 bg-gray-200 rounded w-3/4 animate-pulse" />
+                        )}
+                      </h3>
+
+                      {it && (
+                        <>
+                          <p className="text-sm text-gray-600 mb-3">
+                            {it.questionsCount ?? it.questions?.length ?? "—"}{" "}
+                            questions
+                          </p>
+
+                          <span
+                            className="font-semibold text-sm"
+                            style={{ color: activeHex }}
+                          >
+                            Start Test →
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+
+            {!loadingItems && items.length === 0 && !itemsError && (
+              <div className="text-center py-16 bg-white rounded-xl shadow">
+                <p className="text-gray-600">
+                  No tests available for this category.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ import {
 } from "react-router-dom";
 import { ParallaxProvider } from "react-scroll-parallax";
 
-import LandingPage from "./pages/LandingPage.tsx";
+// import LandingPage from "./pages/LandingPage.tsx";
 import Carrer from "./pages/Careers.tsx";
 import CourseCatalog from "./pages/Courses.tsx";
 import CourseDetailsPage from "./pages/[courseId]/CourseDetails.tsx";
@@ -51,6 +51,7 @@ import ScrollToTop from "./scrolltotop.tsx";
 import SuperAdmin from "./admin/SuperAdmin.tsx";
 import ResumesPage from "./pages/ResumesPage.tsx";
 import AdminResumesPage from "./admin/AdminResumes.tsx";
+import LandingPage1 from "./pages/LandingPage1.tsx";
 
 const queryClient = new QueryClient();
 
@@ -70,7 +71,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />, // App should render <Outlet />
     children: [
-      { index: true, element: <LandingPage /> },
+      { index: true, element: <LandingPage1 /> },
       { path: "carrers", element: <Carrer /> },
       { path: "courses", element: <CourseCatalog /> },
       { path: "freshers-pratice", element: <FreshersReady /> },
@@ -101,7 +102,7 @@ const router = createBrowserRouter([
     children: [
       { path: "my-courses/:courseId", element: <CourseLearningPage /> },
       { path: "my-courses/test/:testId", element: <TestPage1 /> },
-       { path: "freshers-pratice/test/:id/:testId", element: <TestPage /> },
+      { path: "freshers-pratice/test/:id/:testId", element: <TestPage /> },
     ],
   },
 
