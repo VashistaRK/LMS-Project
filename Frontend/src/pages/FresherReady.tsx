@@ -189,14 +189,11 @@ export default function FreshersReady() {
         className="bg-cover bg-center"
         style={{ backgroundImage: `url(${content.img})` }}
       >
-        <div className="py-16 md:py-32 bg-gradient-to-r from-black/60 to-black/0">
-          <div className="mx-auto px-8 max-w-7xl">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div className="py-16 md:py-32 bg-gradient-to-r from-black/60 via-black/0 to-black/0">
+          <div className="mx-auto px-8">
+            <div className="flex flex-col lg:justify-between gap-6">
               <div>
-                <h1
-                  className="text-4xl md:text-5xl font-bold mb-3 tracking-tight"
-                  style={{ color: activeTailwindText }}
-                >
+                <h1 className="text-4xl md:text-6xl md:max-w-4xl font-bold mb-3 tracking-tight text-white">
                   Fresher Readiness Program
                 </h1>
                 <p

@@ -106,30 +106,27 @@ const LandingPage1 = () => {
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
             {/* Left Content */}
             <div className="space-y-8">
-              <span className="inline-flex items-center rounded-full border border-red-400/30 bg-red-500/10 px-4 py-1 text-sm text-red-500">
+              <span className="inline-flex items-center rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-1 text-sm text-blue-500">
                 AI‑Powered Learning & Career Guidance
               </span>
 
               <h1 className="text-4xl font-bold leading-tight sm:text-5xl xl:text-6xl">
                 Learn Smarter. <br />
-                <span className="bg-gradient-to-r from-red-800 to-red-400 bg-clip-text text-transparent">
-                  Build Your Career Faster.
+                <span className="bg-gradient-to-r from-blue-800 to-blue-400 bg-clip-text text-transparent">
+                  Elevate Your Career On Your Terms.
                 </span>
               </h1>
 
               <p className="max-w-xl text-lg text-gray-800">
                 Join the premier self-paced learning ecosystem designed for
-                ambitious professionals — it mentors you.
-                <br /> Master technical skills, refine soft skills, and connect
-                with industry-leading employers. Learn with AI tutors, get
-                personalized roadmaps, build job‑ready resumes, and connect your
-                learning directly to real career opportunities.
+                ambitious professionals. Master technical skills, refine soft
+                skills, and connect with industry-leading employers.
               </p>
 
               <div className="flex flex-wrap gap-4">
                 <a
                   href="/courses"
-                  className="rounded-2xl bg-red-600 px-8 py-4 font-semibold shadow-lg transition text-gray-200 hover:bg-red-500"
+                  className="rounded-2xl bg-blue-600 px-8 py-4 font-semibold shadow-lg transition text-gray-200 hover:bg-blue-500"
                 >
                   Start Learning for Free
                 </a>
@@ -137,20 +134,41 @@ const LandingPage1 = () => {
                   Explore Career Paths
                 </button>
               </div>
-
-              {/* Trust Points */}
-              <div className="flex flex-wrap gap-6 pt-6 text-sm text-zinc-800">
-                <div>🎓 Guided Learning Paths</div>
-                <div>🤖 AI Chatbot Mentor</div>
-                <div>📄 Resume & Interview Prep</div>
-                <div>💼 Job‑Ready Skill Mapping</div>
-              </div>
             </div>
 
             {/* Right Visual Card */}
             <div className="relative">
-              <div className="rounded-xl border-t-2 border-l-2 border-t-red-500 border-l-red-500 bg-white/5 p-8 shadow-lg backdrop-blur-xl">
-                <img src="images/working.jpeg" alt="working" />
+              <div className="rounded-xl border-t-2 border-l-2 border-t-blue-500 border-l-blue-500 bg-white/5 p-8 shadow-lg backdrop-blur-xl">
+                <img
+                  src="images/modern_student_studying_with_laptop.png"
+                  alt="working"
+                />
+
+                <div className="absolute -left-4 top-10 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-border/50 animate-bounce delay-700 duration-[3000ms] z-20 max-w-[200px]">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg text-green-600">
+                      <CheckCircle2 className="w-5 h-5" />
+                    </div>
+                    <span className="font-bold text-sm">Course Completed</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                    <div className="h-full w-full bg-green-500 rounded-full"></div>
+                  </div>
+                </div>
+
+                <div className="absolute -right-4 bottom-20 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-border/50 animate-bounce delay-1000 duration-[4000ms] z-20">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600">
+                      <Briefcase className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">New Job Offer</p>
+                      <p className="text-xs text-muted-foreground">
+                        TechGiant Inc.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
