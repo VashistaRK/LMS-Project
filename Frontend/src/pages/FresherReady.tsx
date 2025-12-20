@@ -82,9 +82,16 @@ export default function FreshersReady() {
   // Category-specific content
   const categoryContent: Record<
     string,
-    { intro: string; tips: string[]; why: string; img: string }
+    {
+      heroContent: string;
+      intro: string;
+      tips: string[];
+      why: string;
+      img: string;
+    }
   > = {
     communication: {
+      heroContent: "Master the Art of Communication",
       intro:
         "Effective communication is the cornerstone of professional success. In today's workplace, the ability to articulate ideas clearly, listen actively, and adapt your message to different audiences is invaluable.",
       why: "Why Communication Skills Matter",
@@ -98,6 +105,7 @@ export default function FreshersReady() {
       img: "images/abstract_communication_concept.png",
     },
     aptitude: {
+      heroContent: "Crack Every Exam With Confidence",
       intro:
         "Logical reasoning and aptitude form the foundation of problem-solving in any profession. These skills help you analyze situations, make sound decisions, and approach challenges systematically.",
       why: "Why Logical & Aptitude Skills Matter",
@@ -111,6 +119,7 @@ export default function FreshersReady() {
       img: "images/abstract_logic_and_aptitude_concept.png",
     },
     technical: {
+      heroContent: "Build the Future with Modern Tech",
       intro:
         "Technical skills are the practical knowledge and abilities required to perform specialized tasks. In the modern workplace, technical proficiency combined with problem-solving creates a powerful competitive advantage.",
       why: "Why Technical Skills Matter",
@@ -193,13 +202,15 @@ export default function FreshersReady() {
           <div className="mx-auto px-8">
             <div className="flex flex-col lg:justify-between gap-6">
               <div>
-                <h1 className="text-4xl md:text-6xl md:max-w-4xl font-bold mb-3 tracking-tight text-white">
-                  Fresher Readiness Program
-                </h1>
-                <p
-                  className="text-lg md:text-xl text-gray-100/90 max-w-2xl"
-                  style={{ color: `${activeTailwindText}dd` }}
+                <h1
+                  className="text-4xl md:text-6xl md:max-w-3xl text-transparent bg-clip-text font-extrabold font-sans mb-3 tracking-tight"
+                  style={{
+                    backgroundImage: `linear-gradient(to bottom right, #ffffff, ${activeTailwindText})`,
+                  }}
                 >
+                  {content.heroContent}
+                </h1>
+                <p className="text-lg md:text-xl text-gray-100/90 max-w-2xl">
                   Master essential skills through comprehensive practice tests
                   and expert guidance
                 </p>
@@ -207,7 +218,7 @@ export default function FreshersReady() {
 
               <div className="flex items-center gap-3">
                 <span
-                  className="px-4 py-2 rounded-full text-4xl font-bold"
+                  className="px-4 py-2 rounded-full text-4xl font-bold font-sans"
                   style={{
                     backgroundColor: `${activeTailwindText}22`,
                     color: activeTailwindText,

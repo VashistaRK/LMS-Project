@@ -51,7 +51,7 @@ export default function CompaniesPage() {
         }}
       >
         <div className="mx-auto px-6 py-12 md:py-24 bg-gradient-to-r from-black/50 via-black/0 to-black/0">
-          <h1 className="text-3xl md:text-6xl font-bold mb-2">
+          <h1 className="text-3xl md:text-6xl max-w-xl font-bold font-sans mb-2">
             Companies & Past Papers
           </h1>
           <p className="text-lg">
@@ -62,7 +62,7 @@ export default function CompaniesPage() {
 
       <div className="max-w-[85rem] mx-auto px-6 py-8">
         {/* Companies Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {(() => {
             const start = currentPage * PAGE_SIZE;
             const paginated = companies.slice(start, start + PAGE_SIZE);

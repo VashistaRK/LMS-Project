@@ -9,7 +9,11 @@ import {
   ChevronRight,
   LayoutGrid,
   List,
-  PlayIcon,
+  Play,
+  Sparkles,
+  Award,
+  Clock,
+  Zap,
 } from "lucide-react";
 import { useAuthContext } from "../context/AuthProvider";
 import getThumbnailUrl from "@/utils/getThumbnailUrl";
@@ -66,7 +70,6 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
           const completed = Array.isArray(purchasedItem?.completedChapters)
             ? purchasedItem.completedChapters.length
             : 0;
-          // protect against bad data where completed might be > total
           const rawProgress = total ? Math.round((completed / total) * 100) : 0;
           const progress = Math.min(100, Math.max(0, rawProgress));
           const status: "Not Started" | "In Progress" | "Completed" =
@@ -98,7 +101,6 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
     setCurrentPage(1);
   }, [filter, sortBy, viewMode]);
 
-  // filtering & sorting
   const filtered = useMemo(
     () =>
       courses.filter((c) => (filter === "All" ? true : c.status === filter)),
@@ -119,302 +121,408 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
     currentPage * pageSize
   );
 
-  // Overall completion as average of individual course progress (0-100)
   const totalProgress = courses.reduce((acc, c) => acc + (c.progress || 0), 0);
   const completionRate =
     courses.length > 0 ? Math.round(totalProgress / courses.length) : 0;
 
+  const completedCourses = courses.filter(
+    (c) => c.status === "Completed"
+  ).length;
+
   if (loading)
     return (
-      <div className="flex justify-center items-center min-h-[70vh]">
-        <p className="text-lg text-gray-600 animate-pulse">
-          Loading courses...
-        </p>
+      <div className="flex justify-center items-center min-h-[70vh] bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-slate-800 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600 font-medium">
+            Loading your courses...
+          </p>
+        </div>
       </div>
     );
 
   if (!courses.length)
     return (
-      <div className="flex justify-center items-center min-h-[70vh]">
-        <p className="text-gray-500 text-lg">
-          You haven’t enrolled in any courses yet.
-        </p>
+      <div className="flex justify-center items-center min-h-[70vh] bg-gray-50">
+        <div className="text-center p-8">
+          <BookOpen className="w-20 h-20 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-700 text-xl font-medium">
+            Ready to start your learning journey?
+          </p>
+          <p className="text-gray-500 mt-2">Explore courses and begin today!</p>
+        </div>
       </div>
     );
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto min-h-[90vh] mb-10">
-      {/* ---------------- HERO SECTION ---------------- */}
-      <header className="flex flex-col lg:flex-row justify-between items-center bg-red-50 text-red-900 w-full rounded-2xl mb-8 p-6 lg:px-10">
-        {/* Left Text */}
-        <aside className="flex flex-col justify-center text-center lg:text-left mb-6 lg:mb-0 max-w-xl">
-          <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
-            Welcome {user?.name || "Learner"}! 👋
-          </h1>
-          <p className="text-gray-700">
-            Here’s a quick look at your learning progress.
-          </p>
-        </aside>
+    <div className="min-h-screen bg-gray-50 pb-16">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        {/* ---------------- HERO SECTION ---------------- */}
+        <header className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl mb-8 p-8 lg:p-12 shadow-xl">
+          {/* Subtle animated background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-10 right-10 w-72 h-72 bg-white rounded-full blur-3xl animate-pulse"></div>
+            <div
+              className="absolute bottom-10 left-10 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse"
+              style={{ animationDelay: "2s" }}
+            ></div>
+          </div>
 
-        {/* Circular Progress */}
-        <aside className="relative flex items-center justify-center">
-          <svg className="w-40 h-40 -rotate-90">
-            <circle
-              className="text-gray-200"
-              strokeWidth="10"
-              stroke="currentColor"
-              fill="transparent"
-              r="60"
-              cx="80"
-              cy="80"
-            />
-            <circle
-              className="text-red-500"
-              strokeWidth="10"
-              strokeLinecap="round"
-              stroke="currentColor"
-              fill="transparent"
-              r="60"
-              cx="80"
-              cy="80"
-              strokeDasharray={2 * Math.PI * 60}
-              strokeDashoffset={2 * Math.PI * 60 * (1 - completionRate / 100)}
-            />
-          </svg>
-          <span className="absolute text-xl font-bold text-red-600">
-            {completionRate}%
-          </span>
-        </aside>
-      </header>
+          <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-8">
+            {/* Left Text */}
+            <aside className="flex flex-col justify-center text-center lg:text-left max-w-xl">
+              <div className="flex items-center gap-2 justify-center lg:justify-start mb-3">
+                <Sparkles className="w-5 h-5 text-amber-400" />
+                <span className="text-gray-300 font-medium text-sm uppercase tracking-wider">
+                  Your Learning Hub
+                </span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3">
+                Welcome back, {user?.name || "Learner"}! 👋
+              </h1>
+              <p className="text-gray-300 text-lg">
+                Track your progress and continue your learning journey
+              </p>
 
-      {/* ---------------- WHATSAPP FLOATING BUTTON ---------------- */}
-      <a
-        href="https://chat.whatsapp.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center transition-all"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-          className="w-8 h-8"
-        >
-          <path d="M20.52 3.48A11.87 11.87 0 0012 0a11.87 11.87 0 00-8.52 3.48A11.87 11.87 0 000 12a11.87 11.87 0 001.64 6L0 24l6.2-1.63A11.87 11.87 0 0012 24a11.87 11.87 0 008.52-3.48A11.87 11.87 0 0024 12a11.87 11.87 0 00-3.48-8.52zM12 22a9.93 9.93 0 01-5.06-1.39l-.36-.21-3.68.97 1-3.51-.23-.37A9.92 9.92 0 1122 12a10 10 0 01-10 10zm5.12-7.23c-.28-.14-1.64-.81-1.89-.9s-.44-.14-.63.14-.72.9-.89 1.09-.33.21-.61.07a8.14 8.14 0 01-2.39-1.47 9 9 0 01-1.66-2.07c-.17-.28 0-.43.13-.57s.28-.33.42-.5a1.91 1.91 0 00.28-.47.51.51 0 000-.48c-.07-.14-.63-1.5-.86-2.06s-.46-.48-.63-.49h-.54a1 1 0 00-.71.33 3 3 0 00-.93 2.22 5.28 5.28 0 001.11 2.83 12.06 12.06 0 009.39 5.6 2.66 2.66 0 001.81-.74 2.21 2.21 0 00.5-1.41c0-.38-.05-.61-.23-.75s-.49-.21-.77-.35z" />
-        </svg>
-      </a>
-
-      {/* ----------- CONTINUE LEARNING SECTION ----------- */}
-      <section className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl sm:text-2xl font-bold">Continue Learning</h2>
-        </div>
-
-        {ContinueLearning.length === 0 ? (
-          <p className="text-gray-500">No courses in progress.</p>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {ContinueLearning.map((course) => {
-              const thumbUrl = getThumbnailUrl(course);
-              return (
-                <Link
-                  key={getCourseId(course)}
-                  to={`/my-courses/${getCourseId(course)}`}
-                  className="block p-4 group"
-                >
-                  <div className="relative group mb-3 w-full h-40 overflow-hidden">
-                    <img
-                      src={thumbUrl}
-                      alt={course.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <PlayIcon className="bg-white/90 rounded-full p-2 h-10 w-10" />
+              {/* Stats Row */}
+              <div className="flex gap-4 mt-6 justify-center lg:justify-start flex-wrap">
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-white/20 p-2 rounded-lg">
+                      <BookOpen className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-2xl font-bold">{courses.length}</div>
+                      <div className="text-xs text-gray-300">Total Courses</div>
                     </div>
                   </div>
-                  <h3 className="font-bold text-lg">{course.title}</h3>
-                  <p className="text-sm text-gray-500">{course.status}</p>
-                  <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
-                    <div
-                      className="bg-red-500 h-1 rounded-full transition-all"
-                      style={{ width: `${course.progress}%` }}
-                    />
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-white/20 p-2 rounded-lg">
+                      <Zap className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-2xl font-bold">
+                        {ContinueLearning.length}
+                      </div>
+                      <div className="text-xs text-gray-300">Active</div>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    {course.progress}% complete
-                  </p>
-                </Link>
-              );
-            })}
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-white/20 p-2 rounded-lg">
+                      <Award className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-2xl font-bold">
+                        {completedCourses}
+                      </div>
+                      <div className="text-xs text-gray-300">Completed</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            {/* Circular Progress */}
+            <aside className="relative flex items-center justify-center">
+              <div className="relative">
+                <svg className="w-44 h-44 -rotate-90 drop-shadow-2xl">
+                  <circle
+                    className="text-white/20"
+                    strokeWidth="10"
+                    stroke="currentColor"
+                    fill="transparent"
+                    r="66"
+                    cx="88"
+                    cy="88"
+                  />
+                  <circle
+                    className="text-amber-400 transition-all duration-1000 ease-out"
+                    strokeWidth="10"
+                    strokeLinecap="round"
+                    stroke="currentColor"
+                    fill="transparent"
+                    r="66"
+                    cx="88"
+                    cy="88"
+                    strokeDasharray={2 * Math.PI * 66}
+                    strokeDashoffset={
+                      2 * Math.PI * 66 * (1 - completionRate / 100)
+                    }
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-4xl font-bold">{completionRate}%</span>
+                  <span className="text-xs text-gray-300 mt-1">Progress</span>
+                </div>
+              </div>
+            </aside>
           </div>
+        </header>
+
+        {/* ---------------- WHATSAPP FLOATING BUTTON ---------------- */}
+        <a
+          href="https://chat.whatsapp.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 z-50 bg-emerald-500 hover:bg-emerald-600 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition-all transform hover:scale-110 duration-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            className="w-7 h-7"
+          >
+            <path d="M20.52 3.48A11.87 11.87 0 0012 0a11.87 11.87 0 00-8.52 3.48A11.87 11.87 0 000 12a11.87 11.87 0 001.64 6L0 24l6.2-1.63A11.87 11.87 0 0012 24a11.87 11.87 0 008.52-3.48A11.87 11.87 0 0024 12a11.87 11.87 0 00-3.48-8.52zM12 22a9.93 9.93 0 01-5.06-1.39l-.36-.21-3.68.97 1-3.51-.23-.37A9.92 9.92 0 1122 12a10 10 0 01-10 10zm5.12-7.23c-.28-.14-1.64-.81-1.89-.9s-.44-.14-.63.14-.72.9-.89 1.09-.33.21-.61.07a8.14 8.14 0 01-2.39-1.47 9 9 0 01-1.66-2.07c-.17-.28 0-.43.13-.57s.28-.33.42-.5a1.91 1.91 0 00.28-.47.51.51 0 000-.48c-.07-.14-.63-1.5-.86-2.06s-.46-.48-.63-.49h-.54a1 1 0 00-.71.33 3 3 0 00-.93 2.22 5.28 5.28 0 001.11 2.83 12.06 12.06 0 009.39 5.6 2.66 2.66 0 001.81-.74 2.21 2.21 0 00.5-1.41c0-.38-.05-.61-.23-.75s-.49-.21-.77-.35z" />
+          </svg>
+        </a>
+
+        {/* ----------- CONTINUE LEARNING SECTION ----------- */}
+        {ContinueLearning.length > 0 && (
+          <section className="mb-10">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="bg-slate-800 p-2.5 rounded-xl">
+                <Clock className="w-6 h-6 text-white" />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Continue Learning
+              </h2>
+            </div>
+
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {ContinueLearning.map((course) => {
+                const thumbUrl = getThumbnailUrl(course);
+                return (
+                  <Link
+                    key={getCourseId(course)}
+                    to={`/my-courses/${getCourseId(course)}`}
+                    className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
+                  >
+                    <div className="relative overflow-hidden">
+                      <img
+                        src={thumbUrl}
+                        alt={course.title}
+                        className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <div className="bg-white rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform shadow-2xl">
+                          <Play className="w-8 h-8 text-slate-800" />
+                        </div>
+                      </div>
+                      <div className="absolute top-3 right-3 bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg">
+                        {course.progress}%
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-slate-700 transition-colors">
+                        {course.title}
+                      </h3>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-lg border border-amber-200">
+                          In Progress
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="bg-slate-800 h-2 rounded-full transition-all duration-500"
+                          style={{ width: `${course.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
         )}
-      </section>
 
-      {/* ---------------- FILTERS & CONTROLS ---------------- */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-            <BookOpen className="w-6 h-6" />
-            My Learning
-          </h1>
-          <div className="ml-2 text-sm text-gray-600">
-            {sorted.length} courses
-          </div>
-        </div>
+        {/* ---------------- FILTERS & CONTROLS ---------------- */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-gray-100">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div className="flex items-center gap-4">
+              <div className="bg-gray-100 p-3 rounded-xl">
+                <BookOpen className="w-7 h-7 text-slate-800" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  All Courses
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {sorted.length} courses total
+                </p>
+              </div>
+            </div>
 
-        <div className="flex items-center gap-3">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="p-2 rounded-lg border border-gray-300 text-gray-700 pr-8"
-          >
-            <option className="text-gray-700 hover:bg-red-100" value="Title">
-              Sort by Title
-            </option>
-            <option className="text-gray-700 hover:bg-red-100" value="Progress">
-              Sort by Progress
-            </option>
-          </select>
-
-          <div className="hidden sm:flex gap-2">
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`p-2 rounded shadow ${
-                viewMode === "grid"
-                  ? "bg-red-600 text-white"
-                  : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              <LayoutGrid size={18} />
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`p-2 rounded shadow ${
-                viewMode === "list"
-                  ? "bg-red-600 text-white"
-                  : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              <List size={18} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Filter Buttons */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        {["All", "Not Started", "In Progress", "Completed"].map((status) => (
-          <button
-            key={status}
-            onClick={() => setFilter(status as any)}
-            className={`px-3 py-1 rounded-xl transition ${
-              filter === status
-                ? "bg-red-500 text-white border-red-500"
-                : "hover:bg-red-100"
-            }`}
-          >
-            {status}
-          </button>
-        ))}
-      </div>
-
-      {/* ---------------- COURSES GRID/LIST ---------------- */}
-      <div
-        className={`grid gap-6 mt-10 ${
-          viewMode === "grid"
-            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-            : "grid-cols-1"
-        }`}
-      >
-        {paginatedCourses.map((course) => {
-          const thumbUrl = getThumbnailUrl(course);
-          const instructorNames = getInstructorNames(course);
-          return (
-            <div key={getCourseId(course)}>
-              <Link
-                to={`/my-courses/${getCourseId(course)}`}
-                className={`group block bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition`}
+            <div className="flex items-center gap-3 flex-wrap">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-medium bg-white hover:border-gray-300 focus:border-slate-800 focus:outline-none transition-colors"
               >
-                <div className="relative group mb-3 w-full h-50 overflow-hidden">
+                <option value="Title">Sort by Title</option>
+                <option value="Progress">Sort by Progress</option>
+              </select>
+
+              <div className="hidden sm:flex gap-2 bg-gray-100 p-1.5 rounded-xl">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`p-2.5 rounded-lg transition-all duration-300 ${
+                    viewMode === "grid"
+                      ? "bg-slate-800 text-white shadow-md"
+                      : "text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  <LayoutGrid size={18} />
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`p-2.5 rounded-lg transition-all duration-300 ${
+                    viewMode === "list"
+                      ? "bg-slate-800 text-white shadow-md"
+                      : "text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  <List size={18} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Filter Buttons */}
+          <div className="flex flex-wrap gap-3 mt-6">
+            {["All", "Not Started", "In Progress", "Completed"].map(
+              (status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilter(status as any)}
+                  className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${
+                    filter === status
+                      ? "bg-slate-800 text-white shadow-md"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  {status}
+                </button>
+              )
+            )}
+          </div>
+        </div>
+
+        {/* ---------------- COURSES GRID/LIST ---------------- */}
+        <div
+          className={`grid gap-6 ${
+            viewMode === "grid"
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              : "grid-cols-1"
+          }`}
+        >
+          {paginatedCourses.map((course) => {
+            const thumbUrl = getThumbnailUrl(course);
+            const instructorNames = getInstructorNames(course);
+            return (
+              <Link
+                key={getCourseId(course)}
+                to={`/my-courses/${getCourseId(course)}`}
+                className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
+              >
+                <div className="relative overflow-hidden">
                   <img
                     src={thumbUrl}
                     alt={course.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <PlayIcon className="bg-white/90 rounded-full p-2 h-10 w-10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="bg-white rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform shadow-2xl">
+                      <Play className="w-8 h-8 text-slate-800" />
+                    </div>
+                  </div>
+                  <div className="absolute top-4 right-4">
+                    <div className="bg-white/95 backdrop-blur-sm text-slate-800 text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      {course.progress}%
+                    </div>
+                  </div>
+                  <div className="absolute top-4 left-4">
+                    <span
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-full shadow-lg backdrop-blur-sm ${
+                        course.status === "Completed"
+                          ? "bg-emerald-500/90 text-white"
+                          : course.status === "In Progress"
+                          ? "bg-amber-500/90 text-white"
+                          : "bg-gray-500/90 text-white"
+                      }`}
+                    >
+                      {course.status}
+                    </span>
                   </div>
                 </div>
 
-                <div
-                  className={`${
-                    viewMode === "grid" ? "p-2 sm:p-4" : "min-w-1/2 p-4 flex-1"
-                  }`}
-                >
-                  <h2 className="text-lg max-w-80 font-semibold text-gray-800 mb-1 line-clamp-2">
+                <div className="p-5">
+                  <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-slate-700 transition-colors">
                     {course.title}
-                  </h2>
-                  <p className="text-sm text-gray-500 mb-2">
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-3">
                     {instructorNames || "Instructor"} •{" "}
                     {course.difficulty ?? "All"} • {course.duration ?? ""}
                   </p>
                   {viewMode === "list" && (
-                    <p className="text-gray-600 mb-2">
+                    <p className="text-gray-600 mb-4 line-clamp-2">
                       {(course as any).shortDescription}
                     </p>
                   )}
-                  <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+                  <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
                     <div
-                      className="bg-red-500 h-1 rounded-full transition-all"
+                      className="bg-slate-800 h-2.5 rounded-full transition-all duration-500"
                       style={{ width: `${course.progress}%` }}
                     />
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    {course.progress}% complete
-                  </p>
                 </div>
               </Link>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* ---------------- PAGINATION ---------------- */}
-      {courses.length > pageSize && (
-        <div className="flex justify-center mt-8 gap-2">
-          <button
-            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-            disabled={currentPage === 1}
-            className="p-2 hover:bg-red-100 rounded-full disabled:opacity-40"
-          >
-            <ChevronLeft />
-          </button>
-
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`px-3 font-bold py-1 rounded ${
-                currentPage === i + 1
-                  ? "bg-red-500 text-white"
-                  : "text-gray-500 hover:bg-gray-100"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-
-          <button
-            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="p-2 hover:bg-red-100 rounded-full disabled:opacity-40"
-          >
-            <ChevronRight />
-          </button>
+            );
+          })}
         </div>
-      )}
+
+        {/* ---------------- PAGINATION ---------------- */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-12 gap-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-3 bg-white hover:bg-gray-50 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm border border-gray-200"
+            >
+              <ChevronLeft className="text-slate-800" />
+            </button>
+
+            <div className="flex gap-2">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-4 py-2 font-semibold rounded-xl transition-all ${
+                    currentPage === i + 1
+                      ? "bg-slate-800 text-white shadow-md"
+                      : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-3 bg-white hover:bg-gray-50 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm border border-gray-200"
+            >
+              <ChevronRight className="text-slate-800" />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

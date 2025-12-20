@@ -1,9 +1,9 @@
+/* eslint-disable */
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   ArrowRight,
   Award,
-  Badge,
   BrainCircuit,
   Briefcase,
   Building2,
@@ -16,6 +16,7 @@ import {
   Target,
   Users,
 } from "lucide-react";
+import { useCourses } from "@/hooks/queries/courses";
 
 const LandingPage1 = () => {
   const categories = [
@@ -59,12 +60,12 @@ const LandingPage1 = () => {
         "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
     },
   ];
-  const featuredCourses = [
+  const sampleFeatured = [
     {
       title: "Enterprise Architecture Patterns",
       description: "Design scalable systems for large organizations.",
       duration: "8 weeks",
-      level: "Advanced" as const,
+      level: "Advanced",
       rating: 4.9,
       image:
         "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000",
@@ -73,7 +74,7 @@ const LandingPage1 = () => {
       title: "Strategic Business Communication",
       description: "Master high-stakes negotiation and leadership messaging.",
       duration: "4 weeks",
-      level: "Intermediate" as const,
+      level: "Intermediate",
       rating: 4.8,
       image:
         "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=1000",
@@ -82,7 +83,7 @@ const LandingPage1 = () => {
       title: "Data Science for Executives",
       description: "Understand data-driven decision making without the code.",
       duration: "6 weeks",
-      level: "Beginner" as const,
+      level: "Beginner",
       rating: 4.7,
       image:
         "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1000",
@@ -91,12 +92,48 @@ const LandingPage1 = () => {
       title: "Cloud Infrastructure Fundamentals",
       description: "Core concepts of AWS, Azure and Google Cloud.",
       duration: "5 weeks",
-      level: "Beginner" as const,
+      level: "Beginner",
       rating: 4.6,
       image:
         "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&q=80&w=1000",
     },
   ];
+
+  const { data: courses = [] } = useCourses();
+
+  const mappedFromApi = (Array.isArray(courses) ? courses : [])
+    .slice()
+    .sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0))
+    .slice(0, 4)
+    .map((c: any) => {
+      const difficulty = (c.difficulty || "").toString().toLowerCase();
+      const level = difficulty
+        ? difficulty.charAt(0).toUpperCase() + difficulty.slice(1)
+        : "Beginner";
+
+      const APIroot = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+      const image = c.id
+        ? `${APIroot}/courses/${c.id}/thumbnail`
+        : c.thumbnail?.url || c.image || sampleFeatured[0].image;
+
+      const description = c.shortDescription || c.description || "";
+
+      const duration =
+        c.duration || (c.chapterCount ? `${c.chapterCount} chapters` : "");
+
+      return {
+        title: c.title || "Untitled Course",
+        description,
+        duration,
+        level,
+        rating: c.rating || 0,
+        image,
+      };
+    });
+
+  const featuredCoursesToShow = mappedFromApi.length
+    ? mappedFromApi
+    : sampleFeatured;
 
   return (
     <div className="text-gray-800 flex flex-col items-center font-Quick overflow-hidden">
@@ -110,7 +147,7 @@ const LandingPage1 = () => {
                 AI‑Powered Learning & Career Guidance
               </span>
 
-              <h1 className="text-4xl font-bold leading-tight sm:text-5xl xl:text-6xl">
+              <h1 className="text-4xl font-bold font-sans leading-tight sm:text-5xl xl:text-6xl">
                 Learn Smarter. <br />
                 <span className="bg-gradient-to-r from-blue-800 to-blue-400 bg-clip-text text-transparent">
                   Elevate Your Career On Your Terms.
@@ -261,7 +298,7 @@ const LandingPage1 = () => {
           </div>
         </div>
       </section>
-      <section className="py-32 bg-background relative">
+      <section className="py-12 bg-background relative">
         {/* Background Pattern */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -272,7 +309,7 @@ const LandingPage1 = () => {
         ></div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col text-center items-center max-w-3xl mx-auto mb-20">
+          <div className="flex flex-col text-center items-center max-w-3xl mx-auto mb-10">
             <div className="mb-4 px-4 py-1.5 text-sm font-medium rounded-full border-primary/20 bg-primary/5 text-primary">
               End-to-End Career Ecosystem
             </div>
@@ -487,7 +524,7 @@ const LandingPage1 = () => {
         </div>
       </section>
       {/* Learning Pathways - Immersive Cards */}
-      <section className="py-24 bg-background relative overflow-hidden px-18">
+      <section className="py-12 bg-background relative overflow-hidden px-18">
         <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
@@ -564,8 +601,10 @@ const LandingPage1 = () => {
       {/* Featured Courses - Polished Grid */}
       <section className="py-24 bg-muted/30 border-y border-border/60 px-18">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <Badge className="mb-4">Hot Right Now</Badge>
+          <div className="text-center flex flex-col items-center max-w-3xl mx-auto mb-16">
+            <div className="border-2 max-w-fit bg-gray-200 mb-4 rounded-3xl px-2">
+              Hot Right Now
+            </div>
             <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
               Trending Certifications
             </h2>
@@ -575,17 +614,17 @@ const LandingPage1 = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredCourses.map((course, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredCoursesToShow.map((course, index) => (
               <div
                 key={index}
-                className="group relative bg-card rounded-2xl border border-border/50 overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1"
+                className="group relative bg-card rounded-2xl border border-border/50 overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
               >
-                <div className="aspect-[4/3] overflow-hidden relative">
+                <div className="aspect-[4/3] overflow-hidden relative w-full">
                   <div className="absolute top-3 left-3 z-10">
-                    <Badge className="bg-white/90 text-black hover:bg-white backdrop-blur shadow-sm">
+                    <span className="bg-white/90 text-black hover:bg-white rounded-2xl px-2 backdrop-blur shadow-sm">
                       {course.level}
-                    </Badge>
+                    </span>
                   </div>
                   <img
                     src={course.image}
@@ -593,22 +632,24 @@ const LandingPage1 = () => {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
-                <div className="p-5">
-                  <div className="flex items-center gap-1 text-yellow-500 mb-2">
-                    <Star className="w-4 h-4 fill-current" />
-                    <span className="text-sm font-medium text-foreground">
-                      {course.rating}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      (450+ reviews)
-                    </span>
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-1 text-yellow-500 mb-2">
+                      <Star className="w-4 h-4 fill-current" />
+                      <span className="text-sm font-medium text-foreground">
+                        {course.rating}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        (450+ reviews)
+                      </span>
+                    </div>
+                    <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                      {course.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                      {course.description}
+                    </p>
                   </div>
-                  <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                    {course.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                    {course.description}
-                  </p>
 
                   <div className="flex items-center justify-between pt-4 border-t border-border/50 text-xs font-medium text-muted-foreground">
                     <div className="flex items-center gap-1">
@@ -625,14 +666,14 @@ const LandingPage1 = () => {
             ))}
           </div>
 
-          <div className="mt-12 text-center">
-            <Button
-              size="lg"
-              variant="outline"
-              className="px-8 h-12 rounded-xl"
+          <div className="mt-12 flex items-center justify-center text-center">
+            <a
+              href={`/courses`}
+              className="flex items-center border border-gray-400 bg-gray-100 rounded-3xl px-6 py-3 text-sm font-bold text-primary mt-auto group/link"
             >
-              View All Courses
-            </Button>
+              View All Courses{" "}
+              <ArrowRight className="ml-2 w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+            </a>
           </div>
         </div>
       </section>

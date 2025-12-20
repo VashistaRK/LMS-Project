@@ -252,7 +252,7 @@ export default function CompanyTestTake() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-[#C21817]">
+              <h1 className="text-3xl font-bold text-[#7e17c2]">
                 {meta.title}
               </h1>
               <div className="text-sm text-gray-500 mt-1">
@@ -263,7 +263,7 @@ export default function CompanyTestTake() {
               <button
                 onClick={() => handleSubmit()}
                 disabled={loading || Object.keys(responses).length === 0}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-[#C21817] to-[#A51515] text-white font-semibold shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-[#7e17c2] to-[#4f15a5] text-white font-semibold shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Submitting..." : "Submit Test"}
               </button>
@@ -272,7 +272,7 @@ export default function CompanyTestTake() {
 
           {/* Score Display */}
           {result && (
-            <div className="bg-gradient-to-r from-[#C21817] to-[#A51515] rounded-2xl shadow-lg p-6 text-white mb-6">
+            <div className="bg-gradient-to-r from-[#7e17c2] to-[#4f15a5] rounded-2xl shadow-lg p-6 text-white mb-6">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold mb-2">
@@ -373,7 +373,7 @@ export default function CompanyTestTake() {
                       key={s.key}
                       className={`rounded-lg border-2 ${
                         isActive
-                          ? "border-[#C21817] bg-red-50"
+                          ? "border-[#7e17c2] bg-blue-50"
                           : "border-gray-200 bg-white"
                       }`}
                     >
@@ -383,7 +383,7 @@ export default function CompanyTestTake() {
                           setSelectedQuestionIndex(0);
                         }}
                         className={`w-full text-left px-4 py-3 rounded-t-lg ${
-                          isActive ? "bg-red-50" : "hover:bg-gray-50"
+                          isActive ? "bg-blue-50" : "hover:bg-gray-50"
                         }`}
                       >
                         <div className="flex items-center justify-between mb-1">
@@ -439,7 +439,7 @@ export default function CompanyTestTake() {
 
                               if (isCurrent)
                                 bgColor +=
-                                  " ring-2 ring-[#C21817] ring-offset-1";
+                                  " ring-2 ring-[#7e17c2] ring-offset-1";
 
                               return (
                                 <button
@@ -528,7 +528,7 @@ export default function CompanyTestTake() {
                                   optionClass +=
                                     " bg-green-50 border-green-400";
                                 } else if (userSubmittedIndex === oi) {
-                                  optionClass += " bg-red-50 border-red-400";
+                                  optionClass += " bg-blue-50 border-blue-400";
                                 } else {
                                   optionClass += " bg-gray-50 border-gray-200";
                                 }
@@ -552,7 +552,7 @@ export default function CompanyTestTake() {
                                       )
                                     }
                                     disabled={!!result}
-                                    className="w-5 h-5 text-[#C21817] focus:ring-[#C21817]"
+                                    className="w-5 h-5 text-[#7e17c2] focus:ring-[#7e17c2]"
                                   />
                                   <div className="flex-1">
                                     <div className="font-medium text-gray-800">
@@ -601,7 +601,7 @@ export default function CompanyTestTake() {
                       ) : (
                         <div>
                           <textarea
-                            className="w-full border-2 border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-[#C21817] focus:border-transparent resize-none"
+                            className="w-full border-2 border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-[#7e17c2] focus:border-transparent resize-none"
                             rows={8}
                             value={String(
                               getSubmittedValue(
@@ -660,7 +660,7 @@ export default function CompanyTestTake() {
                                   className={`ml-2 font-bold ${
                                     det.correct
                                       ? "text-green-600"
-                                      : "text-red-600"
+                                      : "text-blue-600"
                                   }`}
                                 >
                                   {typeof det.submitted !== "undefined"
@@ -677,7 +677,7 @@ export default function CompanyTestTake() {
                                 className={`font-bold ${
                                   det.correct
                                     ? "text-green-600"
-                                    : "text-red-600"
+                                    : "text-blue-600"
                                 }`}
                               >
                                 {det.correct ? "✓ Correct" : "✗ Incorrect"}
@@ -754,7 +754,7 @@ export default function CompanyTestTake() {
                           sections[sections.length - 1]?.key &&
                         selectedQuestionIndex === totalQuestions - 1
                       }
-                      className="px-6 py-2 rounded-lg bg-[#C21817] text-white font-medium hover:bg-[#A51515] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="px-6 py-2 rounded-lg bg-[#7e17c2] text-white font-medium hover:bg-[#4f15a5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Next →
                     </button>

@@ -30,7 +30,7 @@ function PDFViewer({ pdfUrl }: { pdfUrl: string }) {
 
     // Case 1: Base64 PDF (data URL)
     if (pdfUrl.startsWith("data:")) {
-      setFinalUrl(pdfUrl+"#toolbar=0&navpanes=0&scrollbar=0");
+      setFinalUrl(pdfUrl + "#toolbar=0&navpanes=0&scrollbar=0");
       return;
     }
 
@@ -60,13 +60,11 @@ function PDFViewer({ pdfUrl }: { pdfUrl: string }) {
   }
 
   return (
-    <div className="w-full overflow-auto border rounded-lg" style={{ height: "720px" }}>
-      <embed
-        src={finalUrl}
-        type="application/pdf"
-        width="100%"
-        height="100%"
-      />
+    <div
+      className="w-full overflow-auto border rounded-lg"
+      style={{ height: "720px" }}
+    >
+      <embed src={finalUrl} type="application/pdf" width="100%" height="100%" />
     </div>
   );
 }
@@ -128,7 +126,7 @@ export default function CompanyPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6">
         <div className="text-center">
-          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl">🏢</span>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-1">
@@ -184,7 +182,7 @@ export default function CompanyPage() {
         {company.guidance && (
           <div className="mb-8 bg-white rounded-lg border p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="text-red-600">📋</span>
+              <span className="text-blue-600">📋</span>
               Preparation Guidance
             </h2>
             <div
@@ -216,7 +214,7 @@ export default function CompanyPage() {
               {(company.tests || []).map((t: any) => (
                 <div
                   key={t.testId}
-                  className="flex items-center justify-between gap-4 p-4 rounded-lg border hover:border-red-200 hover:bg-red-50 transition-all"
+                  className="flex items-center justify-between gap-4 p-4 rounded-lg border hover:border-blue-200 hover:bg-blue-50 transition-all"
                 >
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-gray-900">{t.title}</h4>
@@ -236,7 +234,7 @@ export default function CompanyPage() {
                       to={`/companies/${encodeURIComponent(
                         slug || ""
                       )}/tests/${encodeURIComponent(t.testId)}`}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
                     >
                       Take Test
                     </Link>
@@ -272,7 +270,7 @@ export default function CompanyPage() {
                 <div key={year} className="bg-white rounded-lg border">
                   <div className="px-6 py-4 border-b bg-gray-50">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                      <span className="text-red-600">{year}</span>
+                      <span className="text-blue-600">{year}</span>
                       Papers
                     </h3>
                   </div>
@@ -281,7 +279,7 @@ export default function CompanyPage() {
                       {papersByYear[year].map((p) => (
                         <div
                           key={p._id}
-                          className="flex items-center justify-between gap-4 p-4 rounded-lg border hover:border-red-200 hover:bg-red-50 transition-all"
+                          className="flex items-center justify-between gap-4 p-4 rounded-lg border hover:border-blue-200 hover:bg-blue-50 transition-all"
                         >
                           <div className="flex-1 min-w-0">
                             <h4 className="font-medium text-gray-900 mb-1">
@@ -316,7 +314,7 @@ export default function CompanyPage() {
                                     `data:${p.contentType};base64,${p.base64}`
                                   )
                                 }
-                                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
                               >
                                 Preview
                               </button>
@@ -331,7 +329,7 @@ export default function CompanyPage() {
             </div>
           ) : (
             <div className="text-center py-12 bg-white rounded-lg border">
-              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">📄</span>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-1">

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react"; // npm i lucide-react
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 type FilterPanelProps = {
   filters: any;
@@ -30,7 +30,9 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     "DevOps",
     "Tableau",
   ];
+
   const difficulties = ["Beginner", "Intermediate", "Advanced"];
+
   const priceRanges = [
     { label: "Free", value: "free" },
     { label: "Under $50", value: "under-50" },
@@ -38,12 +40,14 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     { label: "$100 - $200", value: "100-200" },
     { label: "Over $200", value: "over-200" },
   ];
+
   const durations = [
     { label: "Under 5 hours", value: "under-5" },
-    { label: "5-10 hours", value: "5-10" },
-    { label: "10-20 hours", value: "10-20" },
+    { label: "5–10 hours", value: "5-10" },
+    { label: "10–20 hours", value: "10-20" },
     { label: "Over 20 hours", value: "over-20" },
   ];
+
   const ratings = [
     { label: "4.5 & up", value: "4.5" },
     { label: "4.0 & up", value: "4.0" },
@@ -51,71 +55,80 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     { label: "3.0 & up", value: "3.0" },
   ];
 
-  const toggleFilter = (type: string, value: string, checked: boolean) => {
-    onFilterChange(type, value, checked);
-  };
-
   return (
     <div
-      className={`w-full h-full bg-red-50 rounded-md flex flex-col shadow-md
-        ${isMobile ? "fixed inset-0 z-50" : ""}`}
+      className={`
+        w-full h-full rounded-2xl
+        bg-gradient-to-br from-slate-50 via-indigo-50/60 to-cyan-50
+        border border-slate-200 shadow-xl
+        flex flex-col
+        ${isMobile ? "fixed inset-0 z-50" : ""}
+      `}
     >
       {/* Header */}
-      <div className="flex justify-between items-center p-4 border-b border-red-200">
-        <h3 className="text-lg font-semibold text-gray-900">Filter Courses</h3>
+      <div className="flex justify-between items-center p-5 border-b border-slate-200 bg-white/60 backdrop-blur">
+        <h3 className="text-lg font-bold text-slate-800">
+          Refine Your Learning
+        </h3>
+
         {isMobile && (
           <button
             onClick={onClose}
-            className="px-3 py-1 rounded-lg text-sm bg-red-200 hover:bg-red-300 transition"
+            className="px-4 py-1.5 rounded-lg text-sm font-medium
+                       bg-slate-200 hover:bg-slate-300 transition"
           >
             Close
           </button>
         )}
       </div>
 
-      {/* Scrollable Content */}
-      <div className="p-2 space-y-4 overflow-y-auto flex-1">
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-5">
         <FilterSection
           title="Subject"
           options={subjects.map((s) => ({ label: s, value: s }))}
           selected={filters?.subjects || []}
-          onChange={(val, checked) => toggleFilter("subjects", val, checked)}
+          onChange={(v, c) => onFilterChange("subjects", v, c)}
         />
+
         <FilterSection
           title="Difficulty"
           options={difficulties.map((d) => ({ label: d, value: d }))}
           selected={filters?.difficulties || []}
-          onChange={(val, checked) =>
-            toggleFilter("difficulties", val, checked)
-          }
+          onChange={(v, c) => onFilterChange("difficulties", v, c)}
         />
+
         <FilterSection
           title="Price"
           options={priceRanges}
           selected={filters?.priceRanges || []}
-          onChange={(val, checked) => toggleFilter("priceRanges", val, checked)}
+          onChange={(v, c) => onFilterChange("priceRanges", v, c)}
         />
+
         <FilterSection
           title="Duration"
           options={durations}
           selected={filters?.durations || []}
-          onChange={(val, checked) => toggleFilter("durations", val, checked)}
+          onChange={(v, c) => onFilterChange("durations", v, c)}
         />
+
         <FilterSection
           title="Rating"
           options={ratings}
           selected={filters?.ratings || []}
-          onChange={(val, checked) => toggleFilter("ratings", val, checked)}
+          onChange={(v, c) => onFilterChange("ratings", v, c)}
         />
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-red-200 flex justify-end">
+      <div className="p-4 border-t border-slate-200 bg-white/70 backdrop-blur flex justify-end">
         <button
           onClick={() => onFilterChange("clear-all")}
-          className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-red-200 rounded-lg border border-gray-800 transition hover:cursor-pointer"
+          className="px-4 py-2 text-sm font-semibold rounded-xl
+                     bg-slate-800 text-white
+                     hover:bg-slate-700 transition"
         >
-          Clear All
+          Clear All Filters
         </button>
       </div>
     </div>
@@ -135,42 +148,42 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   selected,
   onChange,
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   return (
-    <div className="border-b border-red-100 pb-2">
-      {/* Header Row */}
+    <div className="rounded-xl border border-slate-200 bg-white/60 backdrop-blur p-3">
       <button
         onClick={() => setOpen((p) => !p)}
-        className="w-full flex justify-between items-center text-sm font-semibold text-gray-800 hover:text-gray-900 transition"
+        className="w-full flex justify-between items-center text-sm font-semibold text-slate-800"
       >
-        <span>{title}</span>
+        {title}
         {open ? (
-          <ChevronUp className="w-4 h-4 text-gray-500" />
+          <ChevronUp className="w-4 h-4 text-slate-500" />
         ) : (
-          <ChevronDown className="w-4 h-4 text-gray-500" />
+          <ChevronDown className="w-4 h-4 text-slate-500" />
         )}
       </button>
 
-      {/* Collapsible Options */}
       <div
-        className={`overflow-hidden transition-all duration-300 ${
-          open ? "max-h-96 mt-2" : "max-h-0"
+        className={`transition-all duration-300 overflow-hidden ${
+          open ? "max-h-96 mt-3" : "max-h-0"
         }`}
       >
         <div className="space-y-2">
           {options.map((opt) => (
             <label
               key={opt.value}
-              className="group flex items-center gap-2 text-xs cursor-pointer py-1 hover:bg-red-100 transition"
+              className="flex items-center gap-3 px-2 py-1.5 rounded-lg
+                         hover:bg-indigo-50 transition cursor-pointer"
             >
               <input
                 type="checkbox"
                 checked={selected.includes(opt.value)}
                 onChange={(e) => onChange(opt.value, e.target.checked)}
-                className="w-4 h-4 rounded focus:ring-red-500 transition"
+                className="w-4 h-4 rounded border-slate-300
+                           text-indigo-600 focus:ring-indigo-500"
               />
-              <span className="text-gray-700 group-hover:text-gray-900 font-medium">
+              <span className="text-sm font-medium text-slate-700">
                 {opt.label}
               </span>
             </label>

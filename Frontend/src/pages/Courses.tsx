@@ -169,40 +169,39 @@ const CourseCatalog: React.FC = () => {
   const renderedCourses = useMemo(() => filteredCourses, [filteredCourses]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center mt-10 text-gray-900 font-Quick mb-20">
+    <div className="min-h-screen w-full flex flex-col items-center bg-slate-50 text-slate-900 font-Quick pb-24">
       <ExpertProfessionals />
       {/* Controls Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t py-8 border-zinc-200 w-full px-4 sm:px-6 lg:px-16 max-w-6xl mt-10">
+      <div id="courses" className="w-full mt-16 px-6 sm:px-10 lg:px-20">
         <button
           onClick={() => setIsFilterOpen(!isFilterOpen)}
-          className="group flex items-center justify-center sm:justify-start gap-2.5 px-4 py-2 rounded-lg border  hover:bg-red-50 transition"
-          style={{ borderColor: "#C21817" }}
+          className="group flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300
+             hover:bg-slate-100 transition text-sm font-medium"
         >
-          <Filter size={18} className="text-red-600" />
-          <span className="text-sm font-medium">
-            {isFilterOpen ? "Hide Filters" : "Show Filters"}
-          </span>
+          <Filter size={18} className="text-slate-700" />
+          {isFilterOpen ? "Hide Filters" : "Show Filters"}
         </button>
 
         <div className="flex items-center justify-between sm:justify-end gap-4">
           {/* View Mode Toggles */}
-          <div className="flex gap-1 p-1 bg-gray-100 rounded-lg">
+          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-md transition-all ${
+              className={`p-2 rounded-md transition ${
                 viewMode === "grid"
-                  ? "bg-lime-700 text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-800"
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-600 hover:text-slate-800"
               }`}
             >
               <LayoutGrid size={18} />
             </button>
+
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2 rounded-md transition-all ${
+              className={`p-2 rounded-md transition ${
                 viewMode === "list"
-                  ? "bg-lime-700 text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-800"
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-600 hover:text-slate-800"
               }`}
             >
               <List size={18} />
@@ -217,13 +216,13 @@ const CourseCatalog: React.FC = () => {
         </div>
       </div>
       {/* Main Content Area */}
-      <main className="w-full px-4 sm:px-6 lg:px-16 mt-6 lg:mt-10 max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <main className="w-full px-6 sm:px-10 lg:px-20 mt-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filter Sidebar */}
           <aside
             className={`${isFilterOpen ? "block lg:col-span-1" : "hidden"}`}
           >
-            <div className="lg:sticky lg:top-6">
+            <div className="sticky top-24 bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
               <FilterPanel
                 filters={filters}
                 onFilterChange={handleFilterChange}

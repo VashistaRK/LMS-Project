@@ -14,79 +14,77 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
   const sortOptions = [
     { value: "popularity", label: "Popular" },
     { value: "newest", label: "Newest" },
-    { value: "rating", label: "Rated" },
-    { value: "price", label: "Price" }, // toggle
-    { value: "duration", label: "Duration" }, // toggle
+    { value: "rating", label: "Top Rated" },
+    { value: "price", label: "Price" },
+    { value: "duration", label: "Duration" },
   ];
 
   const handleSortSelect = (sortValue: string) => {
-    // Toggle logic for Price
     if (sortValue === "price") {
-      if (currentSort === "price-low") {
-        onSortChange("price-high");
-      } else {
-        onSortChange("price-low");
-      }
+      onSortChange(currentSort === "price-low" ? "price-high" : "price-low");
       return;
     }
 
-    // Toggle logic for Duration
     if (sortValue === "duration") {
-      if (currentSort === "duration-short") {
-        onSortChange("duration-long");
-      } else {
-        onSortChange("duration-short");
-      }
+      onSortChange(
+        currentSort === "duration-short" ? "duration-long" : "duration-short"
+      );
       return;
     }
 
-    // Normal case
     onSortChange(sortValue);
   };
 
   const handleMobileSelect = (value: string) => {
-    // For mobile dropdown, directly set the value since it includes the specific sort direction
     onSortChange(value);
   };
 
   return (
-    <div className={`${className}`}>
-      {/* Desktop Buttons */}
-      <div className="hidden md:flex flex-wrap border border-red-300 overflow-hidden">
-        {sortOptions.map((option, index) => (
-          <button
-            key={option.value}
-            onClick={() => handleSortSelect(option.value)}
-            className={`p-2 px-3 text-sm font-bold transition-colors duration-200 ${
-              currentSort.startsWith(option.value)
-                ? "bg-[#C21817] text-white shadow-md"
-                : "text-gray-700 hover:bg-red-200"
-            } ${index > 0 ? "border-l border-red-300" : ""}`}
-          >
-            {option.value === "price"
-              ? currentSort === "price-high"
-                ? "Price: High → Low ↑↓"
-                : "Price: Low → High ↑↓"
-              : option.value === "duration"
-              ? currentSort === "duration-long"
-                ? "Duration: Long → Short ↑↓"
-                : "Duration: Short → Long ↑↓"
-              : option.label}
-          </button>
-        ))}
+    <div className={className}>
+      {/* Desktop */}
+      <div className="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+        {sortOptions.map((option) => {
+          const isActive = currentSort.startsWith(option.value);
+
+          return (
+            <button
+              key={option.value}
+              onClick={() => handleSortSelect(option.value)}
+              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all
+                ${
+                  isActive
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-slate-700 hover:bg-slate-200"
+                }
+              `}
+            >
+              {option.value === "price"
+                ? currentSort === "price-high"
+                  ? "Price ↓"
+                  : "Price ↑"
+                : option.value === "duration"
+                ? currentSort === "duration-long"
+                  ? "Duration ↓"
+                  : "Duration ↑"
+                : option.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Mobile Dropdown */}
-      <div className="flex flex-row items-center md:hidden">
-        <p>SortBy:</p>
+      {/* Mobile */}
+      <div className="flex md:hidden items-center gap-2">
+        <span className="text-sm font-medium text-slate-600">Sort by</span>
         <select
           value={currentSort}
           onChange={(e) => handleMobileSelect(e.target.value)}
-          className="w-full p-1 border border-gray-300 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-[#C21817]"
+          className="flex-1 px-3 py-2 rounded-lg border border-slate-300
+                     text-sm font-medium bg-white
+                     focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="popularity">Popular</option>
           <option value="newest">Newest</option>
-          <option value="rating">Rated</option>
+          <option value="rating">Top Rated</option>
           <option value="price-low">Price: Low → High</option>
           <option value="price-high">Price: High → Low</option>
           <option value="duration-short">Duration: Short → Long</option>

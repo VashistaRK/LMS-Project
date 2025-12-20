@@ -8,9 +8,7 @@ import {
   Award,
   CheckCircle2,
   PlayCircle,
-  FileText,
   Target,
-  Settings,
   MessageSquare,
   HelpCircle,
   ChevronDown,
@@ -35,29 +33,32 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
   };
 
   return (
-    <div className="w-full bg-red-50 text-gray-900">
+    <div className="w-full text-gray-900">
       {/* Modern Tab Navigation */}
-      <div className="sticky top-0 bg-white border-b border-gray-200 z-10">
-        <div className="px-6 py-4">
-          <nav className="flex space-x-8" aria-label="Content sections">
+      <div className="sticky top-4 md:top-0 bg-white/90 backdrop-blur-sm z-10">
+        <div className="px-4 sm:px-6 py-3">
+          <nav
+            className="flex flex-wrap gap-4 sm:gap-8"
+            aria-label="Content sections"
+          >
             <button
               className={`relative py-2 px-1 text-sm font-medium transition-colors duration-200 ${
                 activeSection === "chapter"
-                  ? "text-red-600 border-b-2 border-red-600"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "text-purple-600 border-b-2 border-purple-600"
+                  : "text-gray-500 hover:text-black"
               }`}
               onClick={() => setActiveSection("chapter")}
             >
               <div className="flex items-center gap-2">
                 <PlayCircle size={16} />
-                Current Chapter
+                Current Chapter Overview
               </div>
             </button>
             <button
               className={`relative py-2 px-1 text-sm font-medium transition-colors duration-200 ${
                 activeSection === "course"
-                  ? "text-red-600 border-b-2 border-red-600"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "text-purple-600 border-b-2 border-purple-600"
+                  : "text-gray-500 hover:text-black"
               }`}
               onClick={() => setActiveSection("course")}
             >
@@ -71,43 +72,17 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
       </div>
 
       {/* Content Area */}
-      <div className="px-6 py-8">
+      <div className="px-4 sm:px-6 py-6 max-w-6xl mx-auto">
         {activeSection === "chapter" ? (
           /* Chapter Section */
-          <div className="max-w-4xl mx-auto space-y-8">
+          <div className="mx-auto space-y-8">
             {chapter ? (
               <>
-                {/* Chapter Header */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                  <div className="flex items-start gap-4">
-            <div className="p-3 bg-red-100 rounded-lg">
-              <PlayCircle size={24} className="text-red-600" />
-                    </div>
-                    <div className="flex-1">
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                        {chapter.title}
-                      </h2>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <Clock size={16} />
-                          <span>{chapter.duration}</span>
-                        </div>
-                        {chapter.type && (
-                          <span className="px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs font-medium capitalize">
-                            {chapter.type}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Chapter Description */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="p-4 sm:p-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <FileText size={20} className="text-gray-600" />
                     <h3 className="text-lg font-semibold text-gray-900">
-                      Description
+                      Chapter Description
                     </h3>
                   </div>
                   <p className="text-gray-700 leading-relaxed">
@@ -117,7 +92,7 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
                 </div>
 
                 {/* Chapter Notes */}
-                <NotesDisplay 
+                <NotesDisplay
                   notesId={chapter.notesId}
                   manualNotes={chapter.notes || []}
                   className="mb-6"
@@ -125,7 +100,7 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
               </>
             ) : (
               /* No Chapter Selected State */
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+              <div className="p-12 text-center">
                 <div className="flex flex-col items-center gap-4">
                   <div className="p-4 bg-gray-100 rounded-full">
                     <PlayCircle size={48} className="text-gray-400" />
@@ -145,56 +120,54 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
           </div>
         ) : (
           /* Course Overview Section */
-          <div className="max-w-6xl mx-auto space-y-8">
+          <div className="max-w-6xl mx-auto space-y-6">
             {/* Course Header */}
-            <div className="bg-gradient-to-r from-[#ff915a] to-[#F67F45] text-white rounded-xl p-8">
-              <h1 className="text-3xl font-bold mb-4">{course.title}</h1>
-              <p className="text-purple-100 text-lg leading-relaxed max-w-4xl">
+            <div className="p-6 sm:p-8 border-l-4 border-purple-600 bg-purple-50 rounded-r-xl">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-3">
+                {course.title}
+              </h1>
+              <p className="text-base sm:text-lg leading-relaxed max-w-full">
                 {course.description}
               </p>
             </div>
 
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <StatCard
                 icon={<Clock />}
                 label="Total Duration"
                 value={course.duration}
-                color="blue"
               />
               <StatCard
                 icon={<PlayCircle />}
                 label="Lectures"
                 value={course.chapterCount}
-                color="green"
               />
               <StatCard
                 icon={<Award />}
                 label="Exercises"
                 value={course.exerciseCount}
-                color="purple"
               />
               <StatCard
                 icon={<Users />}
                 label="Students"
                 value={course.studentCount}
-                color="orange"
               />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="flex space-y-8 lg:space-y-12 mb-12 flex-col">
               {/* Main Content */}
-              <div className="lg:col-span-2 space-y-8">
+              <div className="space-y-8">
                 {/* Learning Outcomes */}
                 {course.learningOutcomes?.length > 0 && (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center gap-2 mb-6">
+                  <div className="p-4 sm:p-6">
+                    <div className="flex items-center gap-2">
                       <Target size={20} className="text-green-600" />
                       <h3 className="text-xl font-semibold text-gray-900">
                         What you'll learn
                       </h3>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {course.learningOutcomes.map((outcome, idx) => (
                         <div key={idx} className="flex items-start gap-3">
                           <CheckCircle2
@@ -210,28 +183,20 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
 
                 {/* Prerequisites */}
                 {course.prerequisites && (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Settings size={20} className="text-red-600" />
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        Prerequisites
-                      </h3>
-                    </div>
-                    <p className="text-gray-700 leading-relaxed">
-                      {course.prerequisites}
-                    </p>
+                  <div className="px-4 sm:px-6 space-y-2">
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      Prerequisites
+                    </h3>
+                    <p className="text-gray-700">{course.prerequisites}</p>
                   </div>
                 )}
 
                 {/* Features */}
                 {course.features?.length > 0 && (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center gap-2 mb-6">
-                      <Award size={20} className="text-purple-600" />
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        Course Features
-                      </h3>
-                    </div>
+                  <div className="px-4 sm:px-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Course Features
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {course.features.map((feature, idx) => (
                         <div key={idx} className="flex items-start gap-3">
@@ -248,18 +213,15 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
 
                 {/* Technologies */}
                 {course.technologies?.length > 0 && (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center gap-2 mb-6">
-                      <Settings size={20} className="text-blue-600" />
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        Technologies Covered
-                      </h3>
-                    </div>
+                  <div className="px-4 sm:px-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Technologies Covered
+                    </h3>
                     <div className="flex flex-wrap gap-2">
                       {course.technologies.map((tech, idx) => (
                         <span
                           key={idx}
-                          className="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg text-sm font-medium"
+                          className="px-3 py-2 bg-purple-100 text-purple-800 rounded-lg text-sm font-medium"
                         >
                           {tech}
                         </span>
@@ -268,64 +230,17 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
                   </div>
                 )}
               </div>
-
-              {/* Sidebar */}
-              <div className="space-y-6">
-                {/* Instructor Card */}
-                {course.instructor?.length > 0 && (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                      Instructor
-                    </h3>
-                    {course.instructor.map((inst, idx) => (
-                      <div key={idx} className="space-y-4">
-                        <div className="flex items-start gap-4">
-                          <img
-                            src={inst.image}
-                            alt={inst.name}
-                            className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold text-gray-900 truncate">
-                              {inst.name}
-                            </h4>
-                            <p className="text-sm text-purple-600 font-medium">
-                              {inst.title}
-                            </p>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                          {inst.bio}
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Star
-                              size={12}
-                              className="text-yellow-400"
-                              fill="currentColor"
-                            />
-                            <span className="font-medium">{inst.rating}</span>
-                            <span>({inst.reviews})</span>
-                          </div>
-                          <span>{inst.students} students</span>
-                          <span>{inst.courses} courses</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
 
             {/* Reviews Section */}
             {course.reviews?.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="px-6">
                 <div className="flex items-center gap-2 mb-6">
-                  <MessageSquare size={20} className="text-blue-600" />
+                  <MessageSquare size={20} className="text-purple-600" />
                   <h3 className="text-xl font-semibold text-gray-900">
                     Student Reviews
                   </h3>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs font-medium">
+                  <span className="px-2 text-purple-700 text-xs font-medium">
                     {course.reviewCount} reviews
                   </span>
                 </div>
@@ -370,7 +285,7 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
 
             {/* FAQ Section */}
             {course.faq?.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="px-6">
                 <div className="flex items-center gap-2 mb-6">
                   <HelpCircle size={20} className="text-green-600" />
                   <h3 className="text-xl font-semibold text-gray-900">
@@ -417,29 +332,20 @@ const StatCard = ({
   icon,
   label,
   value,
-  color,
 }: {
   icon: React.ReactNode;
   label: string;
   value: any;
-  color: "blue" | "green" | "purple" | "orange";
 }) => {
-  const colorClasses = {
-    blue: "bg-blue-100 text-blue-600",
-    green: "bg-green-100 text-green-600",
-    purple: "bg-purple-100 text-purple-600",
-  orange: "bg-red-100 text-red-600",
-  };
-
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-      <div
-        className={`w-12 h-12 mx-auto rounded-lg ${colorClasses[color]} flex items-center justify-center mb-3`}
-      >
+    <div className="p-3 sm:p-4 bg-white rounded-lg shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      <div className="w-10 h-10 rounded-md bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
         {icon}
       </div>
-      <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
-      <p className="text-sm text-gray-600">{label}</p>
+      <div className="min-w-0">
+        <p className="text-xs text-gray-500 truncate">{label}</p>
+        <p className="font-semibold truncate">{value}</p>
+      </div>
     </div>
   );
 };
