@@ -11,7 +11,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code (excluding .env for security)
 COPY main.py .
 COPY static/ ./static/
-COPY i.html .
 
 # Expose port 8000
 EXPOSE 8000
