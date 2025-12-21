@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>English Tutor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-main: #020616;
+      --bg-card: #050b1f;
+      --bg-chat: #050716;
+      --bg-input: #06081b;
+      --accent: #3df5ff;
+      --accent-soft: rgba(61, 245, 255, 0.2);
+      --text-main: #f3f7ff;
+      --text-muted: #7d8ca8;
+      --border-subtle: #1b2340;
+      --radius-lg: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 0, rgba(0, 255, 255, 0.14) 0, transparent 40%),
+        radial-gradient(circle at 90% 100%, rgba(0, 180, 255, 0.18) 0, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(0, 40, 140, 0.7) 0, #020616 60%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .scan-overlay {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 0,
+        rgba(0, 255, 255, 0.03) 2px,
+        rgba(0, 0, 0, 0) 4px
+      );
+      background-size: 100% 8px;
+      opacity: 0.4;
+      mix-blend-mode: screen;
+      animation: scan-move 10s linear infinite;
+      z-index: -2;
+    }
+
+    @keyframes scan-move {
+      from { background-position-y: 0; }
+      to   { background-position-y: 100%; }
+    }
+
+    /* floating glowing orbs behind the card */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(61,245,255,0.6) 0, transparent 65%);
+      filter: blur(2px);
+      opacity: 0.16;
+      z-index: -1;
+    }
+
+    .bg-orb.orb1 {
+      width: 260px;
+      height: 260px;
+      top: -40px;
+      left: 5%;
+      animation: orb-drift-1 26s ease-in-out infinite alternate;
+    }
+
+    .bg-orb.orb2 {
+      width: 320px;
+      height: 320px;
+      bottom: -80px;
+      right: 4%;
+      animation: orb-drift-2 32s ease-in-out infinite alternate;
+    }
+
+    .bg-orb.orb3 {
+      width: 180px;
+      height: 180px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: orb-drift-3 40s linear infinite;
+      opacity: 0.1;
+    }
+
+    @keyframes orb-drift-1 {
+      from { transform: translate3d(0, 0, 0); }
+      to   { transform: translate3d(40px, 60px, 0); }
+    }
+
+    @keyframes orb-drift-2 {
+      from { transform: translate3d(0, 0, 0); }
+      to   { transform: translate3d(-50px, -40px, 0); }
+    }
+
+    @keyframes orb-drift-3 {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to   { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 980px;
+    }
+
+    .hud-card {
+      background:
+        radial-gradient(circle at 0 0, rgba(61,245,255,0.12), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(0,160,255,0.16), transparent 60%),
+        var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      box-shadow:
+        0 0 0 1px rgba(61,245,255,0.06),
+        0 18px 45px rgba(0,0,0,0.85);
+      padding: 16px 20px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hud-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid rgba(61,245,255,0.12);
+      pointer-events: none;
+    }
+
+    .panel-grid {
+      position: absolute;
+      inset: 0;
+      opacity: 0.08;
+      background-image:
+        linear-gradient(to right, #1b2340 1px, transparent 1px),
+        linear-gradient(to bottom, #1b2340 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 8px;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .status-pill {
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(61,245,255,0.9);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .voice-toggle-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .voice-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Center mic + state text */
+    .center-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 10px;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .state-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      max-width: 420px;
+    }
+
+    .state-text strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .mic-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mic-button {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: none;
+      background: radial-gradient(circle at 30% 0, #7ffaff 0, #021824 55%, #000 100%);
+      box-shadow:
+        0 0 18px rgba(61,245,255,0.9),
+        0 0 40px rgba(0,165,255,0.7);
+      position: relative;
+      cursor: pointer;
+      outline: none;
+      padding: 0;
+    }
+
+    .mic-button::before {
+      /* outer ring */
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: inherit;
+      border: 1px solid rgba(61,245,255,0.5);
+      box-shadow: 0 0 16px rgba(61,245,255,0.5);
+      opacity: 0.8;
+    }
+
+    .mic-icon {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mic-body {
+      width: 22px;
+      height: 30px;
+      border-radius: 12px;
+      border: 2px solid #021621;
+      background: rgba(0,0,0,0.35);
+      box-shadow: 0 0 12px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
+    .mic-body::before {
+      /* inner glow */
+      content: "";
+      position: absolute;
+      inset: 4px 4px 4px 4px;
+      border-radius: 9px;
+      background: radial-gradient(circle, #aaf9ff 0, #1f9db6 40%, #000 100%);
+      opacity: 0.9;
+    }
+
+    .mic-stand {
+      position: absolute;
+      width: 18px;
+      height: 14px;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      border: 2px solid rgba(168,239,255,0.9);
+      border-top: none;
+      left: 50%;
+      margin-left: -9px;
+      bottom: -12px;
+    }
+
+    .mic-stand::after {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 2px;
+      background: rgba(168,239,255,1);
+      left: 50%;
+      margin-left: -6px;
+      bottom: -6px;
+    }
+
+    .mic-button.listening {
+      animation: mic-pulse 1.2s ease-in-out infinite;
+    }
+
+    .mic-button.listening .mic-body::before {
+      background: radial-gradient(circle, #fff 0, #8df7ff 30%, #0db6ff 60%, #000 100%);
+    }
+
+    @keyframes mic-pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 18px rgba(61,245,255,0.9), 0 0 40px rgba(0,165,255,0.7); }
+      50%      { transform: scale(1.05); box-shadow: 0 0 26px rgba(61,245,255,1), 0 0 60px rgba(0,200,255,0.9); }
+    }
+
+    /* Wave bar full width under header (bot speaking) */
+    .wave-strip {
+      margin-top: 8px;
+      margin-bottom: 10px;
+      height: 26px;
+      border-radius: 40px;
+      border: 1px solid rgba(61,245,255,0.25);
+      background: radial-gradient(circle at 0 0, rgba(61,245,255,0.09), transparent 55%),
+                  radial-gradient(circle at 100% 100%, rgba(0,140,255,0.07), transparent 60%),
+                  rgba(4, 7, 28, 0.9);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      position: relative;
+    }
+
+    .wave-particles {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 100%;
+      flex: 1;
+    }
+
+    .wave-bar {
+      width: 3px;
+      border-radius: 999px;
+      background: rgba(61,245,255,0.25);
+      height: 6px;
+    }
+
+    .wave-strip.bot-speaking .wave-bar {
+      animation: wave-pulse 0.8s infinite ease-in-out;
+    }
+
+    .wave-strip.bot-speaking .wave-bar:nth-child(2) { animation-delay: 0.05s; }
+    .wave-strip.bot-speaking .wave-bar:nth-child(3) { animation-delay: 0.1s; }
+    .wave-strip.bot-speaking .wave-bar:nth-child(4) { animation-delay: 0.15s; }
+    .wave-strip.bot-speaking .wave-bar:nth-child(5) { animation-delay: 0.2s; }
+    .wave-strip.bot-speaking .wave-bar:nth-child(6) { animation-delay: 0.25s; }
+    .wave-strip.bot-speaking .wave-bar:nth-child(7) { animation-delay: 0.3s; }
+    .wave-strip.bot-speaking .wave-bar:nth-child(8) { animation-delay: 0.35s; }
+    .wave-strip.bot-speaking .wave-bar:nth-child(9) { animation-delay: 0.4s; }
+    .wave-strip.bot-speaking .wave-bar:nth-child(10){ animation-delay: 0.45s; }
+
+    @keyframes wave-pulse {
+      0%, 100% { height: 6px; background: rgba(61,245,255,0.25); }
+      50%      { height: 22px; background: rgba(61,245,255,0.95); }
+    }
+
+    .wave-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .wave-strip.bot-speaking .wave-label::before {
+      content: "Speaking";
+      color: var(--accent);
+    }
+
+    .wave-strip:not(.bot-speaking) .wave-label::before {
+      content: "Idle";
+    }
+
+    /* Chat area */
+    #chat {
+      margin-top: 6px;
+      padding: 12px 10px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      background:
+        radial-gradient(circle at 0 0, rgba(61,245,255,0.08), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(0,140,255,0.08), transparent 60%),
+        var(--bg-chat);
+      height: 380px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .msg-row {
+      margin: 6px 0;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .msg-user { justify-content: flex-end; }
+    .msg-bot  { justify-content: flex-start; }
+
+    .avatar-small {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      margin: 0 6px;
+      flex-shrink: 0;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .avatar-bot {
+      background: radial-gradient(circle at 30% 0, var(--accent) 0, #050b1f 60%);
+      color: #02131a;
+      box-shadow: 0 0 10px rgba(61,245,255,0.7);
+    }
+
+    .avatar-user {
+      background: #050b1f;
+      color: var(--accent);
+      box-shadow: 0 0 10px rgba(61,245,255,0.4);
+    }
+
+    .bubble {
+      max-width: 78%;
+      padding: 8px 11px;
+      border-radius: 12px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      position: relative;
+    }
+
+    .msg-bot .bubble {
+      background: rgba(8, 11, 30, 0.97);
+      border: 1px solid rgba(61,245,255,0.22);
+      box-shadow: 0 0 16px rgba(0,200,255,0.18);
+    }
+
+    .msg-user .bubble {
+      background: var(--accent);
+      color: #031016;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 0 14px rgba(61,245,255,0.35);
+    }
+
+    /* Input row */
+    .chat-input-row {
+      display: flex;
+      margin-top: 10px;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    #userInput {
+      flex: 1;
+      padding: 9px 13px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-input);
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    #userInput:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+      outline: none;
+    }
+
+    #sendBtn {
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background:
+        radial-gradient(circle at 30% 0, var(--accent) 0, #041623 60%);
+      color: #021018;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      transition: transform 0.08s, box-shadow 0.08s, filter 0.08s;
+    }
+
+    #sendBtn:hover {
+      filter: brightness(1.06);
+      box-shadow: 0 0 18px rgba(61,245,255,0.7);
+    }
+
+    #sendBtn:active {
+      transform: scale(0.97);
+      box-shadow: 0 0 8px rgba(61,245,255,0.4);
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 10px; }
+      .shell { max-width: 100%; }
+      .center-strip {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      #chat { height: 300px; }
+    }
+
+    /* ==============
+       ROCKER SWITCH
+       ============== */
+
+    .rocker {
+      display: inline-block;
+      position: relative;
+      font-size: 1.4em;
+      font-weight: bold;
+      text-align: center;
+      text-transform: uppercase;
+      color: #888;
+      width: 7em;
+      height: 4em;
+      overflow: hidden;
+      border-bottom: 0.5em solid #0c1328;
+    }
+
+    .rocker-small {
+      font-size: 0.7em;
+      margin: 0;
+    }
+
+    .rocker::before {
+      content: "";
+      position: absolute;
+      top: 0.5em;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #11182f;
+      border: 0.5em solid #1c2745;
+      border-bottom: 0;
+    }
+
+    .rocker input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch-left,
+    .switch-right {
+      cursor: pointer;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 2.5em;
+      width: 3em;
+      transition: 0.2s;
+      user-select: none;
+      font-size: 0.7rem;
+    }
+
+    .switch-left {
+      height: 2.4em;
+      width: 2.75em;
+      left: 0.85em;
+      bottom: 0.4em;
+      background-color: #18233f;
+      transform: rotate(15deg) skewX(15deg);
+      color: #6ea1bf;
+    }
+
+    .switch-right {
+      right: 0.5em;
+      bottom: 0;
+      background-color: #552626;
+      color: #fff;
+    }
+
+    .switch-left::before,
+    .switch-right::before {
+      content: "";
+      position: absolute;
+      width: 0.4em;
+      height: 2.45em;
+      bottom: -0.45em;
+      background-color: #151d35;
+      transform: skewY(-65deg);
+    }
+
+    .switch-left::before {
+      left: -0.4em;
+    }
+
+    .switch-right::before {
+      right: -0.375em;
+      background-color: transparent;
+      transform: skewY(65deg);
+    }
+
+    input:checked + .switch-left {
+      background-color: #00b6ff;
+      color: #fff;
+      bottom: 0px;
+      left: 0.5em;
+      height: 2.5em;
+      width: 3em;
+      transform: rotate(0deg) skewX(0deg);
+    }
+
+    input:checked + .switch-left::before {
+      background-color: transparent;
+      width: 3.0833em;
+    }
+
+    input:checked + .switch-left + .switch-right {
+      background-color: #18233f;
+      color: #6ea1bf;
+      bottom: 0.4em;
+      right: 0.8em;
+      height: 2.4em;
+      width: 2.75em;
+      transform: rotate(-15deg) skewX(-15deg);
+    }
+
+    input:checked + .switch-left + .switch-right::before {
+      background-color: #151d35;
+    }
+
+    /* Keyboard focus */
+    input:focus + .switch-left {
+      color: #e3f4ff;
+    }
+
+    input:checked:focus + .switch-left {
+      color: #fff;
+    }
+
+    input:focus + .switch-left + .switch-right {
+      color: #fff;
+    }
+
+    input:checked:focus + .switch-left + .switch-right {
+      color: #c1d7ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="scan-overlay"></div>
+  <div class="bg-orb orb1"></div>
+  <div class="bg-orb orb2"></div>
+  <div class="bg-orb orb3"></div>
+
+  <div class="shell">
+    <div class="hud-card">
+      <div class="panel-grid"></div>
+
+      <div class="header">
+        <div class="title-block">
+          <h1>ENGLISH TUTOR</h1>
+          <div class="title-sub">A Personal English conversation practice</div>
+        </div>
+        <div class="header-right">
+          <div class="voice-toggle-wrapper">
+            <span class="voice-label">Voice</span>
+            <!-- Rocker switch controls voice on/off -->
+            <label class="rocker rocker-small">
+              <input type="checkbox" id="voiceToggle" checked />
+              <span class="switch-left">Yes</span>
+              <span class="switch-right">No</span>
+            </label>
+          </div>
+          <div class="status-pill">
+            <span class="status-dot"></span>
+            ONLINE
+          </div>
+        </div>
+      </div>
+
+      <div class="center-strip">
+        <div class="mic-wrapper">
+          <button id="micButton" class="mic-button" title="Tap to start / stop listening">
+            <div class="mic-icon">
+              <div class="mic-body"></div>
+              <div class="mic-stand"></div>
+            </div>
+          </button>
+        </div>
+        <div class="state-text" id="stateText">
+          Press the microphone and speak. The tutor listens, then replies with feedback and a new question.
+          You can also type your reply in the box below.
+        </div>
+      </div>
+
+      <div class="wave-strip" id="waveStrip">
+        <div class="wave-particles">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        <div class="wave-label"></div>
+      </div>
+
+      <div id="chat"></div>
+
+      <div class="chat-input-row">
+        <input type="text" id="userInput" placeholder="Or type your reply and press Enter..." />
+        <button id="sendBtn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const chatEl = document.getElementById('chat');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const voiceToggle = document.getElementById('voiceToggle');
+    const micButton = document.getElementById('micButton');
+    const stateText = document.getElementById('stateText');
+    const waveStrip = document.getElementById('waveStrip');
+
+    let voiceEnabled = true;
+    let sessionId = null;
+    let recognition = null;
+    let listening = false;
+    let started = false; // whether conversation has begun
+
+    voiceToggle.addEventListener('change', () => {
+      voiceEnabled = voiceToggle.checked;
+    });
+
+    function setBotSpeaking(isSpeaking) {
+      if (isSpeaking) {
+        waveStrip.classList.add('bot-speaking');
+      } else {
+        waveStrip.classList.remove('bot-speaking');
+      }
+    }
+
+    function setListeningState(isListening) {
+      listening = isListening;
+      if (isListening) {
+        micButton.classList.add('listening');
+        stateText.innerHTML = "<strong>Listening...</strong> Please speak clearly.";
+      } else {
+        micButton.classList.remove('listening');
+        if (!started) {
+          stateText.innerHTML = "Press the microphone and speak. The tutor listens, then replies with feedback and a new question.";
+        } else {
+          stateText.innerHTML = "You can speak again or type a longer reply to continue the conversation.";
+        }
+      }
+    }
+
+    function addMessage(text, sender) {
+      const row = document.createElement('div');
+      row.className = 'msg-row ' + (sender === 'user' ? 'msg-user' : 'msg-bot');
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar-small ' + (sender === 'user' ? 'avatar-user' : 'avatar-bot');
+      avatar.textContent = sender === 'user' ? 'YOU' : 'AI';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+
+      if (sender === 'user') {
+        row.appendChild(bubble);
+        row.appendChild(avatar);
+      } else {
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+      }
+
+      chatEl.appendChild(row);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    async function ensureSession() {
+      if (sessionId) return sessionId;
+      const res = await fetch('/api/session/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error('Session create failed: ' + t);
+      }
+      const data = await res.json();
+      sessionId = data.session_id;
+      return sessionId;
+    }
+
+    async function playVoice(text) {
+      if (!text || !voiceEnabled) return;
+      try {
+        setBotSpeaking(true);
+        const res = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+
+        if (!res.ok) {
+          console.error('TTS failed: ', res.status);
+          setBotSpeaking(false);
+          return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.play();
+        audio.onended = () => {
+          URL.revokeObjectURL(url);
+          setBotSpeaking(false);
+        };
+      } catch (e) {
+        console.error('TTS error: ', e);
+        setBotSpeaking(false);
+      }
+    }
+
+    async function callChat(messageText) {
+      const sid = await ensureSession();
+
+      const body = {
+        user_message: messageText,
+        session_id: sid,
+      };
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      started = true;
+      addMessage(data.reply, 'bot');
+      playVoice(data.reply);
+    }
+
+    async function sendMessageText(text) {
+      const trimmed = text.trim();
+      if (!trimmed && started) return;
+
+      // For first turn, allow empty to trigger START_CONVERSATION
+      addMessage(trimmed || "[started conversation]", 'user');
+
+      try {
+        await callChat(trimmed);
+      } catch (err) {
+        console.error(err);
+        addMessage('Error contacting server: ' + err, 'bot');
+      }
+    }
+
+    async function sendMessage() {
+      const text = userInput.value;
+      userInput.value = '';
+      await sendMessageText(text);
+    }
+
+    sendBtn.addEventListener('click', () => { sendMessage(); });
+    userInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Speech recognition setup (Chrome)
+    function setupSpeechRecognition() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        console.log("SpeechRecognition not supported; mic will only animate UI.");
+        return null;
+      }
+      const rec = new SR();
+      rec.lang = 'en-US';
+      rec.interimResults = false;
+      rec.maxAlternatives = 1;
+
+      rec.onstart = () => {
+        setListeningState(true);
+      };
+
+      rec.onend = () => {
+        setListeningState(false);
+      };
+
+      rec.onerror = (event) => {
+        console.error('Speech recognition error:', event);
+        setListeningState(false);
+      };
+
+      rec.onresult = async (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript && transcript.trim()) {
+          addMessage(transcript, 'user');
+          await callChat(transcript);
+        }
+      };
+
+      return rec;
+    }
+
+    recognition = setupSpeechRecognition();
+
+    micButton.addEventListener('click', () => {
+      if (!recognition) {
+        // No speech API -> just send empty to start or show hint
+        if (!started) {
+          sendMessageText(""); // triggers START_CONVERSATION
+        } else {
+          stateText.textContent = "Speech recognition not available. Please type your reply below.";
+        }
+        return;
+      }
+
+      try {
+        if (!listening) {
+          recognition.start();
+        } else {
+          recognition.stop();
+        }
+      } catch (e) {
+        console.error('Error starting/stopping recognition:', e);
+      }
+    });
+
+    // Do not auto-start; wait for mic or typed message.
+    window.addEventListener('load', () => {
+      stateText.textContent =
+        "Press the microphone and speak. The tutor listens, then replies with feedback and a new question.";
+    });
+  </script>
+</body>
+</html>

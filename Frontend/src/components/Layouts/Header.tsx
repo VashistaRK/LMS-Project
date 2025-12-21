@@ -277,31 +277,37 @@ export default function Header() {
                     href="/companies"
                     className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
                   >
-                    <Building2 className="w-4 h-4 mr-2" /> Companies
+                    Companies
                   </a>
                   <a
                     href="/freshers-pratice"
                     className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
                   >
-                    <Library className="w-4 h-4 mr-2" /> Freshers Ready
+                    Freshers Ready
                   </a>
                   <a
                     href="/courses"
                     className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
                   >
-                    <GraduationCap className="w-4 h-4 mr-2" /> Courses
+                    Courses
                   </a>
                   <a
                     href="/my-learning"
                     className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
                   >
-                    <BookOpen className="w-4 h-4 mr-2" /> My Learning
+                    My Learning
                   </a>
                   <a
                     href="/resumes"
                     className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
                   >
-                    <BookOpen className="w-4 h-4 mr-2" /> Resumes
+                    Resumes
+                  </a>
+                  <a
+                    href="/Tutor"
+                    className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
+                  >
+                    Ai Tutor
                   </a>
                 </nav>
 
