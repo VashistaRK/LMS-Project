@@ -562,6 +562,31 @@
     let listening = false;
     let started = false; // whether conversation has begun
 
+    // Helper: try original endpoint, if HTML/error detected retry with '/tutor' prefix
+    async function fetchWithTutor(url, options = {}) {
+      // attempt original URL
+      let res = await fetch(url, options);
+      const contentType = (res.headers.get('content-type') || '').toLowerCase();
+
+      // If response looks like HTML (error page) or doesn't provide JSON, inspect body
+      if (contentType.includes('text/html') || contentType === '' || !contentType.includes('application/json')) {
+        const text = await res.text().catch(() => '');
+        if (text && (text.includes('Cannot POST') || contentType.includes('text/html'))) {
+          const prefix = '/tutor';
+          const nextUrl = (url.startsWith('/') ? prefix + url : prefix + '/' + url);
+          try {
+            const retryRes = await fetch(nextUrl, options);
+            return retryRes;
+          } catch (e) {
+            return res;
+          }
+        }
+        return new Response(text || '', { status: res.status, statusText: res.statusText, headers: { 'Content-Type': contentType || 'text/plain' } });
+      }
+
+      return res;
+    }
+
     voiceToggle.addEventListener('change', () => {
       voiceEnabled = voiceToggle.checked;
     });
@@ -615,7 +640,7 @@
 
     async function ensureSession() {
       if (sessionId) return sessionId;
-      const res = await fetch('/api/session/create', {
+      const res = await fetchWithTutor('/api/session/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: '{}',
@@ -633,7 +658,7 @@
       if (!text || !voiceEnabled) return;
       try {
         setBotSpeaking(true);
-        const res = await fetch('/api/tts', {
+        const res = await fetchWithTutor('/api/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text }),
@@ -667,11 +692,16 @@
         session_id: sid,
       };
 
-      const res = await fetch('/api/chat', {
+      const res = await fetchWithTutor('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
+
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error('Chat failed: ' + t);
+      }
 
       const data = await res.json();
       started = true;
