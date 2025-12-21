@@ -304,7 +304,7 @@ export default function Header() {
                     Resumes
                   </a>
                   <a
-                    href="/Tutor"
+                    href="/tutor"
                     className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
                   >
                     Ai Tutor
