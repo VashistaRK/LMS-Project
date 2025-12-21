@@ -812,7 +812,7 @@
 
     async function ensureSession() {
       if (sessionId) return sessionId;
-      const res = await fetch('/api/session/create', {
+      const res = await fetch('/tutor/api/session/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: '{}',
@@ -830,7 +830,7 @@
       if (!text || !voiceEnabled) return;
       try {
         setBotSpeaking(true);
-        const res = await fetch('/api/tts', {
+        const res = await fetch('/tutor/api/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text }),
@@ -864,7 +864,7 @@
         session_id: sid,
       };
 
-      const res = await fetch('/api/chat', {
+      const res = await fetch('/tutor/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
