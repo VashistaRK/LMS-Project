@@ -22,6 +22,31 @@ setx OPENAI_API_KEY "sk-proj-xxxx"
 
 Then close and reopen your terminal.
 
+## 1.5. Alternative: Run with Docker
+
+If you prefer Docker:
+
+- Install Docker Desktop
+- Set your OpenAI API key as an environment variable in your shell or in a `.env` file
+
+### Build and run with Docker Compose (recommended):
+
+```bash
+docker-compose up --build
+```
+
+### Or manually with Docker:
+
+```bash
+# Build the image
+docker build -t english-tutor .
+
+# Run the container
+docker run -p 8000:8000 -e OPENAI_API_KEY="your-api-key-here" english-tutor
+```
+
+Then open http://localhost:8000 in your browser.
+
 ## 2. Install dependencies
 
 From the project folder:

@@ -1,5 +1,5 @@
 # =============================
-# English Free Talk Tutor (FastAPI)
+# English Free Talk Tutor (FastAPI)  • With One-Time Greeting
 # =============================
 
 from fastapi import FastAPI, Response, HTTPException
@@ -14,6 +14,11 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Optional
 import threading
+from contextlib import asynccontextmanager
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # ==== CONFIG ====
 
@@ -29,9 +34,15 @@ if not api_key:
 
 client = OpenAI(api_key=api_key)
 
-app = FastAPI(title="English Free Talk Tutor")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("English Free Talk Tutor API started.")
+    yield
+    print("Shutting down tutor.")
 
-# CORS: open for dev (restrict in production)
+app = FastAPI(title="English Free Talk Tutor", lifespan=lifespan)
+
+# CORS for development (restrict later)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -46,10 +57,7 @@ app.add_middleware(
 # ========================================
 
 class ConversationStore:
-    """
-    In-memory conversation storage.
-    For production, replace with Redis/DB.
-    """
+    """In-memory store; replace with Redis/DB later."""
 
     def __init__(self, max_history_length: int = 20, session_timeout_minutes: int = 60):
         self.sessions: dict[str, dict] = {}
@@ -63,7 +71,7 @@ class ConversationStore:
             self.sessions[session_id] = {
                 "id": session_id,
                 "mode": "free_talk",
-                "metadata": {},   # kept for future extensions
+                "metadata": {"greeted": False},  # <- IMPORTANT
                 "history": [],
                 "created_at": datetime.now(),
                 "last_active": datetime.now(),
@@ -74,7 +82,6 @@ class ConversationStore:
         with self.lock:
             session = self.sessions.get(session_id)
             if session:
-                # expire old sessions
                 if datetime.now() - session["last_active"] > self.session_timeout:
                     del self.sessions[session_id]
                     return None
@@ -92,7 +99,7 @@ class ConversationStore:
             )
 
             if len(session["history"]) > self.max_history_length:
-                session["history"] = session["history"][-self.max_history_length :]
+                session["history"] = session["history"][-self.max_history_length:]
 
             session["last_active"] = datetime.now()
             return True
@@ -104,6 +111,14 @@ class ConversationStore:
                 return []
             return [{"role": m["role"], "content": m["content"]} for m in session["history"]]
 
+    def update_metadata(self, session_id: str, key: str, value):
+        with self.lock:
+            session = self.sessions.get(session_id)
+            if not session:
+                return False
+            session["metadata"][key] = value
+            return True
+
 
 conversation_store = ConversationStore(max_history_length=30, session_timeout_minutes=120)
 
@@ -111,7 +126,6 @@ conversation_store = ConversationStore(max_history_length=30, session_timeout_mi
 # ======== MODELS ========
 
 class SessionCreateRequest(BaseModel):
-    # no fields needed for now
     pass
 
 
@@ -136,7 +150,7 @@ class TTSRequest(BaseModel):
 
 
 # ========================================
-# PROMPT
+# SYSTEM PROMPT
 # ========================================
 
 def get_free_talk_system_prompt() -> str:
@@ -145,28 +159,15 @@ You are an English tutor having natural FREE CONVERSATION with an ADVANCED learn
 
 GOAL:
 - Help the learner practice fluent English.
-- The learner should talk MORE than you.
+- The learner should speak MORE than you.
 - Keep the conversation going with open questions.
 
-FIRST MESSAGE:
-- If the user message is "START_CONVERSATION", you should:
-  - Greet the learner.
-  - Introduce a simple topic (e.g., daily life, studies, work, hobbies).
-  - Ask an open-ended question to get them talking.
-
-FOR EVERY USER MESSAGE:
-1) First, respond naturally (2–4 short sentences).
-2) Then give short feedback on their English:
-   - Start with: "Feedback: ..."
-   - Correct 1–2 important grammar or phrasing issues, in a friendly way.
-3) End with an open question that invites a longer answer
-   (opinions, reasons, examples, or stories).
-
-STYLE:
-- Friendly, conversational, and encouraging.
-- Use natural advanced English, but not too academic.
-- Do NOT write very long paragraphs.
-- Always reply in English only.
+RULES FOR ALL RESPONSES:
+1) Respond naturally in 2–4 short sentences.
+2) Then add a short correction labeled:
+   Feedback: (correct only 1–2 important issues, simply)
+3) End with an open question (reasons, examples, opinions).
+4) Always reply in English only.
 """
 
 
@@ -177,14 +178,13 @@ STYLE:
 def call_openai_chat(messages: list[dict]) -> str:
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",   # stable chat model
+            model="gpt-4o-mini",
             messages=messages,
             temperature=0.7,
         )
         content = response.choices[0].message.content
         return content or ""
     except Exception as e:
-        print("Chat error:", e)
         raise HTTPException(status_code=500, detail=f"Chat error: {e}")
 
 
@@ -199,7 +199,6 @@ def serve_index():
         raise HTTPException(status_code=404, detail="index.html not found in /static")
     return FileResponse(index_path)
 
-
 if os.path.isdir("static"):
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -210,9 +209,6 @@ if os.path.isdir("static"):
 
 @app.post("/api/session/create", response_model=SessionCreateResponse)
 def create_session(_: SessionCreateRequest | None = None):
-    """
-    Create a new free-talk session for a learner.
-    """
     session_id = conversation_store.create_session()
     return SessionCreateResponse(
         session_id=session_id,
@@ -245,51 +241,47 @@ def chat(req: ChatRequest):
     if session_id:
         session = conversation_store.get_session(session_id)
         if not session:
-            raise HTTPException(status_code=404, detail="Session not found or expired. Create a new session.")
+            raise HTTPException(status_code=404, detail="Session expired. Create a new session.")
     else:
         session_id = conversation_store.create_session()
         session = conversation_store.get_session(session_id)
 
-    # Build messages with history
+    # ========== ONE-TIME GREETING ==========
+    if not session["metadata"].get("greeted"):
+        greeting = (
+            "Hello! My name is friday, and I will be your personal English speaking trainer. "
+            "We’ll practice natural conversation and I’ll help you sound confident and fluent. "
+            "To begin, tell me something about your day!"
+        )
+        conversation_store.update_metadata(session_id, "greeted", True)
+        conversation_store.add_message(session_id, "assistant", greeting)
+        return ChatResponse(reply=greeting, session_id=session_id, message_count=1)
+
+    # Normal conversation
     system_prompt = get_free_talk_system_prompt()
     history = conversation_store.get_history(session_id)
 
-    # A-mode behaviour: if no/short greeting, start conversation from bot
-    raw_msg = msg
-    if not raw_msg or raw_msg.lower() in {"hi", "hello", "hey", "start"}:
-        user_msg = "START_CONVERSATION"
-    else:
-        user_msg = raw_msg
-
     messages = [{"role": "system", "content": system_prompt}]
     messages.extend(history)
-    messages.append({"role": "user", "content": user_msg})
+    messages.append({"role": "user", "content": msg})
 
     reply = call_openai_chat(messages)
 
-    # Save messages to history
-    conversation_store.add_message(session_id, "user", user_msg)
+    conversation_store.add_message(session_id, "user", msg)
     conversation_store.add_message(session_id, "assistant", reply)
 
-    updated_session = conversation_store.get_session(session_id)
-    message_count = len(updated_session["history"]) if updated_session else 0
+    updated = conversation_store.get_session(session_id)
+    count = len(updated["history"])
 
-    return ChatResponse(
-        reply=reply,
-        session_id=session_id,
-        message_count=message_count,
-    )
+    return ChatResponse(reply=reply, session_id=session_id, message_count=count)
 
 
 # ========================================
-# TTS ENDPOINT (tts-1 + alloy)
+# TTS ENDPOINT
 # ========================================
 
 @app.post("/api/tts")
 def tts(req: TTSRequest):
-    """
-    Text-to-speech for tutor reply.
-    """
     text = (req.text or "").strip()
     if not text:
         raise HTTPException(status_code=400, detail="Text is required for TTS.")
@@ -299,7 +291,6 @@ def tts(req: TTSRequest):
 
     try:
         tmp_path = Path("tts_temp_output.mp3")
-
         with client.audio.speech.with_streaming_response.create(
             model="tts-1",
             voice="alloy",
@@ -315,7 +306,6 @@ def tts(req: TTSRequest):
 
         return Response(content=audio_bytes, media_type="audio/mpeg")
     except Exception as e:
-        print("TTS error:", e)
         raise HTTPException(status_code=500, detail=f"TTS error: {e}")
 
 
@@ -323,13 +313,3 @@ def tts(req: TTSRequest):
 # STARTUP/SHUTDOWN
 # ========================================
 
-@app.on_event("startup")
-async def on_startup():
-    print("English Free Talk Tutor API started.")
-    print(f"Max history length: {conversation_store.max_history_length}")
-    print(f"Session timeout: {conversation_store.session_timeout}")
-
-
-@app.on_event("shutdown")
-async def on_shutdown():
-    print(f"Shutting down. Active sessions: {len(conversation_store.sessions)}")
