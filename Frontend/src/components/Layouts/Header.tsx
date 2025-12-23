@@ -8,10 +8,6 @@ import {
   Bell,
   User,
   ChevronDown,
-  BookOpen,
-  GraduationCap,
-  Library,
-  Building2,
 } from "lucide-react";
 import { useAuthContext } from "../../context/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
@@ -329,29 +325,37 @@ export default function Header() {
                 href="/companies"
                 className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"
               >
-                <Building2 className="w-4 h-4 mr-2" />
                 Companies
               </a>
               <a
                 href="/freshers-pratice"
                 className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"
               >
-                <Library className="w-4 h-4 mr-2" />
                 Freshers Ready
               </a>
               <a
                 href="/courses"
                 className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"
               >
-                <GraduationCap className="w-4 h-4 mr-2" />
                 Courses
               </a>
               <a
                 href="/my-learning"
                 className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"
               >
-                <BookOpen className="w-4 h-4 mr-2" />
                 My Learning
+              </a>
+              <a
+                href="/resumes"
+                className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"
+              >
+                Resumes
+              </a>
+              <a
+                href="/tutor"
+                className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"
+              >
+                Ai Tutor
               </a>
               <a
                 href="/cart"

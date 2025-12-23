@@ -233,7 +233,7 @@ export default function FreshersReady() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-6xl sm:max-w-7xl mx-auto px-6 py-12">
         {/* Tabs */}
         <div className="mb-10">
           <div className="bg-white rounded-2xl shadow-lg p-2 inline-flex gap-2">
@@ -247,7 +247,7 @@ export default function FreshersReady() {
                     ? { backgroundColor: tabStyles[t.key]?.hex ?? activeHex }
                     : undefined
                 }
-                className={`px-6 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+                className={`px-3 py-2 sm:px-6 sm:py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2 ${
                   activeTab === t.key
                     ? "text-white shadow"
                     : "text-gray-700 hover:bg-gray-100"

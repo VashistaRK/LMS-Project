@@ -178,14 +178,14 @@ const LandingPage1 = () => {
                 skills, and connect with industry-leading employers.
               </p>
 
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href="/courses"
-                  className="rounded-2xl bg-blue-600 px-8 py-4 font-semibold shadow-lg transition text-gray-200 hover:bg-blue-500"
+                  className="w-full sm:w-auto text-center rounded-2xl bg-blue-600 px-8 py-4 font-semibold shadow-lg transition text-gray-200 hover:bg-blue-500"
                 >
                   Start Learning
                 </a>
-                <button className="rounded-2xl border border-white/20 px-8 py-4 font-semibold text-white transition hover:bg-white/10">
+                <button className="w-full sm:w-auto text-center rounded-2xl border border-white/20 px-8 py-4 font-semibold text-white transition hover:bg-white/10">
                   Explore Career Paths
                 </button>
               </div>
@@ -193,13 +193,15 @@ const LandingPage1 = () => {
 
             {/* Right Visual Card */}
             <div className="relative">
-              <div className="rounded-xl border-t-2 border-l-2 border-t-blue-500 border-l-blue-500 bg-white/5 p-8 shadow-lg backdrop-blur-xl">
+              <div className="rounded-xl border-t-2 border-l-2 border-t-blue-500 border-l-blue-500 bg-white/5 p-6 sm:p-8 shadow-lg backdrop-blur-xl">
                 <img
                   src="images/modern_student_studying_with_laptop.png"
                   alt="working"
+                  className="w-full h-auto max-w-full"
                 />
 
-                <div className="absolute -left-4 top-10 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-border/50 animate-bounce delay-700 duration-[3000ms] z-20 max-w-[200px]">
+                {/* decorative badges hidden on small screens to improve responsiveness */}
+                <div className="hidden md:block absolute -left-4 top-10 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-border/50 animate-bounce delay-700 duration-[3000ms] z-20 max-w-[200px]">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg text-green-600">
                       <CheckCircle2 className="w-5 h-5" />
@@ -211,7 +213,7 @@ const LandingPage1 = () => {
                   </div>
                 </div>
 
-                <div className="absolute -right-4 bottom-20 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-border/50 animate-bounce delay-1000 duration-[4000ms] z-20">
+                <div className="hidden md:block absolute -right-4 bottom-20 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-border/50 animate-bounce delay-1000 duration-[4000ms] z-20">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600">
                       <Briefcase className="w-5 h-5" />
@@ -542,10 +544,10 @@ const LandingPage1 = () => {
         </div>
       </section>
       {/* Learning Pathways - Immersive Cards */}
-      <section className="py-12 bg-background relative overflow-hidden px-18">
+      <section className="py-12 bg-background relative overflow-hidden px-8 md:px-18">
         <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+        <div className="container mx-auto md:px-4 relative z-10">
+          <div className="flex flex-col md:flex-row items-end mb-16 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
                 Comprehensive Learning Paths
@@ -617,7 +619,7 @@ const LandingPage1 = () => {
       </section>
 
       {/* Featured Courses - Polished Grid */}
-      <section className="py-24 bg-muted/30 border-y border-border/60 px-18">
+      <section className="py-24 bg-muted/30 border-y border-border/60 px-8 md:px-18">
         <div className="container mx-auto px-4">
           <div className="text-center flex flex-col items-center max-w-3xl mx-auto mb-16">
             <div className="border-2 max-w-fit bg-gray-200 mb-4 rounded-3xl px-2">
@@ -697,7 +699,7 @@ const LandingPage1 = () => {
       </section>
 
       {/* Self-Learning Advantage - Visual Layout */}
-      <section className="py-24 bg-background relative px-18">
+      <section className="py-24 bg-background relative px-8 md:px-18">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1 relative">
@@ -790,7 +792,7 @@ const LandingPage1 = () => {
       </section>
 
       {/* Value Props / Why Choose Us - Dark Mode */}
-      <section className="py-24 bg-slate-900 text-white relative overflow-hidden px-18">
+      <section className="py-24 bg-slate-900 text-white relative overflow-hidden px-8 md:px-18">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
@@ -913,12 +915,12 @@ const LandingPage1 = () => {
             </p>
           </div>
           <div className="relative w-full max-w-7xl mx-auto py-8">
-            {/* Left Button */}
+            {/* Left Button (responsive) */}
             <button
               onClick={() => scroll("left")}
-              className="absolute -left-18 top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white text-3xl font-bold rounded-full w-14 h-14 flex items-center justify-center backdrop-blur-md shadow-md transition-all duration-300"
+              className="absolute left-4 md:left-[-72px] top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white text-3xl font-bold rounded-full w-12 h-12 md:w-14 md:h-14 flex items-center justify-center backdrop-blur-md shadow-md transition-all duration-300"
             >
-              <ChevronLeft className="h-8 w-8" />
+              <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
             </button>
 
             {/* Scrollable Row */}
@@ -942,12 +944,12 @@ const LandingPage1 = () => {
               ))}
             </div>
 
-            {/* Right Button */}
+            {/* Right Button (responsive) */}
             <button
               onClick={() => scroll("right")}
-              className="absolute -right-18 top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white text-3xl font-bold rounded-full w-14 h-14 flex items-center justify-center backdrop-blur-md shadow-md transition-all duration-300"
+              className="absolute right-4 md:right-[-72px] top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white text-3xl font-bold rounded-full w-12 h-12 md:w-14 md:h-14 flex items-center justify-center backdrop-blur-md shadow-md transition-all duration-300"
             >
-              <ChevronRight className="h-8 w-8" />
+              <ChevronRight className="h-6 w-6 md:h-8 md:w-8" />
             </button>
           </div>
           <div className="flex items-center justify-center">
