@@ -12,6 +12,12 @@ const resumeSchema = new mongoose.Schema({
   fileSize: { type: Number },
   fileBuffer: { type: Buffer }, // stores DOCX/PDF binary
 
+  // Optional template image (stored in DB as buffer)
+  imageFileName: { type: String },
+  imageType: { type: String },
+  imageSize: { type: Number },
+  imageBuffer: { type: Buffer },
+
   // Optional editor content (if you want to keep)
   content: { type: Object, default: {} },
 

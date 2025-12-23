@@ -41,18 +41,18 @@ export default function AuthPage() {
         const msg = await res.json().catch(() => ({}));
         throw new Error(msg.error || "Login failed");
       }
-        // Parse the JSON payload. The backend may include a `redirect` field for admin users.
-        const data = await res.json().catch(() => ({}));
+      // Parse the JSON payload. The backend may include a `blueirect` field for admin users.
+      const data = await res.json().catch(() => ({}));
 
-        if (data.redirect) {
-          // Navigate the browser to the admin UI (this is a full navigation so the cookie is sent)
-          window.location.href = data.redirect;
-          return true;
-        }
-
-        // Otherwise reload so the auth provider re-checks /auth/me and updates user state
-        window.location.reload();
+      if (data.blueirect) {
+        // Navigate the browser to the admin UI (this is a full navigation so the cookie is sent)
+        window.location.href = data.blueirect;
         return true;
+      }
+
+      // Otherwise reload so the auth provider re-checks /auth/me and updates user state
+      window.location.reload();
+      return true;
     },
     onError: (err: any) => setError(err.message || "Login failed"),
   });
@@ -112,13 +112,13 @@ export default function AuthPage() {
                       Welcome back
                     </h1>
                     <p className="text-gray-600">
-                      Please enter your credentials to continue
+                      Please enter your cblueentials to continue
                     </p>
                   </div>
 
                   {error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-sm text-red-800">{error}</p>
+                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-sm text-blue-800">{error}</p>
                     </div>
                   )}
 
@@ -133,7 +133,7 @@ export default function AuthPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                       />
                     </div>
 
@@ -148,7 +148,7 @@ export default function AuthPage() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           required
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition pr-10"
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition pr-10"
                         />
                         <button
                           type="button"
@@ -166,13 +166,13 @@ export default function AuthPage() {
                           type="checkbox"
                           checked={rememberMe}
                           onChange={() => setRememberMe(!rememberMe)}
-                          className="w-4 h-4 border-gray-300 rounded text-red-600 focus:ring-red-500"
+                          className="w-4 h-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500"
                         />
                         <span className="text-gray-600">Remember me</span>
                       </label>
                       <button
                         type="button"
-                        className="text-red-600 hover:text-red-700 font-medium"
+                        className="text-blue-600 hover:text-blue-700 font-medium"
                       >
                         Forgot password?
                       </button>
@@ -181,7 +181,7 @@ export default function AuthPage() {
                     <button
                       type="submit"
                       disabled={loginMutation.isPending}
-                      className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loginMutation.isPending ? "Signing in..." : "Sign in"}
                     </button>
@@ -197,8 +197,14 @@ export default function AuthPage() {
                     onClick={() => login()}
                     className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
                   >
-                    <img src="images/Google.jpg" alt="Google" className="h-5 w-5" />
-                    <span className="font-medium text-gray-700">Continue with Google</span>
+                    <img
+                      src="images/Google.jpg"
+                      alt="Google"
+                      className="h-5 w-5"
+                    />
+                    <span className="font-medium text-gray-700">
+                      Continue with Google
+                    </span>
                   </button>
 
                   <p className="text-center text-sm text-gray-600 mt-6">
@@ -206,7 +212,7 @@ export default function AuthPage() {
                     <button
                       type="button"
                       onClick={() => setIsLogin(false)}
-                      className="text-red-600 hover:text-red-700 font-medium"
+                      className="text-blue-600 hover:text-blue-700 font-medium"
                     >
                       Sign up
                     </button>
@@ -219,7 +225,7 @@ export default function AuthPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className="hidden md:block relative bg-gradient-to-br from-red-50 to-red-100"
+                className="hidden md:block relative bg-gradient-to-br from-blue-50 to-blue-100"
               >
                 <div className="absolute inset-0 flex items-center justify-center p-12">
                   <div className="relative">
@@ -247,7 +253,7 @@ export default function AuthPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className="hidden md:block relative bg-gradient-to-br from-red-50 to-red-100"
+                className="hidden md:block relative bg-gradient-to-br from-blue-50 to-blue-100"
               >
                 <div className="absolute inset-0 flex items-center justify-center p-12">
                   <div className="relative">
@@ -288,8 +294,8 @@ export default function AuthPage() {
                   </div>
 
                   {error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-sm text-red-800">{error}</p>
+                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-sm text-blue-800">{error}</p>
                     </div>
                   )}
 
@@ -304,7 +310,7 @@ export default function AuthPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                       />
                     </div>
 
@@ -318,7 +324,7 @@ export default function AuthPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                       />
                     </div>
 
@@ -333,7 +339,7 @@ export default function AuthPage() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           required
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition pr-10"
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition pr-10"
                         />
                         <button
                           type="button"
@@ -352,7 +358,7 @@ export default function AuthPage() {
                       <select
                         value={role}
                         onChange={(e) => setRole(e.target.value)}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                         required
                       >
                         <option value="student">Student</option>
@@ -363,9 +369,11 @@ export default function AuthPage() {
                     <button
                       type="submit"
                       disabled={signupMutation.isPending}
-                      className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {signupMutation.isPending ? "Creating account..." : "Create account"}
+                      {signupMutation.isPending
+                        ? "Creating account..."
+                        : "Create account"}
                     </button>
                   </form>
 
@@ -374,7 +382,7 @@ export default function AuthPage() {
                     <button
                       type="button"
                       onClick={() => setIsLogin(true)}
-                      className="text-red-600 hover:text-red-700 font-medium"
+                      className="text-blue-600 hover:text-blue-700 font-medium"
                     >
                       Sign in
                     </button>

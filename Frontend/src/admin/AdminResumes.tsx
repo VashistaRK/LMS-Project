@@ -17,10 +17,12 @@ interface ResumeItem {
   _id: string;
   resumeId: string;
   title?: string;
-  authorName?: string;
   fileName?: string;
   fileType?: string;
   fileSize?: number;
+  authorName?: string;
+  imageFileName?: string;
+  imageUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -81,6 +83,7 @@ export default function AdminResumesPage() {
   const [modal, setModal] = useState(false);
   const [docId, setDocId] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [success, setSuccess] = useState("");
   const [preview, setPreview] = useState<ResumeItem | null>(null);
 
@@ -100,6 +103,7 @@ export default function AdminResumesPage() {
       setModal(false);
       setDocId("");
       setSelectedFile(null);
+      setSelectedImage(null);
       setSuccess("Resume uploaded successfully!");
       setTimeout(() => setSuccess(""), 3000);
     },
@@ -130,6 +134,7 @@ export default function AdminResumesPage() {
       (document.getElementById("author") as HTMLInputElement)?.value || ""
     );
     form.append("file", selectedFile);
+    if (selectedImage) form.append("image", selectedImage);
 
     uploadMutation.mutate(form);
   };
@@ -148,8 +153,12 @@ export default function AdminResumesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Admin – Resume Manager</h1>
-          <p className="text-gray-600 mt-1">Upload, preview and delete resumes</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Admin – Resume Manager
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Upload, preview and delete resumes
+          </p>
         </div>
 
         <button
@@ -216,6 +225,20 @@ export default function AdminResumesPage() {
                 />
               </div>
 
+              <div>
+                <label className="text-sm font-medium">
+                  Template Image (optional)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setSelectedImage(e.target.files?.[0] || null)
+                  }
+                  className="w-full mt-2"
+                />
+              </div>
+
               <div className="flex gap-3">
                 <button
                   type="button"
@@ -261,13 +284,25 @@ export default function AdminResumesPage() {
                   {resumes.map((r) => (
                     <tr key={r._id}>
                       <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-blue-600" />
-                          {r.title || r.resumeId}
+                        <div className="flex items-center gap-3">
+                          {/* thumbnail if available */}
+                          <div className="w-10 h-10 bg-gray-50 rounded overflow-hidden flex items-center justify-center">
+                            <img
+                              src={`${API}/api/resumes/${r.resumeId}/image`}
+                              alt="template"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display =
+                                  "none";
+                              }}
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-blue-600" />
+                            {r.title || r.resumeId}
+                          </div>
                         </div>
                       </td>
-
-                      <td className="p-3 text-gray-600">{r.authorName || "—"}</td>
 
                       <td className="p-3 text-gray-600">
                         {formatDate(r.createdAt)}
@@ -304,13 +339,17 @@ export default function AdminResumesPage() {
           <div className="bg-white border rounded-xl shadow-sm p-4 sticky top-6">
             {preview ? (
               <>
+                <img
+                  src={`${API}/api/resumes/${preview.resumeId}/image`}
+                  alt="template"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
                 <h3 className="text-lg font-bold mb-1">
                   {preview.title || preview.resumeId}
                 </h3>
-
-                <p className="text-sm text-gray-600 mb-3">
-                  Author: {preview.authorName || "—"}
-                </p>
 
                 <div className="text-sm text-gray-700 space-y-1 mb-4">
                   <p>

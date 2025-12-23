@@ -8,6 +8,8 @@ import {
   Briefcase,
   Building2,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Code,
   MessageSquare,
@@ -17,8 +19,18 @@ import {
   Users,
 } from "lucide-react";
 import { useCourses } from "@/hooks/queries/courses";
+import { useRef } from "react";
 
 const LandingPage1 = () => {
+  const videoScrollerRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    const el = videoScrollerRef.current;
+    if (!el) return;
+    const scrollAmount = direction === "left" ? -420 : 420;
+    el.scrollBy({ left: scrollAmount, behavior: "smooth" });
+  };
+
   const categories = [
     {
       title: "Communications",
@@ -99,6 +111,12 @@ const LandingPage1 = () => {
     },
   ];
 
+  const videos = [
+    "https://www.youtube.com/embed/eV0m6NowqWA?si=Nz_Nw6-orR3H3raK",
+    "https://www.youtube.com/embed/Lv1ABw3RPwc?si=PHJd53FTA73ssqdx",
+    "https://www.youtube.com/embed/w6C_ABHXMZU?si=YAEpmOZCDcoE5SVd",
+  ];
+
   const { data: courses = [] } = useCourses();
 
   const mappedFromApi = (Array.isArray(courses) ? courses : [])
@@ -138,8 +156,8 @@ const LandingPage1 = () => {
   return (
     <div className="text-gray-800 flex flex-col items-center font-Quick overflow-hidden">
       {/* Hero Section */}
-      <section className="relative w-full mt-10 min-h-screen overflow-hidden flex items-start justify-center">
-        <div className="relative mx-auto max-w-[85rem] px-6 py-28">
+      <section className="relative w-full min-h-screen overflow-hidden flex items-start justify-center">
+        <div className="relative mx-auto max-w-[85rem] px-6 py-8 lg:py-18">
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
             {/* Left Content */}
             <div className="space-y-8">
@@ -165,7 +183,7 @@ const LandingPage1 = () => {
                   href="/courses"
                   className="rounded-2xl bg-blue-600 px-8 py-4 font-semibold shadow-lg transition text-gray-200 hover:bg-blue-500"
                 >
-                  Start Learning for Free
+                  Start Learning
                 </a>
                 <button className="rounded-2xl border border-white/20 px-8 py-4 font-semibold text-white transition hover:bg-white/10">
                   Explore Career Paths
@@ -877,39 +895,69 @@ const LandingPage1 = () => {
         </div>
       </section>
 
-      {/* CTA Footer Section - High Impact */}
-      <section className="text-blue-950 md:py-20 w-full bg-gradient-to-r from-blue-800/70 via-purple-700/30 to-purple-500/50">
-        <div className="mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-6xl font-heading font-bold mb-8 tracking-tight">
-            Ready to Accelerate Your Career?
-          </h2>
-          <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-12 font-light">
-            Join 25,000+ learners who have transformed their careers through our
-            platform. No credit card required.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <a href="/Authenticate">
-              <Button
-                size="lg"
-                variant="secondary"
-                className="h-16 px-12 text-xl rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all"
-              >
-                Start Learning for Free
-              </Button>
-            </a>
-            <a href="/mentorship">
-              <Button
-                size="lg"
-                variant="outline"
-                className="h-16 px-12 text-xl rounded-2xl bg-transparent border-2 border-primary-foreground/30 hover:bg-primary-foreground transition-all"
-              >
-                Become an Instructor
-              </Button>
+      {/* Career Guidance (condensed content + horizontal video carousel) */}
+      <section
+        className="py-16 w-full text-black bg-center bg-cover"
+        style={{
+          backgroundImage: "url(/images/bg-guide.png)",
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-3">
+              Career guidance that actually helps
+            </h2>
+            <p className="text-gray-900 max-w-2xl mx-auto">
+              Short, practical guidance paired with curated videos to help you
+              make confident, job‑ready decisions.
+            </p>
+          </div>
+          <div className="relative w-full max-w-7xl mx-auto py-8">
+            {/* Left Button */}
+            <button
+              onClick={() => scroll("left")}
+              className="absolute -left-18 top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white text-3xl font-bold rounded-full w-14 h-14 flex items-center justify-center backdrop-blur-md shadow-md transition-all duration-300"
+            >
+              <ChevronLeft className="h-8 w-8" />
+            </button>
+
+            {/* Scrollable Row */}
+            <div
+              ref={videoScrollerRef}
+              className="flex gap-6 overflow-x-auto scroll-smooth px-4 scrollbar-hide"
+            >
+              {videos.map((src, i) => (
+                <div
+                  key={i}
+                  className="min-w-[320px] sm:min-w-[420px] aspect-video bg-black/30 rounded-2xl overflow-hidden border border-white/10 shadow-lg flex-shrink-0"
+                >
+                  <iframe
+                    className="w-full h-full"
+                    src={src}
+                    title={`career-video-${i}`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Right Button */}
+            <button
+              onClick={() => scroll("right")}
+              className="absolute -right-18 top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white text-3xl font-bold rounded-full w-14 h-14 flex items-center justify-center backdrop-blur-md shadow-md transition-all duration-300"
+            >
+              <ChevronRight className="h-8 w-8" />
+            </button>
+          </div>
+          <div className="flex items-center justify-center">
+            <a
+              href="/carrer-guidence"
+              className="rounded-xl p-4 bg-blue-400 text-xl text-white"
+            >
+              View All Content
             </a>
           </div>
-          <p className="mt-8 text-sm">
-            7-day free trial • Cancel anytime • No hidden fees
-          </p>
         </div>
       </section>
     </div>

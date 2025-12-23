@@ -4,7 +4,7 @@ import { requireAdmin } from "../middleware/roles.js";
 import multer from "multer";
 
 const router = Router();
-const upload = multer(); // store in memory
+const upload = multer({ storage: multer.memoryStorage() }); // store in memory
 
 // List resumes (supports simple pagination)
 router.get("/", async (req, res) => {
@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
 
     const [items, total] = await Promise.all([
       Resume.find()
-        .select("-fileBuffer")
+        .select("-fileBuffer -imageBuffer")
         .sort({ updatedAt: -1 })
         .skip(page * limit)
         .limit(limit)
@@ -29,46 +29,63 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/upload", requireAdmin, upload.single("file"), async (req, res) => {
-  try {
-    const { resumeId, title, authorName, summary, tags } = req.body;
+router.post(
+  "/upload",
+  requireAdmin,
+  upload.fields([
+    { name: "file", maxCount: 1 },
+    { name: "image", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      const { resumeId, title, authorName, summary, tags } = req.body;
 
-    if (!resumeId) {
-      return res.status(400).json({ error: "resumeId is required" });
+      if (!resumeId) {
+        return res.status(400).json({ error: "resumeId is required" });
+      }
+
+      const fileField = req.files && req.files.file ? req.files.file[0] : null;
+      const imageField =
+        req.files && req.files.image ? req.files.image[0] : null;
+
+      if (!fileField) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const exists = await Resume.findOne({ resumeId });
+      if (exists)
+        return res.status(409).json({ error: "resumeId already exists" });
+
+      const resume = new Resume({
+        resumeId,
+        title,
+        authorName,
+        summary,
+        tags: tags ? tags.split(",") : [],
+        fileName: fileField.originalname,
+        fileType: fileField.mimetype,
+        fileSize: fileField.size,
+        fileBuffer: fileField.buffer,
+        // optional template image
+        imageFileName: imageField ? imageField.originalname : undefined,
+        imageType: imageField ? imageField.mimetype : undefined,
+        imageSize: imageField ? imageField.size : undefined,
+        imageBuffer: imageField ? imageField.buffer : undefined,
+      });
+
+      await resume.save();
+      res.status(201).json({ message: "Resume uploaded", resumeId });
+    } catch (err) {
+      console.error("❌ Upload resume error:", err);
+      res.status(500).json({ error: "Failed to upload resume" });
     }
-
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
-
-    const exists = await Resume.findOne({ resumeId });
-    if (exists) return res.status(409).json({ error: "resumeId already exists" });
-
-    const resume = new Resume({
-      resumeId,
-      title,
-      authorName,
-      summary,
-      tags: tags ? tags.split(",") : [],
-
-      fileName: req.file.originalname,
-      fileType: req.file.mimetype,
-      fileSize: req.file.size,
-      fileBuffer: req.file.buffer,
-    });
-
-    await resume.save();
-    res.status(201).json({ message: "Resume uploaded", resumeId });
-  } catch (err) {
-    console.error("❌ Upload resume error:", err);
-    res.status(500).json({ error: "Failed to upload resume" });
   }
-});
+);
 
 router.get("/:resumeId", async (req, res) => {
   try {
     const resume = await Resume.findOne({ resumeId: req.params.resumeId })
-      .select("-fileBuffer")
+      .select("-fileBuffer -imageBuffer")
       .lean();
 
     if (!resume) return res.status(404).json({ error: "Resume not found" });
@@ -77,6 +94,28 @@ router.get("/:resumeId", async (req, res) => {
   } catch (err) {
     console.error("❌ Get resume error:", err);
     res.status(500).json({ error: "Failed to fetch resume" });
+  }
+});
+
+// Serve stored template image (if any)
+router.get("/:resumeId/image", async (req, res) => {
+  try {
+    const resume = await Resume.findOne({ resumeId: req.params.resumeId });
+
+    if (!resume || !resume.imageBuffer) {
+      return res.status(404).json({ error: "Image not found" });
+    }
+
+    res.setHeader(
+      "Content-Type",
+      resume.imageType || "application/octet-stream"
+    );
+    // small caching
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.send(resume.imageBuffer);
+  } catch (err) {
+    console.error("❌ Get resume image error:", err);
+    res.status(500).json({ error: "Failed to fetch image" });
   }
 });
 
@@ -107,6 +146,10 @@ router.put("/:resumeId", requireAdmin, async (req, res) => {
     delete req.body.fileName;
     delete req.body.fileType;
     delete req.body.fileSize;
+    delete req.body.imageBuffer;
+    delete req.body.imageFileName;
+    delete req.body.imageType;
+    delete req.body.imageSize;
 
     const resume = await Resume.findOneAndUpdate(
       { resumeId: req.params.resumeId },

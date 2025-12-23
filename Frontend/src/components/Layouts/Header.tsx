@@ -16,7 +16,7 @@ import {
 import { useAuthContext } from "../../context/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../../hooks/queries/cart";
-import NotificationDropdown from "../NotificationDropdown";
+// import NotificationDropdown from "../NotificationDropdown";
 
 type SearchItem = { type: string; name: string; path: string };
 
@@ -173,8 +173,6 @@ export default function Header() {
           )}
         </a>
 
-        {user && <NotificationDropdown />}
-
         {!user ? (
           <button
             onClick={() => (window.location.href = "/Authenticate")}
@@ -207,7 +205,7 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.18 }}
-                  className="absolute right-0 mt-2 w-56 bg-white/90 text-black backdrop-blur-lg border border-white/20 rounded-xl shadow-xl py-2 z-50"
+                  className="absolute right-0 mt-2 w-56 bg-white/90 text-black backdrop-blur-lg border border-white/20 rounded-xl shadow-xl py-2 z-100"
                 >
                   <div className="px-4 py-3 border-b border-white/20">
                     <p className="text-sm font-semibold text-gray-800">
@@ -257,110 +255,56 @@ export default function Header() {
     <>
       {/* Landing page: floating header until first scroll, then hide entirely */}
       <AnimatePresence>
-        {isLanding && !hasScrolledOnce && (
-          <motion.header
-            key="landing-header"
-            className={`fixed w-full z-50 transition-all duration-500 bg-gray-100 backdrop-blur-xl py-4 border border-white/20`}
-          >
-            <div className="min-w-full mx-auto px-6">
-              <div className="flex justify-between items-center h-16">
-                <a href="/" className="flex items-center space-x-2">
-                  <img
-                    src="images/Sunadh-Logo.png"
-                    alt="Logo"
-                    className="h-20 w-auto select-none pointer-events-none"
-                  />
-                </a>
-
-                <nav className="hidden md:flex items-center space-x-3 font-bold text-gray-800">
-                  <a
-                    href="/companies"
-                    className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
-                  >
-                    Companies
-                  </a>
-                  <a
-                    href="/freshers-pratice"
-                    className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
-                  >
-                    Freshers Ready
-                  </a>
-                  <a
-                    href="/courses"
-                    className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
-                  >
-                    Courses
-                  </a>
-                  <a
-                    href="/my-learning"
-                    className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
-                  >
-                    My Learning
-                  </a>
-                  <a
-                    href="/resumes"
-                    className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
-                  >
-                    Resumes
-                  </a>
-                  <a
-                    href="/tutor"
-                    className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
-                  >
-                    Ai Tutor
-                  </a>
-                </nav>
-
-                {Controls}
-              </div>
-            </div>
-          </motion.header>
-        )}
-      </AnimatePresence>
-
-      {/* Non-landing pages: full width header at top (not fixed/sticky) */}
-      {!isLanding && (
-        <header className="w-full z-50 bg-white border-b">
-          <div className="max-w-7xl mx-auto px-6">
+        <header
+          key="landing-header"
+          className={`w-full z-50 transition-all duration-500 bg-gray-200 backdrop-blur-xl py-4 border border-white/20`}
+        >
+          <div className="min-w-full mx-auto px-6">
             <div className="flex justify-between items-center h-16">
               <a href="/" className="flex items-center space-x-2">
                 <img
                   src="images/Sunadh-Logo.png"
                   alt="Logo"
-                  className="h-10 w-auto select-none pointer-events-none"
+                  className="h-20 w-auto select-none pointer-events-none"
                 />
               </a>
 
-              <nav className="hidden md:flex items-center space-x-3 text-gray-800">
+              <nav className="hidden md:flex items-center p-2 space-x-3 font-bold text-black">
                 <a
                   href="/companies"
-                  className="flex items-center px-4 py-2 text-sm font-medium hover:bg-white rounded-xl transition"
+                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
                 >
-                  <Building2 className="w-4 h-4 mr-2" /> Companies
+                  Companies
                 </a>
                 <a
                   href="/freshers-pratice"
-                  className="flex items-center px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-xl transition"
+                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
                 >
-                  <Library className="w-4 h-4 mr-2" /> Freshers Ready
+                  Freshers Ready
                 </a>
                 <a
                   href="/courses"
-                  className="flex items-center px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-xl transition"
+                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
                 >
-                  <GraduationCap className="w-4 h-4 mr-2" /> Courses
+                  Courses
                 </a>
                 <a
                   href="/my-learning"
-                  className="flex items-center px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-xl transition"
+                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
                 >
-                  <BookOpen className="w-4 h-4 mr-2" /> My Learning
+                  My Learning
                 </a>
                 <a
                   href="/resumes"
-                  className="flex items-center px-4 py-2 text-lg font-medium hover:bg-white/30 rounded-xl transition"
+                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
                 >
-                  <BookOpen className="w-4 h-4 mr-2" /> Resumes
+                  Resumes
+                </a>
+                <a
+                  href="/tutor"
+                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
+                >
+                  Ai Tutor
                 </a>
               </nav>
 
@@ -368,7 +312,7 @@ export default function Header() {
             </div>
           </div>
         </header>
-      )}
+      </AnimatePresence>
 
       {/* Mobile dropdown */}
       <AnimatePresence>
