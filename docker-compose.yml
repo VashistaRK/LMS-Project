@@ -15,15 +15,16 @@ services:
       - OIDC_CLIENT_ID=857081833212-ug3q9qmc5kjg5et9u9lfmoe6rlb2167f.apps.googleusercontent.com
       - OIDC_CLIENT_SECRET=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
       - OIDC_ISSUER=https://accounts.google.com
-      - OIDC_REDIRECT_URI=https://sunadhedutech.com/auth/callback
+      - OIDC_REDIRECT_URI=https://fresherready.com/auth/callback
       - APP_JWT_SECRET=sjdhf9834hr2y48hr92384hr28fhr9283hf9283hf92hf
-      - APP_JWT_ISS=https://sunadhedutech.com
+      - APP_JWT_ISS=https://fresherready.com
       - APP_JWT_AUD=my-backend-api
       - PORT=3000
-      - WEB_ORIGIN=https://sunadhedutech.com
+      - WEB_ORIGIN=https://fresherready.com
+      # - MONGO_URI=mongodb+srv://shoterking1357:MainKey123@cluster0.3kun17m.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       - MONGO_URI=mongodb://host.docker.internal:27017
       - MONGO_DBNAME=LMS_DATA
-      - OPENAI_API_KEY=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
+      - OPENAI_API_KEY=
     ports:
       - "3000:3000"
     extra_hosts:
@@ -38,18 +39,18 @@ services:
       context: ./Frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=https://sunadhedutech.com/api
-        - VITE_API_URL_CMR=https://sunadhedutech.com/api_cmr # or your own URL
-        - VITE_SOCKET_URL=https://sunadhedutech.com
+        - VITE_API_URL=https://fresherready.com/api
+        - VITE_API_URL_CMR=https://fresherready.com/api_cmr # or your own URL
+        - VITE_SOCKET_URL=https://fresherready.com
     restart: unless-stopped
     ports:
       - "5173:5173"
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=https://sunadhedutech.com/api
-      - VITE_API_URL_CMR=https://sunadhedutech.com/api_cmr # or your own URL
-      - VITE_SOCKET_URL=https://sunadhedutech.com
+      - VITE_API_URL=https://fresherready.com/api
+      - VITE_API_URL_CMR=https://fresherready.com/api_cmr # or your own URL
+      - VITE_SOCKET_URL=https://fresherready.com
 
   english-tutor:
     build:
@@ -57,7 +58,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_KEY=
     ports:
       - "8000:8000"
 
