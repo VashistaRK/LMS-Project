@@ -302,6 +302,12 @@ export default function Header() {
                 >
                   Ai Tutor
                 </a>
+                <a
+                  href="https://jobs.fresherready.com/"
+                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
+                >
+                  Jobs Portal
+                </a>
               </nav>
 
               {Controls}
@@ -356,6 +362,12 @@ export default function Header() {
                 className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"
               >
                 Ai Tutor
+              </a>
+              <a
+                href="https://jobs.fresherready.com/"
+                className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"
+              >
+                Jobs Portal
               </a>
               <a
                 href="/cart"
