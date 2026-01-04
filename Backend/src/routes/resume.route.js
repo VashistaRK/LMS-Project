@@ -1,10 +1,19 @@
 import { Router } from "express";
+import mongoose from "mongoose";
 import Resume from "../models/Resume.js";
 import { requireAdmin } from "../middleware/roles.js";
 import multer from "multer";
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage() }); // store in memory
+// Limits and sizes
+const MAX_MONGO_DOC_BYTES = 16 * 1024 * 1024; // 16MB Mongo document limit
+const UPLOAD_LIMIT_BYTES = 10 * 1024 * 1024; // 10MB per-file multer limit (adjustable)
+
+// store in memory for small files; keep a multer fileSize limit to avoid OOM on VPS
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: UPLOAD_LIMIT_BYTES },
+});
 
 // List resumes (supports simple pagination)
 router.get("/", async (req, res) => {
@@ -45,12 +54,29 @@ router.post(
       }
 
       const fileField = req.files && req.files.file ? req.files.file[0] : null;
-      const imageField =
-        req.files && req.files.image ? req.files.image[0] : null;
+      const imageField = req.files && req.files.image ? req.files.image[0] : null;
 
       if (!fileField) {
         return res.status(400).json({ error: "No file uploaded" });
       }
+
+      // Quick size checks before trying to persist into MongoDB document
+      const fileBytes = fileField.size || 0;
+      const imageBytes = imageField ? imageField.size || 0 : 0;
+
+      if (fileBytes > MAX_MONGO_DOC_BYTES) {
+        return res
+          .status(413)
+          .json({ error: "Uploaded file exceeds MongoDB document size (16MB). Use GridFS or external storage." });
+      }
+
+      if (fileBytes + imageBytes > MAX_MONGO_DOC_BYTES) {
+        return res
+          .status(413)
+          .json({ error: "Combined file+image exceeds MongoDB document size (16MB). Use GridFS or external storage." });
+      }
+
+      console.info(`Resume upload: resumeId=${resumeId} fileBytes=${fileBytes} imageBytes=${imageBytes}`);
 
       const exists = await Resume.findOne({ resumeId });
       if (exists)
@@ -73,14 +99,43 @@ router.post(
         imageBuffer: imageField ? imageField.buffer : undefined,
       });
 
-      await resume.save();
-      res.status(201).json({ message: "Resume uploaded", resumeId });
+      try {
+        await resume.save();
+        res.status(201).json({ message: "Resume uploaded", resumeId });
+      } catch (saveErr) {
+        console.error("❌ Save resume error:", saveErr);
+        // Detect common Mongo "document too large" / BSON errors
+        const msg = (saveErr && saveErr.message) || "";
+        if (msg.includes("BSONObjectTooLarge") || msg.toLowerCase().includes("document too large")) {
+          return res.status(413).json({ error: "Document too large for MongoDB. Use GridFS or external storage." });
+        }
+
+        return res.status(500).json({ error: "Failed to save resume" });
+      }
     } catch (err) {
       console.error("❌ Upload resume error:", err);
+
+      // Multer file size errors often come here as a plain Error with message containing 'File too large'
+      const emsg = (err && err.message) || "";
+      if (emsg.toLowerCase().includes("file too large") || emsg.toLowerCase().includes("limit")) {
+        return res.status(413).json({ error: "Uploaded file exceeds server limit" });
+      }
+
       res.status(500).json({ error: "Failed to upload resume" });
     }
   }
 );
+
+// Lightweight DB health endpoint (useful on VPS to confirm local Mongo connection)
+router.get("/health/db", async (req, res) => {
+  try {
+    const state = mongoose.connection.readyState; // 0 disconnected, 1 connected
+    res.json({ ok: true, readyState: state });
+  } catch (err) {
+    console.error("❌ DB health check error:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
 
 router.get("/:resumeId", async (req, res) => {
   try {

@@ -17,7 +17,7 @@ const Admin = () => {
       <Admin_Header />
       <main className="relative">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_300px_at_50%_-10%,rgba(255,230,230,0.6),transparent)]" />
-        <div className={`${width} mx-auto px-4 sm:px-6 lg:px-8 py-8`}>
+        <div className={`${width}`}>
           <Outlet />
         </div>
       </main>

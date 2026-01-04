@@ -1,6 +1,6 @@
 import { useAuthContext } from "@/context/AuthProvider";
 import { Home, Users, BarChart3, ShieldQuestionMark, User } from "lucide-react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 const sidebarItems = [
   { name: "Dashboard", href: "/admin/dashboard", icon: Home },
@@ -11,38 +11,91 @@ const sidebarItems = [
 ];
 
 export default function AdminLayout() {
-   const { user } = useAuthContext();
-  return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r-8 border-r-zinc-600 p-4 space-y-4">
-        <h2 className="text-2xl font-bold mb-6">Admin Panel</h2>
+  const { user } = useAuthContext();
+  const location = useLocation();
 
-        <nav className="space-y-2">
-          {sidebarItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 transition-all font-medium text-gray-700"
-            >
-              <item.icon className="w-5 h-5" />
-              {item.name}
-            </Link>
-          ))}
-          {user && user.role==="Master_ADMIN" && (
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
+      <aside
+        className="
+          lg:static
+          inset-y-0 left-0
+          z-40
+          flex flex-col
+          bg-white
+          border-r
+          transition-all
+          duration-300
+          w-16 lg:w-48
+          p-2 lg:p-4
+        "
+      >
+        {/* Logo / Title */}
+        <div className="mb-6 flex items-center justify-center lg:justify-start">
+          <span className="hidden lg:block text-2xl font-bold">
+            Admin Panel
+          </span>
+          <span className="lg:hidden text-xl font-bold border-b-2">AP</span>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex flex-col gap-2">
+          {sidebarItems.map((item) => {
+            const isActive = location.pathname === item.href;
+
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={`
+                  group flex items-center
+                  justify-center lg:justify-start
+                  gap-3
+                  rounded-xl
+                  px-3 py-3
+                  transition-all
+                  font-medium
+                  ${
+                    isActive
+                      ? "bg-gray-200 text-gray-900"
+                      : "text-gray-600 hover:bg-gray-200"
+                  }
+                `}
+              >
+                <item.icon className="w-5 h-5 shrink-0" />
+                <span className="hidden lg:inline">{item.name}</span>
+              </Link>
+            );
+          })}
+
+          {user?.role === "Master_ADMIN" && (
             <Link
               to="/admin/super-admin"
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 transition-all font-medium text-gray-700"
+              className={`
+                group flex items-center
+                justify-center lg:justify-start
+                gap-3
+                rounded-xl
+                px-3 py-3
+                transition-all
+                font-medium
+                ${
+                  location.pathname === "/admin/super-admin"
+                    ? "bg-gray-200 text-gray-900"
+                    : "text-gray-600 hover:bg-gray-200"
+                }
+              `}
             >
-              <User className="w-5 h-5" />
-              Super Admin
+              <User className="w-5 h-5 shrink-0" />
+              <span className="hidden lg:inline">Super Admin</span>
             </Link>
           )}
         </nav>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 lg:p-4">
         <Outlet />
       </main>
     </div>

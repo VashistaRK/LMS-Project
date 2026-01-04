@@ -49,45 +49,48 @@ const SuperAdmin: React.FC = () => {
   };
 
   if (loading)
-    return <p className="p-6 text-center text-gray-500">Loading users…</p>;
+    return <p className="p-4 md:p-6 text-center text-gray-500 text-sm md:text-base">Loading users…</p>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-6">All Users</h1>
+    <div className="p-4 md:p-6">
+      <h1 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">All Users</h1>
 
       {/* Users Table */}
       <div className="overflow-x-auto shadow rounded-lg border">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-left border-collapse min-w-[640px]">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
-              <th className="p-3 border">Name</th>
-              <th className="p-3 border">Email</th>
-              <th className="p-3 border">Role</th>
-              <th className="p-3 border">Status</th>
-              <th className="p-3 border">Phone</th>
-              <th className="p-3 border">Actions</th>
+              <th className="p-2 md:p-3 border text-xs md:text-sm">Name</th>
+              <th className="p-2 md:p-3 border text-xs md:text-sm hidden sm:table-cell">Email</th>
+              <th className="p-2 md:p-3 border text-xs md:text-sm">Role</th>
+              <th className="p-2 md:p-3 border text-xs md:text-sm">Status</th>
+              <th className="p-2 md:p-3 border text-xs md:text-sm hidden md:table-cell">Phone</th>
+              <th className="p-2 md:p-3 border text-xs md:text-sm">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {users.map((u) => (
               <tr key={u._id} className="hover:bg-gray-50">
-                <td className="p-3 border">{u.name}</td>
-                <td className="p-3 border">{u.email}</td>
-                <td className="p-3 border">{u.role}</td>
-                <td className="p-3 border">
+                <td className="p-2 md:p-3 border">
+                  <div className="font-medium text-sm md:text-base">{u.name}</div>
+                  <div className="text-xs text-gray-500 sm:hidden mt-1">{u.email}</div>
+                </td>
+                <td className="p-2 md:p-3 border text-xs md:text-sm hidden sm:table-cell">{u.email}</td>
+                <td className="p-2 md:p-3 border text-xs md:text-sm">{u.role}</td>
+                <td className="p-2 md:p-3 border">
                   {u.isActive ? (
-                    <span className="px-2 py-1 text-sm text-green-700 bg-green-100 rounded">
+                    <span className="px-2 py-1 text-xs md:text-sm text-green-700 bg-green-100 rounded whitespace-nowrap">
                       Active
                     </span>
                   ) : (
-                    <span className="px-2 py-1 text-sm text-red-700 bg-red-100 rounded">
+                    <span className="px-2 py-1 text-xs md:text-sm text-red-700 bg-red-100 rounded whitespace-nowrap">
                       Disabled
                     </span>
                   )}
                 </td>
-                <td className="p-3 border">{u.phone || "-"}</td>
-                <td className="p-3 border">
+                <td className="p-2 md:p-3 border text-xs md:text-sm hidden md:table-cell">{u.phone || "-"}</td>
+                <td className="p-2 md:p-3 border">
                   <button
                     onClick={() => {
                       setSelectedUser(u);
@@ -99,7 +102,7 @@ const SuperAdmin: React.FC = () => {
                         phone: u.phone || "",
                       });
                     }}
-                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                    className="px-2 md:px-3 py-1 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700 whitespace-nowrap"
                   >
                     Edit
                   </button>
@@ -112,9 +115,9 @@ const SuperAdmin: React.FC = () => {
 
       {/* Edit Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-lg shadow p-6 space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
+          <div className="bg-white w-full max-w-md rounded-lg shadow p-4 md:p-6 space-y-3 md:space-y-4 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-2">
               Edit User
             </h2>
 
@@ -127,7 +130,7 @@ const SuperAdmin: React.FC = () => {
                 onChange={(e) =>
                   setEditData({ ...editData, name: e.target.value })
                 }
-                className="w-full border px-3 py-2 rounded"
+                className="w-full border px-3 py-2 rounded text-sm md:text-base"
               />
 
               <input
@@ -137,7 +140,7 @@ const SuperAdmin: React.FC = () => {
                 onChange={(e) =>
                   setEditData({ ...editData, email: e.target.value })
                 }
-                className="w-full border px-3 py-2 rounded"
+                className="w-full border px-3 py-2 rounded text-sm md:text-base"
               />
 
               <select
@@ -145,7 +148,7 @@ const SuperAdmin: React.FC = () => {
                 onChange={(e) =>
                   setEditData({ ...editData, role: e.target.value })
                 }
-                className="w-full border px-3 py-2 rounded"
+                className="w-full border px-3 py-2 rounded text-sm md:text-base"
               >
                 <option value="student">Student</option>
                 <option value="instructor">Instructor</option>
@@ -159,10 +162,10 @@ const SuperAdmin: React.FC = () => {
                 onChange={(e) =>
                   setEditData({ ...editData, phone: e.target.value })
                 }
-                className="w-full border px-3 py-2 rounded"
+                className="w-full border px-3 py-2 rounded text-sm md:text-base"
               />
 
-              <label className="flex items-center gap-2 mt-1">
+              <label className="flex items-center gap-2 mt-1 text-sm md:text-base">
                 <input
                   type="checkbox"
                   checked={editData.isActive}
@@ -175,17 +178,17 @@ const SuperAdmin: React.FC = () => {
             </div>
 
             {/* Buttons */}
-            <div className="flex justify-end gap-3 mt-6">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-4 md:mt-6">
               <button
                 onClick={() => setSelectedUser(null)}
-                className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
+                className="w-full sm:w-auto px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm md:text-base"
               >
                 Cancel
               </button>
 
               <button
                 onClick={updateUser}
-                className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm md:text-base"
               >
                 Save Changes
               </button>

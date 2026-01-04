@@ -34,7 +34,7 @@ const Admin_Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/20 bg-white/60 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.25)]">
+    <header className="top-0 z-50 w-full border-b border-white/20 bg-white/60 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.25)]">
       <div className="relative">
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -48,7 +48,7 @@ const Admin_Header = () => {
                 className="relative h-10 w-auto transition-transform group-hover:scale-105"
               />
             </a>
-  
+
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-1">
               {navigationItems.map((item) => {
@@ -66,12 +66,12 @@ const Admin_Header = () => {
                 );
               })}
             </nav>
-  
+
             {/* Right Section */}
             <div className="flex items-center space-x-3">
               {/* Notifications */}
               {user && <NotificationDropdown />}
-  
+
               {/* Profile Dropdown */}
               {!user ? (
                 <button
@@ -92,10 +92,12 @@ const Admin_Header = () => {
                       className="w-8 h-8 rounded-full ring-2 ring-white"
                     />
                     <ChevronDown
-                      className={`w-4 h-4 text-gray-500 transition ${isProfileDropdownOpen ? "rotate-180" : ""}`}
+                      className={`w-4 h-4 text-gray-500 transition ${
+                        isProfileDropdownOpen ? "rotate-180" : ""
+                      }`}
                     />
                   </button>
-  
+
                   <AnimatePresence>
                     {isProfileDropdownOpen && (
                       <motion.div
@@ -127,7 +129,7 @@ const Admin_Header = () => {
                   </AnimatePresence>
                 </div>
               )}
-  
+
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -141,7 +143,7 @@ const Admin_Header = () => {
               </button>
             </div>
           </div>
-  
+
           {/* Mobile Navigation */}
           {isMobileMenuOpen && (
             <div className="md:hidden border-t border-gray-200/70 bg-white/95 backdrop-blur-xl rounded-b-xl shadow-xl">
@@ -164,7 +166,7 @@ const Admin_Header = () => {
             </div>
           )}
         </div>
-  
+
         {/* Click outside to close dropdowns */}
         {isProfileDropdownOpen && (
           <div

@@ -76,11 +76,15 @@ export default function MasterAdminDashboard() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-6 max-w-7xl mx-auto ml-0">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#C21817]">Master Admin Dashboard</h1>
-          <p className="text-gray-500 mt-1">Manage colleges across the network</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#C21817]">
+            Master Admin Dashboard
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Manage colleges across the network
+          </p>
         </div>
         <button
           className="px-5 py-2.5 bg-gradient-to-r from-[#C21817] to-[#A51515] text-white rounded-2xl shadow-lg shadow-[#C21817]/20 hover:shadow-[#C21817]/30 hover:translate-y-[-1px] active:translate-y-[0px] transition-all"
@@ -93,7 +97,7 @@ export default function MasterAdminDashboard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {colleges.map((college) => (
           <div
             key={college.id}
@@ -108,17 +112,21 @@ export default function MasterAdminDashboard() {
               />
               <h2 className="text-lg font-semibold">{college.name}</h2>
             </div>
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div className="rounded-xl bg-gray-50 px-3 py-2">
                 <span className="text-gray-500">Users</span>
-                <div className="font-semibold text-gray-800">{college.usersCount}</div>
+                <div className="font-semibold text-gray-800">
+                  {college.usersCount}
+                </div>
               </div>
               <div className="rounded-xl bg-gray-50 px-3 py-2">
                 <span className="text-gray-500">Courses</span>
-                <div className="font-semibold text-gray-800">{college.coursesCount}</div>
+                <div className="font-semibold text-gray-800">
+                  {college.coursesCount}
+                </div>
               </div>
             </div>
-            <div className="mt-5 flex gap-2">
+            <div className="mt-5 flex flex-col sm:flex-row gap-2">
               <button
                 className="px-3 py-1.5 text-sm bg-gradient-to-r from-[#C21817] to-[#A51515] text-white rounded-lg hover:opacity-95 transition"
                 onClick={() => {
@@ -131,7 +139,9 @@ export default function MasterAdminDashboard() {
               </button>
               <button
                 className="px-3 py-1.5 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-                onClick={() => window.location.assign(`/admin/clg/${college.id}`)}
+                onClick={() =>
+                  window.location.assign(`/admin/clg/${college.id}`)
+                }
               >
                 📊 View
               </button>
@@ -139,10 +149,10 @@ export default function MasterAdminDashboard() {
           </div>
         ))}
       </div>
-  
+
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-2xl shadow-2xl ring-1 ring-black/5 w-full max-w-md">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
+          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-2xl ring-1 ring-black/5 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">
               {editingCollege ? "✏️ Edit College" : "➕ Add College"}
             </h2>
@@ -208,7 +218,7 @@ export default function MasterAdminDashboard() {
                   className="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-4 focus:ring-indigo-500/10"
                 />
               </div>
-  
+
               <div className="flex justify-end gap-3 mt-4">
                 <button
                   type="button"
