@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { useAuthContext } from "../context/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
-import NotificationDropdown from "../components/NotificationDropdown";
 
 const Admin_Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -69,9 +68,6 @@ const Admin_Header = () => {
 
             {/* Right Section */}
             <div className="flex items-center space-x-3">
-              {/* Notifications */}
-              {user && <NotificationDropdown />}
-
               {/* Profile Dropdown */}
               {!user ? (
                 <button

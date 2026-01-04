@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
-import { socket } from "../lib/socket";
 import { Star } from "lucide-react";
 
 interface Review {
@@ -35,21 +34,6 @@ export default function ReviewsList({
       .catch((err) => console.error("Failed to fetch reviews:", err));
   }, [courseId]);
 
-  /* -------------------------------------------
-     REAL-TIME SOCKET UPDATES
-  ------------------------------------------- */
-  useEffect(() => {
-    socket.emit("joinRoom", courseId);
-
-    socket.on("review:created", (review: Review) => {
-      setReviews((prev) => [review, ...prev]);
-    });
-
-    return () => {
-      socket.emit("leaveRoom", courseId);
-      socket.off("review:created");
-    };
-  }, [courseId]);
 
   /* -------------------------------------------
      POST A NEW REVIEW

@@ -205,18 +205,25 @@ router.put("/:resumeId", requireAdmin, async (req, res) => {
     delete req.body.imageFileName;
     delete req.body.imageType;
     delete req.body.imageSize;
+    delete req.body.resumeId;
+    delete req.body._id;
+    delete req.body.createdAt;
+    delete req.body.updatedAt;
 
     const resume = await Resume.findOneAndUpdate(
       { resumeId: req.params.resumeId },
       { $set: req.body },
-      { new: true }
-    ).select("-fileBuffer");
+      { new: true, runValidators: true }
+    ).select("-fileBuffer -imageBuffer");
 
     if (!resume) return res.status(404).json({ error: "Resume not found" });
 
     res.json(resume);
   } catch (err) {
     console.error("❌ Update resume error:", err);
+    if (err && err.name === "ValidationError") {
+      return res.status(422).json({ error: "Validation failed", details: err.message });
+    }
     res.status(500).json({ error: "Failed to update resume" });
   }
 });

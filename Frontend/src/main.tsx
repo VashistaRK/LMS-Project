@@ -17,7 +17,6 @@ import CourseCatalog from "./pages/Courses.tsx";
 import CourseDetailsPage from "./pages/[courseId]/CourseDetails.tsx";
 import CourseManagementAdmin from "./admin/Courses/[courseId]/CourseManagement.tsx";
 import { AuthProvider, useAuthContext } from "./context/AuthProvider.tsx";
-import { SocketProvider } from "./context/SocketContext.tsx";
 import Cart from "./pages/Cart.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import CoursesPage from "./admin/CoursePage.tsx";
@@ -29,8 +28,6 @@ import TestPage1 from "./pages/[testId]/TestPage1.tsx";
 import AdminPanel from "./admin/AdminPanel.tsx";
 import CollegeAdminPage from "./admin/[collegeId]/CollegeAdminPage.tsx";
 // import CodingQuiz from "./pages/[courseId]/CodingQuiz.tsx";
-import NotificationsPage from "./pages/NotificationsPage";
-import NotificationToast from "./components/NotificationToast";
 import NotFound from "./pages/NotFound.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -85,7 +82,6 @@ const router = createBrowserRouter([
         children: [
           { path: "cart", element: <Cart /> },
           { path: "resumes", element: <ResumesPage /> },
-          { path: "notifications", element: <NotificationsPage /> },
           { path: "/profile", element: <ProfilePage /> },
           { path: "/my-learning", element: <MyLearningWrapper /> },
           { path: "companies/:slug", element: <CompanyPage /> },
@@ -152,13 +148,10 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <SocketProvider>
           <ParallaxProvider>
             <ScrollToTop />
             <RouterProvider router={router} />
-            <NotificationToast />
           </ParallaxProvider>
-        </SocketProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>

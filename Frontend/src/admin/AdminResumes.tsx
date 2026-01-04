@@ -22,7 +22,6 @@ interface ResumeItem {
   fileSize?: number;
   authorName?: string;
   imageFileName?: string;
-  imageUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -82,15 +81,18 @@ export default function AdminResumesPage() {
 
   const [modal, setModal] = useState(false);
   const [docId, setDocId] = useState("");
+  const [title, setTitle] = useState("");
+  const [authorName, setAuthorName] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
   const [preview, setPreview] = useState<ResumeItem | null>(null);
 
   const {
     data: resumes = [],
     isLoading,
-    error,
+    error: queryError,
   } = useQuery({
     queryKey: ["admin-resumes"],
     queryFn: fetchResumes,
@@ -102,10 +104,16 @@ export default function AdminResumesPage() {
       qc.invalidateQueries({ queryKey: ["admin-resumes"] });
       setModal(false);
       setDocId("");
+      setTitle("");
+      setAuthorName("");
       setSelectedFile(null);
       setSelectedImage(null);
       setSuccess("Resume uploaded successfully!");
       setTimeout(() => setSuccess(""), 3000);
+    },
+    onError: (err: Error) => {
+      setError(err.message || "Failed to upload resume");
+      setTimeout(() => setError(""), 5000);
     },
   });
 
@@ -113,26 +121,33 @@ export default function AdminResumesPage() {
     mutationFn: deleteResume,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-resumes"] });
+      setPreview(null);
       setSuccess("Resume deleted successfully!");
       setTimeout(() => setSuccess(""), 3000);
+    },
+    onError: (err: Error) => {
+      setError(err.message || "Failed to delete resume");
+      setTimeout(() => setError(""), 5000);
     },
   });
 
   const handleUpload = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!docId) return alert("Resume ID is required");
-    if (!selectedFile) return alert("Please upload a file");
+    if (!docId.trim()) {
+      setError("Resume ID is required");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
+    if (!selectedFile) {
+      setError("Please upload a file");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
 
     const form = new FormData();
-    form.append("resumeId", docId);
-    form.append(
-      "title",
-      (document.getElementById("title") as HTMLInputElement)?.value || docId
-    );
-    form.append(
-      "authorName",
-      (document.getElementById("author") as HTMLInputElement)?.value || ""
-    );
+    form.append("resumeId", docId.trim());
+    form.append("title", title.trim() || docId.trim());
+    form.append("authorName", authorName.trim());
     form.append("file", selectedFile);
     if (selectedImage) form.append("image", selectedImage);
 
@@ -143,8 +158,11 @@ export default function AdminResumesPage() {
     try {
       const data = await fetchResumeDetail(resumeId);
       setPreview(data);
-    } catch {
-      alert("Failed to load preview");
+      setError("");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to load preview";
+      setError(errorMessage);
+      setTimeout(() => setError(""), 5000);
     }
   };
 
@@ -165,7 +183,10 @@ export default function AdminResumesPage() {
           onClick={() => {
             setModal(true);
             setDocId("");
+            setTitle("");
+            setAuthorName("");
             setSelectedFile(null);
+            setSelectedImage(null);
           }}
           className="w-full sm:w-auto px-4 md:px-5 py-2 md:py-2.5 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 flex items-center justify-center gap-2 text-sm md:text-base"
         >
@@ -181,6 +202,13 @@ export default function AdminResumesPage() {
       )}
 
       {error && (
+        <div className="p-3 md:p-4 bg-red-50 border-red-300 rounded-lg flex items-center gap-2 md:gap-3 mb-4 text-sm md:text-base">
+          <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-red-700 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {!error && queryError && (
         <div className="p-3 md:p-4 bg-red-50 border-red-300 rounded-lg flex items-center gap-2 md:gap-3 mb-4 text-sm md:text-base">
           <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-red-700 shrink-0" />
           Failed to load resumes
@@ -206,12 +234,24 @@ export default function AdminResumesPage() {
 
               <div>
                 <label className="text-sm font-medium">Title</label>
-                <input id="title" className="w-full border p-2 rounded mt-1 text-sm md:text-base" />
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full border p-2 rounded mt-1 text-sm md:text-base"
+                  placeholder="Resume title (optional)"
+                />
               </div>
 
               <div>
                 <label className="text-sm font-medium">Author Name</label>
-                <input id="author" className="w-full border p-2 rounded mt-1 text-sm md:text-base" />
+                <input
+                  type="text"
+                  value={authorName}
+                  onChange={(e) => setAuthorName(e.target.value)}
+                  className="w-full border p-2 rounded mt-1 text-sm md:text-base"
+                  placeholder="Author name (optional)"
+                />
               </div>
 
               <div>

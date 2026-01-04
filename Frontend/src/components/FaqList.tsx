@@ -1,8 +1,6 @@
 /* eslint-disable */
 import { useEffect, useState, type SetStateAction } from "react";
 import api from "../services/api"; // axios configured
-import { useCourseRealtime } from "../hooks/useCourseRealtime";
-import { socket } from "../lib/socket"; // import socket instance
 import type { User } from "../hooks/useAuth";
 
 export default function FaqList({
@@ -21,11 +19,6 @@ export default function FaqList({
       .then((r: { data: SetStateAction<any[]> }) => setFaqs(r.data));
   }, [courseId]);
 
-  useCourseRealtime(courseId, {
-    onFaqCreated: (faq) => setFaqs((prev) => [faq, ...prev]),
-    onFaqAnswered: (faq) =>
-      setFaqs((prev) => prev.map((f) => (f._id === faq._id ? faq : f))),
-  });
 
   const ask = async () => {
     if (!qText.trim()) return;
@@ -38,12 +31,6 @@ export default function FaqList({
     };
     setFaqs((p) => [temp, ...p]);
     setQText("");
-    // emit via socket or POST via REST
-    socket.emit("client:newFaq", {
-      courseId,
-      question: qText,
-      askedBy: currentUser?.name,
-    });
     console.log(qText, "\n", currentUser?.name);
     await api.post(`/api/faqs/${courseId}`, {
       question: qText,
