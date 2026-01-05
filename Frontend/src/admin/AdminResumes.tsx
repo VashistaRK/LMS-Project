@@ -42,6 +42,7 @@ async function uploadResume(formData: FormData) {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || "Upload failed");
+    console.log(err);
   }
   return res.json();
 }
@@ -113,6 +114,7 @@ export default function AdminResumesPage() {
     },
     onError: (err: Error) => {
       setError(err.message || "Failed to upload resume");
+      console.log(err);
       setTimeout(() => setError(""), 5000);
     },
   });
