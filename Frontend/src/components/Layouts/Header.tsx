@@ -112,7 +112,7 @@ export default function Header() {
 
   const Controls = (
     <div
-      className={`flex items-center space-x-4 ${
+      className={`flex items-center z-100 space-x-4 ${
         isLanding ? "text-black" : "text-black"
       }`}
     >
@@ -201,7 +201,7 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.18 }}
-                  className="absolute right-0 mt-2 w-56 bg-white/90 text-black backdrop-blur-lg border border-white/20 rounded-xl shadow-xl py-2 z-100"
+                  className="absolute right-0 mt-2 w-56 bg-white/90 text-black border border-white/20 rounded-xl shadow-xl py-2 z-200"
                 >
                   <div className="px-4 py-3 border-b border-white/20">
                     <p className="text-sm font-semibold text-gray-800">
@@ -253,7 +253,7 @@ export default function Header() {
       <AnimatePresence>
         <header
           key="landing-header"
-          className={`w-full z-50 transition-all duration-500 bg-gray-200 backdrop-blur-xl py-4 border border-white/20`}
+          className={`sticky w-full z-50 transition-all duration-500 bg-gray-200 backdrop-blur-xl py-4 border border-white/20`}
         >
           <div className="min-w-full mx-auto px-6">
             <div className="flex justify-between items-center h-16">
@@ -266,18 +266,36 @@ export default function Header() {
               </a>
 
               <nav className="hidden md:flex items-center p-2 space-x-3 font-bold text-black">
-                <a
-                  href="/companies"
-                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
-                >
-                  Companies
-                </a>
-                <a
-                  href="/freshers-pratice"
-                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
-                >
-                  Freshers Ready
-                </a>
+                <div className="relative group">
+                  <button className="px-4 py-2 text-lg rounded-xl hover:bg-white/30 transition">
+                    Practice
+                  </button>
+
+                  <div
+                    className="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100
+                    opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                    transition-all duration-200 z-50"
+                  >
+                    <a
+                      href="/companies"
+                      className="block px-4 py-2 hover:bg-gray-100 rounded-t-xl"
+                    >
+                      Companies
+                    </a>
+                    <a
+                      href="/freshers-pratice"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Fresher Practice
+                    </a>
+                    <a
+                      href="/tutor"
+                      className="block px-4 py-2 hover:bg-gray-100 rounded-b-xl"
+                    >
+                      AI Tutor
+                    </a>
+                  </div>
+                </div>
                 <a
                   href="/courses"
                   className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
@@ -295,12 +313,6 @@ export default function Header() {
                   className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
                 >
                   Resumes
-                </a>
-                <a
-                  href="/tutor"
-                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
-                >
-                  Ai Tutor
                 </a>
                 <a
                   href="https://jobs.fresherready.com/"

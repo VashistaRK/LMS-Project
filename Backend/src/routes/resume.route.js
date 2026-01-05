@@ -54,7 +54,8 @@ router.post(
       }
 
       const fileField = req.files && req.files.file ? req.files.file[0] : null;
-      const imageField = req.files && req.files.image ? req.files.image[0] : null;
+      const imageField =
+        req.files && req.files.image ? req.files.image[0] : null;
 
       if (!fileField) {
         return res.status(400).json({ error: "No file uploaded" });
@@ -67,16 +68,24 @@ router.post(
       if (fileBytes > MAX_MONGO_DOC_BYTES) {
         return res
           .status(413)
-          .json({ error: "Uploaded file exceeds MongoDB document size (16MB). Use GridFS or external storage." });
+          .json({
+            error:
+              "Uploaded file exceeds MongoDB document size (16MB). Use GridFS or external storage.",
+          });
       }
 
       if (fileBytes + imageBytes > MAX_MONGO_DOC_BYTES) {
         return res
           .status(413)
-          .json({ error: "Combined file+image exceeds MongoDB document size (16MB). Use GridFS or external storage." });
+          .json({
+            error:
+              "Combined file+image exceeds MongoDB document size (16MB). Use GridFS or external storage.",
+          });
       }
 
-      console.info(`Resume upload: resumeId=${resumeId} fileBytes=${fileBytes} imageBytes=${imageBytes}`);
+      console.info(
+        `Resume upload: resumeId=${resumeId} fileBytes=${fileBytes} imageBytes=${imageBytes}`
+      );
 
       const exists = await Resume.findOne({ resumeId });
       if (exists)
@@ -106,8 +115,16 @@ router.post(
         console.error("❌ Save resume error:", saveErr);
         // Detect common Mongo "document too large" / BSON errors
         const msg = (saveErr && saveErr.message) || "";
-        if (msg.includes("BSONObjectTooLarge") || msg.toLowerCase().includes("document too large")) {
-          return res.status(413).json({ error: "Document too large for MongoDB. Use GridFS or external storage." });
+        if (
+          msg.includes("BSONObjectTooLarge") ||
+          msg.toLowerCase().includes("document too large")
+        ) {
+          return res
+            .status(413)
+            .json({
+              error:
+                "Document too large for MongoDB. Use GridFS or external storage.",
+            });
         }
 
         return res.status(500).json({ error: "Failed to save resume" });
@@ -117,8 +134,13 @@ router.post(
 
       // Multer file size errors often come here as a plain Error with message containing 'File too large'
       const emsg = (err && err.message) || "";
-      if (emsg.toLowerCase().includes("file too large") || emsg.toLowerCase().includes("limit")) {
-        return res.status(413).json({ error: "Uploaded file exceeds server limit" });
+      if (
+        emsg.toLowerCase().includes("file too large") ||
+        emsg.toLowerCase().includes("limit")
+      ) {
+        return res
+          .status(413)
+          .json({ error: "Uploaded file exceeds server limit" });
       }
 
       res.status(500).json({ error: "Failed to upload resume" });
@@ -222,7 +244,9 @@ router.put("/:resumeId", requireAdmin, async (req, res) => {
   } catch (err) {
     console.error("❌ Update resume error:", err);
     if (err && err.name === "ValidationError") {
-      return res.status(422).json({ error: "Validation failed", details: err.message });
+      return res
+        .status(422)
+        .json({ error: "Validation failed", details: err.message });
     }
     res.status(500).json({ error: "Failed to update resume" });
   }

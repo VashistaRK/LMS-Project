@@ -12,7 +12,7 @@ import {
 import { ParallaxProvider } from "react-scroll-parallax";
 
 // import LandingPage from "./pages/LandingPage.tsx";
-import Carrer from "./pages/Careers.tsx";
+import DreamJobPage from "./pages/Careers.tsx";
 import CourseCatalog from "./pages/Courses.tsx";
 import CourseDetailsPage from "./pages/[courseId]/CourseDetails.tsx";
 import CourseManagementAdmin from "./admin/Courses/[courseId]/CourseManagement.tsx";
@@ -69,7 +69,7 @@ const router = createBrowserRouter([
     element: <App />, // App should render <Outlet />
     children: [
       { index: true, element: <LandingPage1 /> },
-      { path: "carrers", element: <Carrer /> },
+      { path: "carrer-guidence", element: <DreamJobPage /> },
       { path: "courses", element: <CourseCatalog /> },
       { path: "freshers-pratice", element: <FreshersReady /> },
       { path: "companies", element: <CompaniesPage /> },
@@ -148,10 +148,10 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-          <ParallaxProvider>
-            <ScrollToTop />
-            <RouterProvider router={router} />
-          </ParallaxProvider>
+        <ParallaxProvider>
+          <ScrollToTop />
+          <RouterProvider router={router} />
+        </ParallaxProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>

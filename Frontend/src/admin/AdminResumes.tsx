@@ -42,7 +42,6 @@ async function uploadResume(formData: FormData) {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || "Upload failed");
-    console.log(err);
   }
   return res.json();
 }
@@ -114,7 +113,6 @@ export default function AdminResumesPage() {
     },
     onError: (err: Error) => {
       setError(err.message || "Failed to upload resume");
-      console.log(err);
       setTimeout(() => setError(""), 5000);
     },
   });
@@ -162,7 +160,8 @@ export default function AdminResumesPage() {
       setPreview(data);
       setError("");
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to load preview";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to load preview";
       setError(errorMessage);
       setTimeout(() => setError(""), 5000);
     }
@@ -221,7 +220,9 @@ export default function AdminResumesPage() {
       {modal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl p-4 md:p-6 w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4">Upload Resume</h2>
+            <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4">
+              Upload Resume
+            </h2>
 
             <form onSubmit={handleUpload} className="space-y-3 md:space-y-4">
               <div>
@@ -316,10 +317,18 @@ export default function AdminResumesPage() {
                 <table className="w-full min-w-[500px]">
                   <thead className="bg-gray-100 border-b">
                     <tr>
-                      <th className="p-2 md:p-3 text-left text-xs md:text-sm">Name</th>
-                      <th className="p-2 md:p-3 text-left text-xs md:text-sm hidden sm:table-cell">Author</th>
-                      <th className="p-2 md:p-3 text-left text-xs md:text-sm hidden md:table-cell">Uploaded</th>
-                      <th className="p-2 md:p-3 text-right text-xs md:text-sm">Actions</th>
+                      <th className="p-2 md:p-3 text-left text-xs md:text-sm">
+                        Name
+                      </th>
+                      <th className="p-2 md:p-3 text-left text-xs md:text-sm hidden sm:table-cell">
+                        Author
+                      </th>
+                      <th className="p-2 md:p-3 text-left text-xs md:text-sm hidden md:table-cell">
+                        Uploaded
+                      </th>
+                      <th className="p-2 md:p-3 text-right text-xs md:text-sm">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
 
@@ -342,7 +351,9 @@ export default function AdminResumesPage() {
                             </div>
                             <div className="flex items-center gap-2 min-w-0">
                               <FileText className="w-3 h-3 md:w-4 md:h-4 text-blue-600 shrink-0" />
-                              <span className="text-xs md:text-sm truncate">{r.title || r.resumeId}</span>
+                              <span className="text-xs md:text-sm truncate">
+                                {r.title || r.resumeId}
+                              </span>
                             </div>
                           </div>
                         </td>
@@ -438,7 +449,9 @@ export default function AdminResumesPage() {
             ) : (
               <div className="text-center text-gray-500 p-6 md:p-8">
                 <Eye className="w-8 h-8 md:w-10 md:h-10 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm md:text-base">Select a resume to preview</p>
+                <p className="text-sm md:text-base">
+                  Select a resume to preview
+                </p>
               </div>
             )}
           </div>

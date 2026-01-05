@@ -154,9 +154,9 @@ const LandingPage1 = () => {
     : sampleFeatured;
 
   return (
-    <div className="text-gray-800 flex flex-col items-center font-Quick overflow-hidden">
+    <div className="text-gray-800 flex flex-col items-center font-Quick">
       {/* Hero Section */}
-      <section className="relative w-full min-h-screen overflow-hidden flex items-start justify-center">
+      <section className="relative w-full min-h-screen flex items-start justify-center">
         <div className="relative mx-auto max-w-[85rem] px-6 py-8 lg:py-18">
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
             {/* Left Content */}
@@ -193,7 +193,7 @@ const LandingPage1 = () => {
 
             {/* Right Visual Card */}
             <div className="relative">
-              <div className="rounded-xl border-t-2 border-l-2 border-t-blue-500 border-l-blue-500 bg-white/5 p-6 sm:p-8 shadow-lg backdrop-blur-xl">
+              <div className="rounded-xl border-t-2 border-l-2 border-t-blue-500 border-l-blue-500 bg-white/5 p-6 sm:p-8 shadow-lg">
                 <img
                   src="images/modern_student_studying_with_laptop.png"
                   alt="working"
