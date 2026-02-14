@@ -15,6 +15,7 @@ import {
   ChevronDown,
   MoreHorizontal,
   CheckIcon,
+  ArrowUpLeft,
 } from "lucide-react";
 import { useAuthContext } from "../../context/AuthProvider";
 import {
@@ -178,7 +179,7 @@ const CourseLearningPage: React.FC = () => {
       let expectedLetter = q.correctAnswerLetter;
       if (!expectedLetter && q.correctAnswerText && Array.isArray(q.options)) {
         const idx = q.options.findIndex(
-          (opt: any) => String(opt) === String(q.correctAnswerText)
+          (opt: any) => String(opt) === String(q.correctAnswerText),
         );
         if (idx >= 0) expectedLetter = String.fromCharCode(65 + idx);
       }
@@ -211,7 +212,7 @@ const CourseLearningPage: React.FC = () => {
 
   const toggleSection = (index: number) => {
     setExpandedSections((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index],
     );
   };
 
@@ -225,7 +226,7 @@ const CourseLearningPage: React.FC = () => {
       }
     }
     const updatedChapters = Array.from(
-      new Set([...completedChapters, chapterTitle])
+      new Set([...completedChapters, chapterTitle]),
     );
     setCompletedChapters(updatedChapters);
 
@@ -235,7 +236,7 @@ const CourseLearningPage: React.FC = () => {
       const res = await markChapterCompleted(
         user.sub,
         courseId,
-        updatedChapters
+        updatedChapters,
       );
       console.log("Updated completed chapters:", res);
     } catch (err) {
@@ -255,7 +256,7 @@ const CourseLearningPage: React.FC = () => {
         if (user?.sub) {
           const purchasedCourses = await fetchPurchasedCourses(user.sub);
           const thisCourse = purchasedCourses.find(
-            (c: any) => c.CourseId === courseId
+            (c: any) => c.CourseId === courseId,
           );
           if (thisCourse) {
             setCompletedChapters((thisCourse.completedChapters ?? []).flat());
@@ -307,7 +308,7 @@ const CourseLearningPage: React.FC = () => {
       const pdfNote = (doc as any)?.notes?.find?.(
         (n: any) =>
           typeof n.content === "string" &&
-          n.content.startsWith("/uploads/notes/")
+          n.content.startsWith("/uploads/notes/"),
       );
       setPdfUrl(pdfNote?.content || "");
     } else {
@@ -319,7 +320,7 @@ const CourseLearningPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           <p className="text-gray-600 font-medium">Loading your course...</p>
         </div>
       </div>
@@ -342,41 +343,24 @@ const CourseLearningPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen font-Quick bg-gradient-to-br from-white via-[#fff6f6] to-white">
-      {/* Header */}
-      {/* <header className="bg-gradient-to-r from-[#C21817] to-[#A51515] fixed w-full top-0 z-50 text-white shadow">
-        <div className="flex items-center gap-3 px-4 py-3 justify-between">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
-            aria-label="Toggle menu"
-          >
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-
-          <img
-            src="/images/Sunadh-Logo.png"
-            alt="Sunadh"
-            className="h-10 w-24 object-contain"
-          />
-
-          <nav className="hidden sm:flex items-center gap-2 text-sm">
+    <div className="min-h-screen font-Quick">
+      <div className="grid grid-cols-1 xl:grid-cols-3">
+        {/* Main Content */}
+        <main className="col-span-2 flex-1 min-h-screen bg-white">
+          <header className="w-full flex justify-between px-8 py-3">
+            <img
+              src="/images/Sunadh-Logo.png"
+              alt="Logo"
+              className="h-16 w-auto"
+            />
             <a
               href="/my-learning"
-              className="flex items-center gap-1 text-white hover:text-gray-300"
+              className="flex lg:hidden items-center gap-1"
             >
-              <Home size={16} />
+              <ArrowUpLeft />
               My Learning
             </a>
-            <ChevronRight size={16} />
-            <span className="truncate max-w-[200px]">{course.title}</span>
-          </nav>
-        </div>
-      </header> */}
-
-      <div className="grid grid-cols-3">
-        {/* Main Content */}
-        <main className="col-span-2 pt-6 flex-1 min-h-screen bg-white">
+          </header>
           {/* Video Section */}
           <div className="relative p-4 sm:p-8 w-full min-h-[60vh] flex items-center justify-center">
             <div className="w-full max-w-6xl">
@@ -471,7 +455,7 @@ const CourseLearningPage: React.FC = () => {
                       onClick={() =>
                         chapter.title && markChapterComplete(chapter.title)
                       }
-                      className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors bg-purple-600 hover:bg-purple-400 shadow-md"
+                      className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors bg-blue-600 hover:bg-blue-400 shadow-md"
                     >
                       <CheckIcon size={16} />
                       Mark Complete
@@ -489,10 +473,14 @@ const CourseLearningPage: React.FC = () => {
 
         {/* Sidebar */}
         <aside
-          className={`col-span-1 py-3 px-6 bg-gray-100 border border-gray-100 shadow-xl overflow-hidden transform transition-transform duration-300 ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-          }`}
+          className={`col-span-1 py-3 px-6 bg-gray-100 border border-gray-100 shadow-xl`}
         >
+          <nav className="m-4 mb-6 hidden lg:flex w-fit justify-start border-b-2 border-black pb-2">
+            <a href="/my-learning" className="flex items-center gap-1">
+              <ArrowUpLeft />
+              My Learning
+            </a>
+          </nav>
           <div className="flex flex-col h-full">
             <div className="p-4 mt-4">
               <h3 className="font-extrabold text-2xl mb-1">Course Overview</h3>
@@ -500,7 +488,7 @@ const CourseLearningPage: React.FC = () => {
                 {course.sections?.length || 0} sections •{" "}
                 {course.sections?.reduce(
                   (acc, s) => acc + (s.chapters?.length || 0),
-                  0
+                  0,
                 )}{" "}
                 lectures
               </p>
@@ -544,7 +532,7 @@ const CourseLearningPage: React.FC = () => {
                       {section.chapters?.map((ch, chIndex) => {
                         const isActive = chapter === ch;
                         const isCompleted = completedChapters.includes(
-                          ch.title || ""
+                          ch.title || "",
                         );
 
                         return (
@@ -569,11 +557,11 @@ const CourseLearningPage: React.FC = () => {
                                 />
                               ) : ch.type === "quiz" ||
                                 ch.type === "assignment" ? (
-                                <Brain size={16} className="text-purple-600" />
+                                <Brain size={16} className="text-blue-600" />
                               ) : (
                                 <Play
                                   size={16}
-                                  className={isActive ? "text-purple-600" : ""}
+                                  className={isActive ? "text-blue-600" : ""}
                                 />
                               )}
                             </div>
@@ -589,7 +577,7 @@ const CourseLearningPage: React.FC = () => {
                               <div className="flex items-center gap-2 mt-1 text-xs">
                                 {ch.type === "quiz" ||
                                 ch.type === "assignment" ? (
-                                  <span className="text-purple-600">
+                                  <span className="text-blue-600">
                                     Score: {scores[ch.testId ?? ""] ?? 0}
                                   </span>
                                 ) : (
@@ -646,7 +634,7 @@ const CourseLearningPage: React.FC = () => {
                               onClick={() => handleAnswer(i, idx)}
                               className={`w-full text-left px-4 py-3 rounded-lg border transition-all ${
                                 active
-                                  ? "bg-purple-600 border-purple-600 text-white"
+                                  ? "bg-blue-600 border-blue-600 text-white"
                                   : "bg-white border-gray-300 hover:bg-gray-100"
                               }`}
                             >
@@ -662,7 +650,7 @@ const CourseLearningPage: React.FC = () => {
                 <div className="mt-6 flex justify-center">
                   <button
                     onClick={submitQuiz}
-                    className="bg-purple-600 hover:bg-purple-400 text-white font-semibold px-6 py-2 rounded-lg shadow-sm transition-colors text-base"
+                    className="bg-blue-600 hover:bg-blue-400 text-white font-semibold px-6 py-2 rounded-lg shadow-sm transition-colors text-base"
                   >
                     Submit Quiz
                   </button>
@@ -690,7 +678,7 @@ const CourseLearningPage: React.FC = () => {
                         Your Answer:{" "}
                         <span
                           className={`${
-                            a.isCorrect ? "text-green-600" : "text-purple-600"
+                            a.isCorrect ? "text-green-600" : "text-blue-600"
                           } font-semibold`}
                         >
                           {a.userAnswer || "Not answered"}

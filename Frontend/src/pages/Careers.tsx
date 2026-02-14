@@ -21,7 +21,7 @@ const DreamJobPage = () => {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#d1d4df] via-white to-[#f5f3ff] font-Quick">
+    <div className="min-h-screen font-Quick">
       {/* HERO */}
       <section className="text-center px-6 pt-18 pb-20">
         <motion.h1
@@ -30,9 +30,7 @@ const DreamJobPage = () => {
           className="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight"
         >
           Your Dream Job <br />
-          <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text">
-            Is Still Possible
-          </span>
+          <span className="">Is Still Possible</span>
         </motion.h1>
 
         <p className="mt-6 max-w-3xl mx-auto text-gray-600 text-lg">

@@ -1,9 +1,9 @@
 import { useAuthContext } from "@/context/AuthProvider";
-import { Home, Users, BarChart3, ShieldQuestionMark, User } from "lucide-react";
+import { Users, BarChart3, ShieldQuestionMark, User } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 
 const sidebarItems = [
-  { name: "Dashboard", href: "/admin/dashboard", icon: Home },
+  // { name: "Dashboard", href: "/admin/dashboard", icon: Home },
   { name: "Students", href: "/admin/students", icon: Users },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "FAQ", href: "/admin/FAQ", icon: ShieldQuestionMark },
@@ -15,7 +15,7 @@ export default function AdminLayout() {
   const location = useLocation();
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex font-mulish">
       {/* Sidebar */}
       <aside
         className="
@@ -23,12 +23,11 @@ export default function AdminLayout() {
           inset-y-0 left-0
           z-40
           flex flex-col
-          bg-white
-          border-r
+          border-r-4
           transition-all
           duration-300
-          w-16 lg:w-48
-          p-2 lg:p-4
+          w-16 lg:w-56
+          p-2 lg:p-8
         "
       >
         {/* Logo / Title */}
@@ -40,7 +39,7 @@ export default function AdminLayout() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col gap-2">
+        <nav className="flex flex-col gap-2 space-y-4">
           {sidebarItems.map((item) => {
             const isActive = location.pathname === item.href;
 
@@ -52,13 +51,11 @@ export default function AdminLayout() {
                   group flex items-center
                   justify-center lg:justify-start
                   gap-3
-                  rounded-xl
-                  px-3 py-3
                   transition-all
                   font-medium
                   ${
                     isActive
-                      ? "bg-gray-200 text-gray-900"
+                      ? "border-l-4 pl-2 border-blue-300 text-gray-900"
                       : "text-gray-600 hover:bg-gray-200"
                   }
                 `}
@@ -76,13 +73,11 @@ export default function AdminLayout() {
                 group flex items-center
                 justify-center lg:justify-start
                 gap-3
-                rounded-xl
-                px-3 py-3
                 transition-all
                 font-medium
                 ${
                   location.pathname === "/admin/super-admin"
-                    ? "bg-gray-200 text-gray-900"
+                    ? "border-l-4 pl-2 border-blue-300 text-gray-900"
                     : "text-gray-600 hover:bg-gray-200"
                 }
               `}
@@ -95,7 +90,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 lg:p-4">
+      <main className="flex-1 max-w-7xl lg:p-4">
         <Outlet />
       </main>
     </div>

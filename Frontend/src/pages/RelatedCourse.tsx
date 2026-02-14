@@ -4,7 +4,7 @@ import { Eye, LoaderCircleIcon } from "lucide-react";
 import { useRelatedCourses } from "../hooks/queries/courses";
 import type { CourseData } from "../types/course";
 import getThumbnailUrl from "@/utils/getThumbnailUrl";
-import AddToCartButton from "@/components/funui/AddToCartButton";
+import AddToCartButton from "@/components/funui/AddTo-Button";
 
 const RelatedCourses: React.FC = () => {
   const { courseId } = useParams();

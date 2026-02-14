@@ -2,30 +2,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import FilterPanel from "../components/common/FilterPannel";
-import { Eye, Filter, LayoutGrid, List, TagIcon } from "lucide-react";
-import { SortDropdown } from "../components/common/SortDropDown";
+import { ChevronRight, CodeXmlIcon, Filter, Option } from "lucide-react";
 import type { CourseData } from "../types/course";
-// import { useSelector } from "react-redux";
-// import type { RootState } from "../store";
-import AddToCartButton from "../components/funui/AddToCartButton";
+import ActionButton from "../components/funui/AddTo-Button";
 import { useCourses } from "../hooks/queries/courses";
 import getThumbnailUrl from "@/utils/getThumbnailUrl";
 import ExpertProfessionals from "./ExpertProfessionals";
-
-type ViewMode = "grid" | "list";
-
-const getPrice = (c: CourseData): number => {
-  const raw = (c as any)?.discountPrice ?? (c as any)?.price ?? "0";
-  const n = typeof raw === "number" ? raw : parseFloat(String(raw));
-  return Number.isFinite(n) ? n : 0;
-};
-
-const getRating = (c: CourseData): number => {
-  const cr = (c as any)?.rating;
-  if (typeof cr === "number") return cr;
-  const ir = c.instructor?.[0]?.rating;
-  return typeof ir === "number" ? ir : 0;
-};
+import { FaEye } from "react-icons/fa";
+import { IoPricetagsSharp } from "react-icons/io5";
 
 const getInstructorNames = (c: CourseData): string =>
   (c.instructor ?? [])
@@ -38,21 +22,16 @@ const CourseCatalog: React.FC = () => {
   const [filteredCourses, setFilteredCourses] = useState<CourseData[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [filter, setFilter] = useState<"subjects" | "difficulties">("subjects");
 
-  const [currentSort, setCurrentSort] = useState<string>("popularity");
   const [filters, setFilters] = useState<any>({
     subjects: [],
     difficulties: [],
-    priceRanges: [],
-    durations: [],
-    ratings: [],
   });
-
-  // const cartItems = useSelector((state: RootState) => state.cart.items);
 
   useEffect(() => {
     setFilteredCourses(courses);
+    console.log("Courses loaded:", courses);
   }, [courses]);
 
   useEffect(() => {
@@ -60,43 +39,22 @@ const CourseCatalog: React.FC = () => {
     const q = params.get("search") || "";
     if (q) {
       setSearchQuery(q);
-      applyFilters(q, filters, currentSort);
+      applyFilters(q, filters);
     }
   }, [courses]);
-
-  // const handleSearch = (query: string) => {
-  //   setSearchQuery(query);
-  //   applyFilters(query, filters, currentSort);
-
-  //   const params = new URLSearchParams(window.location.search);
-  //   if (query) {
-  //     params.set("search", query);
-  //   } else {
-  //     params.delete("search");
-  //   }
-  //   window.history.replaceState({}, "", `?${params.toString()}`);
-  // };
-
-  const handleSortChange = (sortValue: string) => {
-    setCurrentSort(sortValue);
-    applyFilters(searchQuery, filters, sortValue);
-  };
 
   const handleFilterChange = (
     type: string,
     value?: string,
-    checked?: boolean
+    checked?: boolean,
   ) => {
     if (type === "clear-all") {
       const cleared = {
         subjects: [],
         difficulties: [],
-        priceRanges: [],
-        durations: [],
-        ratings: [],
       };
       setFilters(cleared);
-      applyFilters(searchQuery, cleared, currentSort);
+      applyFilters(searchQuery, cleared);
       return;
     }
 
@@ -106,15 +64,15 @@ const CourseCatalog: React.FC = () => {
         updated[type] = [...(updated[type] || []), value];
       } else {
         updated[type] = (updated[type] || []).filter(
-          (v: string) => v !== value
+          (v: string) => v !== value,
         );
       }
     }
     setFilters(updated);
-    applyFilters(searchQuery, updated, currentSort);
+    applyFilters(searchQuery, updated);
   };
 
-  const applyFilters = (query: string, filtersData: any, sortValue: string) => {
+  const applyFilters = (query: string, filtersData: any) => {
     let results = [...courses];
 
     if (query) {
@@ -124,7 +82,7 @@ const CourseCatalog: React.FC = () => {
         const inCategory = (c as any).category?.toLowerCase?.().includes(q);
         const inInstructors = getInstructorNames(c).toLowerCase().includes(q);
         const inTechs = (c.technologies ?? []).some((t) =>
-          String(t).toLowerCase().includes(q)
+          String(t).toLowerCase().includes(q),
         );
         return inTitle || inCategory || inInstructors || inTechs;
       });
@@ -132,99 +90,69 @@ const CourseCatalog: React.FC = () => {
 
     if (filtersData.subjects?.length) {
       results = results.filter((c) =>
-        filtersData.subjects.includes((c as any).category)
+        filtersData.subjects.includes((c as any).category),
       );
     }
 
     if (filtersData.difficulties?.length) {
       results = results.filter((c) =>
-        filtersData.difficulties.includes(c.difficulty)
+        filtersData.difficulties.includes(c.difficulty),
       );
-    }
-
-    switch (sortValue) {
-      case "price-low":
-        results.sort((a, b) => getPrice(a) - getPrice(b));
-        break;
-      case "price-high":
-        results.sort((a, b) => getPrice(b) - getPrice(a));
-        break;
-      case "newest":
-        results.sort(
-          (a, b) =>
-            new Date((b as any)?.createdAt ?? 0).getTime() -
-            new Date((a as any)?.createdAt ?? 0).getTime()
-        );
-        break;
-      case "rating":
-        results.sort((a, b) => getRating(b) - getRating(a));
-        break;
-      default:
-        break;
     }
 
     setFilteredCourses(results);
   };
 
+  const setFilterAndApply = (value: "subjects" | "difficulties") => {
+    setFilter(value);
+    setIsFilterOpen(!isFilterOpen);
+  };
+
   const renderedCourses = useMemo(() => filteredCourses, [filteredCourses]);
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center bg-slate-50 text-slate-900 font-Quick pb-24">
+    <div className="min-h-screen py-12 max-w-7xl mx-4 xl:mx-auto flex flex-col items-center text-slate-900 font-Quick pb-24">
       <ExpertProfessionals />
       {/* Controls Bar */}
-      <div id="courses" className="w-full mt-16 px-6 sm:px-10 lg:px-20">
+      <div
+        id="courses"
+        className="w-full mt-16 flex flex-col md:flex-row items-center gap-6"
+      >
         <button
-          onClick={() => setIsFilterOpen(!isFilterOpen)}
-          className="group flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300
-             hover:bg-slate-100 transition text-sm font-medium"
+          onClick={() => setFilterAndApply("subjects")}
+          className="group w-full xl:w-1/3 flex flex-col items-center py-12 rounded-lg border border-slate-300
+             hover:bg-zinc-300 bg-zinc-200 text-sm font-medium"
         >
+          <CodeXmlIcon className="h-24 w-24 mb-8 group-hover:text-white p-1" />
           <Filter size={18} className="text-slate-700" />
-          {isFilterOpen ? "Hide Filters" : "Show Filters"}
+          <p className="text-zinc-600">Filter</p>
+          <h5 className="text-zinc-800 text-lg font-bold">By language.</h5>
         </button>
-
-        <div className="flex items-center justify-between sm:justify-end gap-4">
-          {/* View Mode Toggles */}
-          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg">
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-md transition ${
-                viewMode === "grid"
-                  ? "bg-blue-600 text-white shadow"
-                  : "text-slate-600 hover:text-slate-800"
-              }`}
-            >
-              <LayoutGrid size={18} />
-            </button>
-
-            <button
-              onClick={() => setViewMode("list")}
-              className={`p-2 rounded-md transition ${
-                viewMode === "list"
-                  ? "bg-blue-600 text-white shadow"
-                  : "text-slate-600 hover:text-slate-800"
-              }`}
-            >
-              <List size={18} />
-            </button>
-          </div>
-
-          {/* Sort Dropdown */}
-          <SortDropdown
-            currentSort={currentSort}
-            onSortChange={handleSortChange}
-          />
-        </div>
+        <button className="w-1/3 flex items-center justify-center text-zinc-800 text-lg font-bold">
+          <ChevronRight />
+          Then
+          <ChevronRight />
+        </button>
+        <button
+          onClick={() => setFilterAndApply("difficulties")}
+          className="group w-full xl:w-1/3 flex flex-col items-center py-12 rounded-lg border border-slate-300
+             hover:bg-zinc-300 bg-zinc-200 text-sm font-medium"
+        >
+          <Option className="h-24 w-24 text-white group-hover:text-black mb-8 p-1" />
+          <Filter size={18} className="text-slate-700" />
+          <p className="text-zinc-600">Filter</p>
+          <h5 className="text-zinc-800 text-lg font-bold">By Level.</h5>
+        </button>
       </div>
       {/* Main Content Area */}
-      <main className="w-full px-6 sm:px-10 lg:px-20 mt-10">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <main className="w-full mt-10">
+        <div className="max-w-7xl mx-auto gap-8">
           {/* Filter Sidebar */}
-          <aside
-            className={`${isFilterOpen ? "block lg:col-span-1" : "hidden"}`}
-          >
-            <div className="sticky top-24 bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <aside className={`${isFilterOpen ? "block lg:relative" : "hidden"}`}>
+            <div className="sticky top-24">
               <FilterPanel
                 filters={filters}
+                filterOption={filter}
                 onFilterChange={handleFilterChange}
               />
             </div>
@@ -242,102 +170,63 @@ const CourseCatalog: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div
-                className={`${
-                  viewMode === "grid"
-                    ? `grid gap-4  sm:gap-6 ${
-                        isFilterOpen
-                          ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
-                          : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                      }`
-                    : "flex flex-col gap-4"
-                }`}
-              >
-                {renderedCourses.map((course) => {
-                  const thumbUrl = getThumbnailUrl(course);
-                  const names = getInstructorNames(course);
-                  // const price = getPrice(course);
-
-                  return (
-                    course.isPublished && (
-                      <div
-                        key={course.id}
-                        className={`overflow-hidden transition-all group ${
-                          viewMode === "list"
-                            ? "flex flex-col sm:flex-row items-start gap-4 p-4 sm:p-6"
-                            : ""
-                        }`}
-                      >
-                        <Link
-                          to={`/course-details/${course.id}`}
-                          className="block relative overflow-hidden"
-                        >
-                          <img
-                            src={thumbUrl}
-                            alt={course.title}
-                            className={`object-cover transition-transform max-w-sm duration-300 group-hover:scale-105 ${
-                              viewMode === "list"
-                                ? "w-full h-32 sm:h-52 rounded-lg"
-                                : "w-full h-48 sm:h-52"
-                            }`}
-                          />
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <Eye className="text-white h-11 w-11" />
-                          </div>
-                        </Link>
-
+              <div className="space-y-12 mt-12">
+                <header className="font-mulish font-bold leading-tight tracking-tight">
+                  <h2 className="text-2xl text-gray-900">Available Courses.</h2>
+                </header>
+                <div
+                  className={`grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`}
+                >
+                  {renderedCourses.map((course) => {
+                    const thumbUrl = getThumbnailUrl(course);
+                    return (
+                      course.isPublished && (
                         <div
-                          className={`py-4 px-2 flex max-w-lg flex-col justify-between ${
-                            viewMode === "list"
-                              ? "flex-1 min-h-0 p-0 sm:p-0"
-                              : "min-h-[180px]"
-                          }`}
+                          key={course.id}
+                          className={`overflow-hidden transition-all group`}
                         >
-                          <div className="flex-1">
-                            <Link to={`/course-details/${course.id}`}>
-                              <h2 className="text-base sm:text-md font-semibold line-clamp-2 mb-1">
-                                {course.title}
-                              </h2>
-                              <p className="text-xs sm:text-sm text-gray-500 mb-1">
-                                By {names || "Instructor"}
-                              </p>
-                              {viewMode === "list" && (
-                                <>
-                                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                                    {course.shortDescription}
-                                  </p>
-                                </>
-                              )}
-                            </Link>
-                          </div>
+                          <Link
+                            to={`/course-details/${course.id}`}
+                            className="block rounded-2xl relative overflow-hidden"
+                          >
+                            <img
+                              src={thumbUrl}
+                              alt={course.title}
+                              className={`object-cover rounded-2xl transition-transform duration-300 group-hover:scale-105`}
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <FaEye className="text-white h-11 w-11" />
+                            </div>
+                          </Link>
 
-                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 pt-1">
-                            {/* <div className="flex items-center gap-2 mb-2">
-                              <span className="font-bold text-base sm:text-lg">
-                                ₹{price.toFixed(2)}
-                              </span>
-                              {course.price > 0 &&
-                                course.discountPrice &&
-                                course.discountPrice < course.price && (
-                                  <del className="text-sm text-gray-500">
-                                    ₹{course.price}
-                                  </del>
-                                )}
-                            </div> */}
-                            {viewMode === "list" && (
-                              <span className="bg-gray-200 flex items-center flex-row rounded-xl px-2">
-                                <TagIcon className="h-3" />
+                          <div
+                            className={`py-4 px-2 flex max-w-lg flex-col justify-between"min-h-[180px]`}
+                          >
+                            <div className="flex-1">
+                              <Link to={`/course-details/${course.id}`}>
+                                <h2 className="text-base sm:text-md font-semibold line-clamp-2 mb-1">
+                                  {course.title}
+                                </h2>
+                                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                                  {course.shortDescription}
+                                </p>
+                              </Link>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row sm:justify-end sm:items-end gap-3 pb-4">
+                              <span className="bg-[#9CCFFF] flex items-center justify-center text-zinc-700 rounded-md font-semibold flex-row px-2 uppercase">
+                                <IoPricetagsSharp className="h-3 pr-1" />
                                 {course.difficulty}
                               </span>
-                            )}
+                            </div>
+                            <ActionButton course={course} />
                           </div>
-                          <AddToCartButton course={course} />
                         </div>
-                      </div>
-                    )
-                  );
-                })}
+                      )
+                    );
+                  })}
+                </div>
               </div>
             )}
 

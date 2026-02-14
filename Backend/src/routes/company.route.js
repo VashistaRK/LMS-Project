@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
   try {
     const companies = await Company.find(
       {},
-      { name: 1, slug: 1, papers: 1, description: 1 }
+      { name: 1, slug: 1, papers: 1, description: 1 },
     ).lean();
     // For each company, compute unique years
     const result = companies.map((c) => ({
@@ -32,10 +32,10 @@ router.get("/", async (req, res) => {
       slug: c.slug,
       description: c.description,
       years: Array.from(new Set((c.papers || []).map((p) => p.year))).sort(
-        (a, b) => b - a
+        (a, b) => b - a,
       ),
     }));
-    res.json(result);
+    res.status(200).json(result);
   } catch (err) {
     console.error("Error listing companies:", err);
     res.status(500).json({ error: "Failed to list companies" });
@@ -62,7 +62,7 @@ router.get("/:slug/years/:year/papers", async (req, res) => {
     const comp = await Company.findOne({ slug }).lean();
     if (!comp) return res.status(404).json({ error: "Company not found" });
     const papers = (comp.papers || []).filter(
-      (p) => String(p.year) === String(year)
+      (p) => String(p.year) === String(year),
     );
     res.json(papers);
   } catch (err) {
@@ -79,7 +79,7 @@ router.get("/:slug/papers/:paperId/download", async (req, res) => {
     if (!comp) return res.status(404).send("Company not found");
 
     const paper = (comp.papers || []).find(
-      (p) => String(p._id) === String(paperId)
+      (p) => String(p._id) === String(paperId),
     );
     if (!paper || !paper.file || !paper.file.data)
       return res.status(404).send("Paper not found");
@@ -87,7 +87,7 @@ router.get("/:slug/papers/:paperId/download", async (req, res) => {
     res.setHeader("Content-Type", paper.file.contentType || "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${paper.file.filename || "paper.pdf"}"`
+      `attachment; filename="${paper.file.filename || "paper.pdf"}"`,
     );
     return res.send(Buffer.from(paper.file.data));
   } catch (err) {
@@ -197,7 +197,7 @@ router.post(
         details: String(err && err.message ? err.message : err),
       });
     }
-  }
+  },
 );
 
 // Admin: get full company with papers & tests
@@ -346,8 +346,8 @@ router.post("/:slug/tests/:testId/start", async (req, res) => {
               q.type === "mcq"
                 ? "MCQ"
                 : !!q.starterCode && !!q.functionName
-                ? "Coding"
-                : "Descriptive",
+                  ? "Coding"
+                  : "Descriptive",
             question: q.questionText,
             points: s.pointsPerQuestion || 1,
           };

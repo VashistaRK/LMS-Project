@@ -1,12 +1,12 @@
 /* eslint-disable */
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+// import { Card, CardContent } from "@/components/ui/card";
 import {
   ArrowRight,
   Award,
   BrainCircuit,
   Briefcase,
-  Building2,
+  // Building2,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -19,10 +19,61 @@ import {
   Users,
 } from "lucide-react";
 import { useCourses } from "@/hooks/queries/courses";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const LandingPage1 = () => {
   const videoScrollerRef = useRef<HTMLDivElement>(null);
+
+  const [activeIndex, setActiveIndex] = useState(2); // top card index
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimated(true);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const cards = [
+    {
+      id: 0,
+      title: "Card One",
+      color: "bg-blue-700/70",
+      image: "images/modern_student_studying_with_laptop.png",
+      description: "Launch Your Career",
+    },
+    {
+      id: 1,
+      title: "Card Two",
+      color: "bg-blue-800/70",
+      image: "images/working.jpeg",
+      description: "Learn with Purpose",
+    },
+    {
+      id: 2,
+      title: "Card Three",
+      color: "bg-blue-900/70",
+      image: "images/fresher.jpg",
+      description: "Turn Ideas into Reality",
+    },
+  ];
+
+  const getStyles = (index: number) => {
+    if (!animated) {
+      return "z-10 rotate-0";
+    }
+    if (index === activeIndex) {
+      return "z-30 rotate-0 translate-y-0";
+    }
+    if (index === activeIndex - 1) {
+      return "z-20 rotate-0 md:rotate-[15deg] translate-y-6 translate-12 md:translate-x-6";
+    }
+    if (activeIndex === 0 && index === 1) {
+      return "z-20 rotate-0 md:rotate-[15deg] translate-y-6 translate-12 md:translate-x-6";
+    }
+    return "z-10 rotate-0 md:rotate-[30deg] translate-y-12 translate-24 md:translate-x-12";
+  };
 
   const scroll = (direction: "left" | "right") => {
     const el = videoScrollerRef.current;
@@ -41,6 +92,14 @@ const LandingPage1 = () => {
       href: "#communications",
       color:
         "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+      featurePoints: [
+        {
+          text: "Real-time feedback",
+        },
+        {
+          text: "Scenario-based practice",
+        },
+      ],
     },
     {
       title: "Aptitude & Logic",
@@ -51,6 +110,14 @@ const LandingPage1 = () => {
       href: "#logical-aptitude",
       color:
         "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+      featurePoints: [
+        {
+          text: "Speed math tricks",
+        },
+        {
+          text: "Pattern recognition",
+        },
+      ],
     },
     {
       title: "Technical Skills",
@@ -60,6 +127,14 @@ const LandingPage1 = () => {
       image: "images/abstract_technology_concept.png",
       href: "#technical-skills",
       color: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300",
+      featurePoints: [
+        {
+          text: "Personalized roadmap",
+        },
+        {
+          text: "Hands-on coding practice",
+        },
+      ],
     },
     {
       title: "Career & Jobs",
@@ -70,6 +145,14 @@ const LandingPage1 = () => {
       href: "/jobsite",
       color:
         "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+      featurePoints: [
+        {
+          text: "Verified listings",
+        },
+        {
+          text: "One-click apply",
+        },
+      ],
     },
   ];
   const sampleFeatured = [
@@ -156,20 +239,18 @@ const LandingPage1 = () => {
   return (
     <div className="text-gray-800 flex flex-col items-center font-Quick">
       {/* Hero Section */}
-      <section className="relative w-full min-h-screen flex items-start justify-center">
+      <section className="relative w-full flex items-start justify-center">
         <div className="relative mx-auto max-w-[85rem] px-6 py-8 lg:py-18">
-          <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
+          <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-start font-Quick">
             {/* Left Content */}
-            <div className="space-y-8">
-              <span className="inline-flex items-center rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-1 text-sm text-blue-500">
-                AI‑Powered Learning & Career Guidance
-              </span>
-
-              <h1 className="text-4xl font-bold font-sans leading-tight sm:text-5xl xl:text-6xl">
-                Learn Smarter. <br />
-                <span className="bg-gradient-to-r from-blue-800 to-blue-400 bg-clip-text text-transparent">
-                  Elevate Your Career On Your Terms.
+            <div className="space-y-8 order-2 lg:order-1">
+              <h1 className="text-4xl font-extrabold leading-14 md:leading-18 sm:text-5xl xl:text-6xl">
+                <span className="inline-flex items-center border-b border-black/30 py-1 text-sm">
+                  AI‑Powered Learning & Career Guidance
                 </span>
+                <br />
+                Learn Smarter. <br />
+                <span className="">Elevate Your Career On Your Terms.</span>
               </h1>
 
               <p className="max-w-xl text-lg text-gray-800">
@@ -181,145 +262,217 @@ const LandingPage1 = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href="/courses"
-                  className="w-full sm:w-auto text-center rounded-2xl bg-blue-600 px-8 py-4 font-semibold shadow-lg transition text-gray-200 hover:bg-blue-500"
+                  className="group relative w-full sm:w-auto overflow-hidden text-center rounded-md px-8 py-4 font-semibold 
+               border border-gray-700 shadow-lg text-gray-700 
+               transition hover:bg-blue-500/20"
                 >
-                  Start Learning
+                  {/* Hover animated rotated element */}
+                  <div
+                    className="absolute inset-0 bg-blue-300 
+                 transform rotate-0 scale-0 
+                 transition-all duration-500 
+                 group-hover:rotate-[225deg] group-hover:scale-150"
+                  />
+
+                  {/* Text above the absolute layer */}
+                  <span className="relative z-10">Start Learning</span>
                 </a>
-                <button className="w-full sm:w-auto text-center rounded-2xl border border-white/20 px-8 py-4 font-semibold text-white transition hover:bg-white/10">
-                  Explore Career Paths
-                </button>
               </div>
             </div>
 
             {/* Right Visual Card */}
-            <div className="relative">
-              <div className="rounded-xl border-t-2 border-l-2 border-t-blue-500 border-l-blue-500 bg-white/5 p-6 sm:p-8 shadow-lg">
-                <img
-                  src="images/modern_student_studying_with_laptop.png"
-                  alt="working"
-                  className="w-full h-auto max-w-full"
+            <div className="relative w-full flex justify-center order-1 lg:order-2 lg:w-80 lg:ml-[15%] h-[32rem]">
+              {cards.map((card, index) => (
+                <div
+                  key={card.id}
+                  onClick={() => setActiveIndex(index)}
+                  className={`
+                  absolute inset-0 cursor-pointer w-8/12 md:w-auto h-[28rem]
+                  flex flex-col items-center justify-center text-white text-xl font-semibold
+                  transition-all duration-700 ease-out animate-[fadeUp_0.8s_ease-out] p-2
+                  ${getStyles(index)}
+                `}
+                >
+                  <img
+                    src={card.image}
+                    alt={card.title}
+                    className={`w-full h-full object-cover rounded-xl ${activeIndex === index ? "pb-2 shadow-xl" : ""}`}
+                  />
+                  <span
+                    className={`${activeIndex === index ? "relative py-2" : "hidden"} ${card.color} w-full text-center rounded-xl text-lg font-extrabold`}
+                  >
+                    {card.description}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {/* <div className="relative w-[420px] h-[520px]  overflow-hidden">
+              <div
+                className="absolute top-0 right-0 w-[380px] h-[380px] rounded-full bg-no-repeat bg-cover bg-center"
+                style={{
+                  backgroundImage: "url('images/fresher.jpg')",
+                }}
+              />
+              <div className="absolute bottom-[120px] left-[40px] w-[260px] h-[260px] rounded-full bg-[#f7f7f4]" />
+              <div
+                className="absolute bottom-0 left-0 w-[120px] h-[120px] rounded-full bg-no-repeat bg-cover bg-center"
+                style={{
+                  backgroundImage: "url('images/fresher.jpg')",
+                  backgroundPosition: "left bottom",
+                }}
+              />
+              <div className="absolute bottom-6 left-20 w-6 h-6 rounded-full bg-slate-900" />
+            </div> */}
+
+            <div className="relative lg:absolute hidden lg:block order-3 lg:order-none right-0 bottom-0 h-[16rem] lg:h-full w-full lg:w-[40%] pointer-events-none overflow-hidden mt-16 lg:mt-0">
+              <div className="relative h-full w-full">
+                <div
+                  className="absolute bottom-[20%] right-4 w-32 h-32 rounded-full 
+             bg-gradient-to-br from-blue-300/80 to-purple-300/30 
+             blur-xl"
+                />
+                <div
+                  className="absolute bottom-[20%] right-4 w-42 h-36 
+             border-2 border-blue-400/30 rounded-xl
+             rotate-12"
+                />
+                <div
+                  className="absolute bottom-[45%] right-2 w-12 h-12 
+             border-4 border-blue-400/30 rounded-xl
+             rotate-62"
+                />
+                <div
+                  className="absolute bottom-[55%] right-2 w-12 h-12 
+             border-l-[24px] border-r-[24px] border-b-[42px]
+             border-l-transparent border-r-transparent
+             border-b-blue-400/30 rotate-12"
                 />
 
-                {/* decorative badges hidden on small screens to improve responsiveness */}
-                <div className="hidden md:block absolute -left-4 top-10 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-border/50 animate-bounce delay-700 duration-[3000ms] z-20 max-w-[200px]">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg text-green-600">
-                      <CheckCircle2 className="w-5 h-5" />
-                    </div>
-                    <span className="font-bold text-sm">Course Completed</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                    <div className="h-full w-full bg-green-500 rounded-full"></div>
-                  </div>
-                </div>
-
-                <div className="hidden md:block absolute -right-4 bottom-20 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-border/50 animate-bounce delay-1000 duration-[4000ms] z-20">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600">
-                      <Briefcase className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm">New Job Offer</p>
-                      <p className="text-xs text-muted-foreground">
-                        TechGiant Inc.
-                      </p>
-                    </div>
-                  </div>
+                <div
+                  className="absolute bottom-10 right-40 w-20 h-20 rounded-full
+             bg-blue-400/20 blur-xl"
+                />
+                <div className="absolute bottom-10 right-10 grid grid-cols-3 gap-4 opacity-30">
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i} className="w-2 h-2 rounded-full bg-blue-500" />
+                  ))}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-      <section className="py-24 bg-slate-900 text-white overflow-hidden relative w-full">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-blue-900/20 to-transparent"></div>
+      <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="images/group_of_diverse_students.png"
+            alt="Background"
+            className="w-full h-full object-cover"
+          />
         </div>
 
-        <div className="container mx-auto px-4 relative z-10 max-w-[85rem]">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <div className="space-y-10 order-2 lg:order-1">
+        {/* Dark Blue Overlay */}
+        <div className="absolute inset-0 z-1 bg-gradient-to-br from-blue-950/70 via-slate-900/70 to-black/70" />
+
+        {/* Curved Lines */}
+        <svg
+          className="absolute inset-0 w-full h-full opacity-20"
+          viewBox="0 0 1440 900"
+          fill="none"
+        >
+          <path
+            d="M-200 300 C 300 100, 900 600, 1600 300"
+            stroke="rgba(96,165,250,0.4)"
+            strokeWidth="2"
+          />
+          <path
+            d="M-200 500 C 400 300, 1000 800, 1600 500"
+            stroke="rgba(167,139,250,0.3)"
+            strokeWidth="1.5"
+          />
+        </svg>
+
+        {/* Dot Pattern */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="w-full h-full bg-[radial-gradient(circle,_rgba(255,255,255,0.15)_1px,_transparent_1px)] bg-[size:24px_24px]" />
+        </div>
+
+        {/* Centered Content */}
+        <div className="relative z-10 max-w-4xl text-center px-6">
+          <span className="inline-block mb-4 py-1.5 text-sm font-semibold text-blue-300 border-b border-blue-400 backdrop-blur">
+            Our Core Purpose
+          </span>
+
+          <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
+            Turning Your Degree Into <br />
+            <span className="text-blue-400">A Successful Career</span>
+          </h2>
+
+          <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            We bridge the gap between academics and industry by blending
+            real-world engineering skills, system thinking, and modern DevOps
+            practices.
+          </p>
+          <div className="grid gap-8 text-started mt-12 md:grid-cols-2">
+            <div className="flex gap-5">
+              <div className="mt-1 flex-shrink-0 w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+                <Target className="w-7 h-7" />
+              </div>
               <div>
-                <nav className="mb-6 px-4 py-1.5 text-sm max-w-38 font-medium rounded-full border-white/20 bg-white/5 text-blue-200 backdrop-blur">
-                  Our Core Purpose
-                </nav>
-                <h2 className="text-4xl lg:text-5xl font-heading font-bold leading-tight mb-6">
-                  Turning Your Degree Into <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
-                    A Successful Career
-                  </span>
-                </h2>
-                <p className="text-lg text-slate-300 leading-relaxed max-w-xl">
-                  A degree gets you to the interview door, but skills get you
-                  through it. We are the bridge that connects your academic
-                  foundation with the practical demands of the modern IT
-                  industry.
+                <h3 className="text-xl font-bold mb-3 text-white">
+                  Our Vision
+                </h3>
+                <p className="text-slate-400 leading-relaxed">
+                  To ensure every degree student graduates with more than just a
+                  certificate. We envision a world where academic foundations
+                  are seamlessly fused with industry-ready skills.
                 </p>
               </div>
-
-              <div className="grid gap-8">
-                <div className="flex gap-5">
-                  <div className="mt-1 flex-shrink-0 w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
-                    <Target className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-3 text-white">
-                      Our Vision
-                    </h3>
-                    <p className="text-slate-400 leading-relaxed">
-                      To ensure every degree student graduates with more than
-                      just a certificate. We envision a world where academic
-                      foundations are seamlessly fused with industry-ready
-                      skills.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-5">
-                  <div className="mt-1 flex-shrink-0 w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
-                    <Rocket className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-3 text-white">
-                      Our Mission
-                    </h3>
-                    <p className="text-slate-400 leading-relaxed">
-                      To bridge the gap between campus and corporate by
-                      providing a holistic learning path. We integrate practical
-                      IT training, aptitude reasoning, and communication
-                      mastery.
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
-
-            <div className="relative order-1 lg:order-2">
-              <div className="relative rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl">
-                <img
-                  src="images/group_of_diverse_students.png"
-                  alt="Vision"
-                  className="w-full h-auto object-cover opacity-90"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent"></div>
-                <div className="absolute bottom-8 left-8 right-8">
-                  <div className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl">
-                    <p className="text-white italic text-lg">
-                      "The gap between education and employability is where we
-                      build our bridges."
-                    </p>
-                  </div>
-                </div>
+            <div className="flex gap-5">
+              <div className="mt-1 flex-shrink-0 w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
+                <Rocket className="w-7 h-7" />
               </div>
-              {/* Decorative elements behind image */}
-              <div className="absolute -z-10 -top-10 -right-10 w-full h-full border-2 border-white/5 rounded-[2.5rem]"></div>
-              <div className="absolute -z-10 -bottom-10 -left-10 w-full h-full border-2 border-white/5 rounded-[2.5rem]"></div>
+              <div>
+                <h3 className="text-xl font-bold mb-3 text-white">
+                  Our Mission
+                </h3>
+                <p className="text-slate-400 leading-relaxed">
+                  To bridge the gap between campus and corporate by providing a
+                  holistic learning path. We integrate practical IT training,
+                  aptitude reasoning, and communication mastery.
+                </p>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Floating Tech Stack Icons
+        <div className="absolute inset-0  z-10 pointer-events-none">
+          {[
+            { icon: <Rocket />, top: "20%", left: "15%", delay: "0s" }, // Docker
+            { icon: "☁️", top: "35%", left: "80%", delay: "1s" }, // Cloud
+            { icon: "⚙️", top: "65%", left: "20%", delay: "2s" }, // System Design
+            { icon: "🧠", top: "70%", left: "75%", delay: "3s" }, // Architecture
+            { icon: "💻", top: "50%", left: "50%", delay: "4s" }, // Fullstack
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="absolute text-3xl opacity-0 animate-fadeFloat"
+              style={{
+                top: item.top,
+                left: item.left,
+                animationDelay: item.delay,
+              }}
+            >
+              {item.icon}
+            </div>
+          ))}
+        </div> */}
       </section>
-      <section className="py-12 bg-background relative">
-        {/* Background Pattern */}
+
+      {/* <section className="py-12 bg-background relative">
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -343,7 +496,6 @@ const LandingPage1 = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:px-18">
-            {/* Feature 1: AI Communication Coach */}
             <Card className="group h-full border-border/40 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-2 bg-card/50 backdrop-blur-sm">
               <CardContent className="p-8 flex flex-col h-full">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-800/20 text-purple-600 flex items-center justify-center mb-6 shadow-inner ring-1 ring-purple-500/10">
@@ -376,7 +528,6 @@ const LandingPage1 = () => {
               </CardContent>
             </Card>
 
-            {/* Feature 2: Technical Mastery */}
             <Card className="group h-full border-border/40 hover:border-blue-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/5 hover:-translate-y-2 bg-card/50 backdrop-blur-sm">
               <CardContent className="p-8 flex flex-col h-full">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20 text-blue-600 flex items-center justify-center mb-6 shadow-inner ring-1 ring-blue-500/10">
@@ -409,7 +560,6 @@ const LandingPage1 = () => {
               </CardContent>
             </Card>
 
-            {/* Feature 3: Aptitude & Exams */}
             <Card className="group h-full border-border/40 hover:border-amber-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/5 hover:-translate-y-2 bg-card/50 backdrop-blur-sm">
               <CardContent className="p-8 flex flex-col h-full">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-800/20 text-amber-600 flex items-center justify-center mb-6 shadow-inner ring-1 ring-amber-500/10">
@@ -442,7 +592,6 @@ const LandingPage1 = () => {
               </CardContent>
             </Card>
 
-            {/* Feature 4: Company Prep */}
             <Card className="group h-full border-border/40 hover:border-slate-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-500/5 hover:-translate-y-2 bg-card/50 backdrop-blur-sm">
               <CardContent className="p-8 flex flex-col h-full">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800/50 dark:to-slate-700/30 text-slate-600 flex items-center justify-center mb-6 shadow-inner ring-1 ring-slate-500/10">
@@ -475,7 +624,6 @@ const LandingPage1 = () => {
               </CardContent>
             </Card>
 
-            {/* Feature 5: Career Guidance */}
             <Card className="group h-full border-border/40 hover:border-rose-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-rose-500/5 hover:-translate-y-2 bg-card/50 backdrop-blur-sm">
               <CardContent className="p-8 flex flex-col h-full">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-100 to-rose-50 dark:from-rose-900/30 dark:to-rose-800/20 text-rose-600 flex items-center justify-center mb-6 shadow-inner ring-1 ring-rose-500/10">
@@ -508,7 +656,6 @@ const LandingPage1 = () => {
               </CardContent>
             </Card>
 
-            {/* Feature 6: In-Build Jobsite */}
             <Card className="group h-full border-border/40 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/5 hover:-translate-y-2 bg-card/50 backdrop-blur-sm">
               <CardContent className="p-8 flex flex-col h-full">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-800/20 text-emerald-600 flex items-center justify-center mb-6 shadow-inner ring-1 ring-emerald-500/10">
@@ -542,25 +689,25 @@ const LandingPage1 = () => {
             </Card>
           </div>
         </div>
-      </section>
+      </section> */}
       {/* Learning Pathways - Immersive Cards */}
-      <section className="py-12 bg-background relative overflow-hidden px-8 md:px-18">
+      <section className="py-12 mt-20 bg-background relative overflow-hidden px-8 md:px-18">
         <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
         <div className="container mx-auto md:px-4 relative z-10">
           <div className="flex flex-col md:flex-row items-end mb-16 gap-6">
             <div className="max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
+              <h2 className="text-3xl md:text-6xl font-extrabold mb-4">
                 Comprehensive Learning Paths
               </h2>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-3xl text-muted-foreground">
                 Structured curriculums designed to take you from foundational
                 knowledge to expert mastery in four key domains.
               </p>
             </div>
-            <Button variant="ghost" className="hidden md:flex group">
+            {/* <Button variant="ghost" className="hidden md:flex group">
               View All Paths{" "}
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
+            </Button> */}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -596,6 +743,25 @@ const LandingPage1 = () => {
                       <p className="text-muted-foreground mb-6 leading-relaxed">
                         {category.description}
                       </p>
+                      <div className="pb-6">
+                        <ul className="space-y-3 text-sm text-muted-foreground">
+                          {category.featurePoints.map((point, index) => (
+                            <li key={index} className="flex items-center gap-3">
+                              <div
+                                className={`
+                                p-1 rounded-full
+                                ${category.color.split(" ")[0]}
+                                ${category.color.split(" ")[1]}
+                              `}
+                              >
+                                <CheckCircle2 className="w-3 h-3" />
+                              </div>
+                              {point.text}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
                       <a
                         href={`/freshers-pratice${category.href.toLowerCase()}`}
                         className="flex items-center text-sm font-bold text-primary mt-auto group/link"
@@ -622,13 +788,11 @@ const LandingPage1 = () => {
       <section className="py-24 bg-muted/30 border-y border-border/60 px-8 md:px-18">
         <div className="container mx-auto px-4">
           <div className="text-center flex flex-col items-center max-w-3xl mx-auto mb-16">
-            <div className="border-2 max-w-fit bg-gray-200 mb-4 rounded-3xl px-2">
-              Hot Right Now
-            </div>
-            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
+            <div className="border-b-2 max-w-fit mb-4">Hot Right Now</div>
+            <h2 className="text-3xl md:text-6xl font-heading font-bold mb-4">
               Trending Certifications
             </h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-2xl text-muted-foreground">
               Top-rated courses selected by industry experts to boost your
               career immediately.
             </p>
@@ -792,14 +956,14 @@ const LandingPage1 = () => {
       </section>
 
       {/* Value Props / Why Choose Us - Dark Mode */}
-      <section className="py-24 bg-slate-900 text-white relative overflow-hidden px-8 md:px-18">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+      <section className="py-24 bg-slate-950 text-white relative overflow-hidden px-8 md:px-18">
+        {/* <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div> */}
+        {/* <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div> */}
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-heading font-bold mb-8 leading-tight">
+              <h2 className="text-3xl md:text-6xl font-bold mb-8 leading-tight">
                 Why Industry Leaders <br />
                 <span className="text-blue-400">Hire Our Graduates</span>
               </h2>

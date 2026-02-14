@@ -1,17 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Menu,
-  X,
-  Search,
-  ShoppingCart,
-  Bell,
-  User,
-  ChevronDown,
-} from "lucide-react";
+import { Menu, X, Search, Bell, User, ChevronDown } from "lucide-react";
 import { useAuthContext } from "../../context/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCart } from "../../hooks/queries/cart";
 // import NotificationDropdown from "../NotificationDropdown";
 
 type SearchItem = { type: string; name: string; path: string };
@@ -47,26 +38,17 @@ export default function Header() {
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState<SearchItem[]>([]);
-  const [hasScrolledOnce, setHasScrolledOnce] = useState(false);
 
   const { user, logout } = useAuthContext();
   const userMenuRef = useRef<HTMLDivElement | null>(null);
-  const { data: cartItems = [] } = useCart();
   const navigate = useNavigate();
 
   const location = useLocation();
   const isLanding = location.pathname === "/";
 
-  // Listen for first scroll on landing page
   useEffect(() => {
-    if (!isLanding) return;
-    const onScroll = () => {
-      if (!hasScrolledOnce && window.scrollY > 10) setHasScrolledOnce(true);
-      if (hasScrolledOnce && window.scrollY < 10) setHasScrolledOnce(false);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [isLanding, hasScrolledOnce]);
+    console.log("Current user in Header:", user);
+  }, [user]);
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -87,7 +69,7 @@ export default function Header() {
     setShowLogoutPopup(true);
     setTimeout(() => {
       setShowLogoutPopup(false);
-      window.location.href = "/";
+      window.location.href = "/Authenticate";
     }, 1400);
   };
 
@@ -96,8 +78,8 @@ export default function Header() {
     if (!value.trim()) return setSuggestions([]);
     setSuggestions(
       SEARCH_DATA.filter((s) =>
-        s.name.toLowerCase().includes(value.toLowerCase())
-      )
+        s.name.toLowerCase().includes(value.toLowerCase()),
+      ),
     );
   };
 
@@ -157,22 +139,10 @@ export default function Header() {
           </div>
         )}
 
-        <a
-          href="/cart"
-          className="relative p-2 hover:bg-white/30 rounded-xl transition"
-        >
-          <ShoppingCart className="w-5 h-5" />
-          {cartItems.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-amber-500  text-xs w-5 h-5 rounded-full flex items-center justify-center">
-              {cartItems.length}
-            </span>
-          )}
-        </a>
-
         {!user ? (
           <button
             onClick={() => (window.location.href = "/Authenticate")}
-            className="px-5 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-white font-semibold rounded-xl shadow hover:scale-105 transition"
+            className="px-5 py-2 text-black border border-black font-semibold rounded-md shadow hover:scale-105 transition"
           >
             Sign In
           </button>
@@ -236,7 +206,7 @@ export default function Header() {
 
       <button
         onClick={() => setIsMobileMenuOpen((p) => !p)}
-        className="md:hidden p-2 rounded-xl hover:bg-white/30 transition"
+        className="xl:hidden p-2 rounded-xl hover:bg-white/30 transition"
       >
         {isMobileMenuOpen ? (
           <X className="w-6 h-6" />
@@ -249,14 +219,10 @@ export default function Header() {
 
   return (
     <>
-      {/* Landing page: floating header until first scroll, then hide entirely */}
       <AnimatePresence>
-        <header
-          key="landing-header"
-          className={`sticky w-full z-50 transition-all duration-500 bg-gray-200 backdrop-blur-xl py-4 border border-white/20`}
-        >
-          <div className="min-w-full mx-auto px-6">
-            <div className="flex justify-between items-center h-16">
+        <header key="landing-header" className={`sticky w-full z-50 py-4`}>
+          <div className="mx-4 xl:mx-16">
+            <div className="flex justify-between xl:justify-around items-center h-16">
               <a href="/" className="flex items-center space-x-2">
                 <img
                   src="images/Sunadh-Logo.png"
@@ -265,49 +231,31 @@ export default function Header() {
                 />
               </a>
 
-              <nav className="hidden md:flex items-center p-2 space-x-3 font-bold text-black">
-                <div className="relative group">
-                  <button className="px-4 py-2 text-lg rounded-xl hover:bg-white/30 transition">
-                    Practice
-                  </button>
-
-                  <div
-                    className="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100
-                    opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                    transition-all duration-200 z-50"
-                  >
-                    <a
-                      href="/companies"
-                      className="block px-4 py-2 hover:bg-gray-100 rounded-t-xl"
-                    >
-                      Companies
-                    </a>
-                    <a
-                      href="/freshers-pratice"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Fresher Practice
-                    </a>
-                    <a
-                      href="/tutor"
-                      className="block px-4 py-2 hover:bg-gray-100 rounded-b-xl"
-                    >
-                      AI Tutor
-                    </a>
-                  </div>
-                </div>
+              <nav className="hidden xl:flex items-center p-2 space-x-3 font-bold text-black">
+                <a
+                  href="/companies"
+                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
+                >
+                  Companies
+                </a>
+                <a
+                  href="/freshers-pratice"
+                  className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
+                >
+                  Fresher Practice
+                </a>
                 <a
                   href="/courses"
                   className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
                 >
                   Courses
                 </a>
-                <a
+                {/* <a
                   href="/my-learning"
                   className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
                 >
                   My Learning
-                </a>
+                </a> */}
                 <a
                   href="/resumes"
                   className="flex items-center px-4 py-2 text-lg hover:bg-white/30 rounded-xl transition"
@@ -336,7 +284,7 @@ export default function Header() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden fixed left-0 right-0 top-26 z-[9999] bg-white/95 backdrop-blur-md border-t border-white/30"
+            className="xl:hidden fixed left-0 right-0 top-26 z-[9999] bg-white/95 backdrop-blur-md border-t border-white/30"
           >
             <div className="px-4 py-3 z-10 space-y-2">
               <a
@@ -380,13 +328,6 @@ export default function Header() {
                 className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"
               >
                 Jobs Portal
-              </a>
-              <a
-                href="/cart"
-                className="flex items-center px-3 py-2 rounded-lg hover:bg-white/40"
-              >
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                Cart ({cartItems.length})
               </a>
               {!user ? (
                 <a

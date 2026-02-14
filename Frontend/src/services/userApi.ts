@@ -6,7 +6,7 @@ export async function fetchPurchasedCourses(userId: string) {
   const res = await axios.get(
     `${import.meta.env.VITE_API_URL}/api/user/${userId}/purchased-courses`
   );
-  return res.data.purchasedCourses || [];
+  return res.data.startedCourses || [];
 }
 
 export async function markChapterCompleted(

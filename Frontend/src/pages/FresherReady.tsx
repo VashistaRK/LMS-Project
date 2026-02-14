@@ -2,9 +2,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { useAuthContext } from "../context/AuthProvider";
+import { Lock } from "lucide-react";
+import { toast } from "sonner";
 
 export default function FreshersReady() {
   const navigate = useNavigate();
+  const { user } = useAuthContext();
+  const hasAccess = !!user?.accessGranted;
 
   const [tracks, setTracks] = useState<
     Array<{ title: string; description: string; slug: string }>
@@ -51,17 +56,17 @@ export default function FreshersReady() {
     { hex: string; tailwindBg: string; tailwindText: string }
   > = {
     communication: {
-      hex: "#7B1FA2",
+      hex: "#540863",
       tailwindBg: "bg-purple-700",
       tailwindText: "#DDA7FA",
     },
     technical: {
-      hex: "#0B74DE",
-      tailwindBg: "bg-blue-600",
+      hex: "#576A8F",
+      tailwindBg: "bg-violet-700",
       tailwindText: "#A7BFFA",
     },
     aptitude: {
-      hex: "#16A34A",
+      hex: "#31694E",
       tailwindBg: "bg-green-600",
       tailwindText: "#ABFAA7",
     },
@@ -72,6 +77,57 @@ export default function FreshersReady() {
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
   const [itemsError, setItemsError] = useState<string | null>(null);
   const [trackDetails, setTrackDetails] = useState<any | null>(null);
+
+  const ITEMS_PER_PAGE = 12;
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
+
+  const totalItems = items.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+  const paginatedItems = loadingItems
+    ? Array.from({ length: ITEMS_PER_PAGE })
+    : items.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE,
+      );
+
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+  const Pagination = () => (
+    <div className="flex justify-end items-center gap-3">
+      <button
+        onClick={() => goToPage(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="px-4 py-2 text-sm font-semibold rounded-lg border
+        disabled:opacity-50 disabled:cursor-not-allowed
+        hover:bg-gray-100"
+      >
+        Prev
+      </button>
+
+      <span className="text-sm font-semibold text-gray-600">
+        Page {currentPage} of {totalPages || 1}
+      </span>
+
+      <button
+        onClick={() => goToPage(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="px-4 py-2 text-sm font-semibold rounded-lg border
+        disabled:opacity-50 disabled:cursor-not-allowed
+        hover:bg-gray-100"
+      >
+        Next
+      </button>
+    </div>
+  );
 
   const defaultSlugs: Record<string, string> = {
     communication: "communication",
@@ -136,11 +192,11 @@ export default function FreshersReady() {
 
   const resolveSlugForTab = (tabKey: string) => {
     const found = tracks.find(
-      (t) => t.slug === tabKey || t.slug === defaultSlugs[tabKey]
+      (t) => t.slug === tabKey || t.slug === defaultSlugs[tabKey],
     );
     if (found) return found.slug;
     const byTitle = tracks.find((t) =>
-      t.title.toLowerCase().includes(tabKey.split("-")[0])
+      t.title.toLowerCase().includes(tabKey.split("-")[0]),
     );
     if (byTitle) return byTitle.slug;
     return defaultSlugs[tabKey];
@@ -192,22 +248,17 @@ export default function FreshersReady() {
   const activeTailwindText = activeStyle.tailwindText;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen max-w-7xl mx-6 lg:mx-auto pt-10">
       {/* Hero Section */}
       <div
-        className="bg-cover bg-center"
+        className="bg-cover bg-center rounded-md"
         style={{ backgroundImage: `url(${content.img})` }}
       >
-        <div className="py-16 md:py-32 bg-gradient-to-r from-black/60 via-black/0 to-black/0">
+        <div className="py-16 md:py-32 rounded-md bg-gradient-to-r from-black/60 via-black/0 to-black/0">
           <div className="mx-auto px-8">
             <div className="flex flex-col lg:justify-between gap-6">
               <div>
-                <h1
-                  className="text-4xl md:text-6xl md:max-w-3xl text-transparent bg-clip-text font-extrabold font-sans mb-3 tracking-tight"
-                  style={{
-                    backgroundImage: `linear-gradient(to bottom right, #ffffff, ${activeTailwindText})`,
-                  }}
-                >
+                <h1 className="text-4xl text-white md:text-6xl md:max-w-3xl bg-clip-text font-extrabold font-mulish mb-3 tracking-tight">
                   {content.heroContent}
                 </h1>
                 <p className="text-lg md:text-xl text-gray-100/90 max-w-2xl">
@@ -218,12 +269,8 @@ export default function FreshersReady() {
 
               <div className="flex items-center gap-3">
                 <span
-                  className="px-4 py-2 rounded-full text-4xl font-bold font-sans"
-                  style={{
-                    backgroundColor: `${activeTailwindText}22`,
-                    color: activeTailwindText,
-                    border: `1px solid ${activeTailwindText}`,
-                  }}
+                  className="text-4xl font-bold font-mulish text-white"
+                  style={{ color: activeTailwindText }}
                 >
                   {tabs.find((t) => t.key === activeTab)?.label}
                 </span>
@@ -233,10 +280,10 @@ export default function FreshersReady() {
         </div>
       </div>
 
-      <div className="max-w-6xl sm:max-w-7xl mx-auto px-6 py-12">
+      <div className="py-12">
         {/* Tabs */}
         <div className="mb-10">
-          <div className="bg-white rounded-2xl shadow-lg p-2 inline-flex gap-2">
+          <div className="bg-white rounded-md shadow-lg p-2 md:inline-flex gap-2">
             {tabs.map((t) => (
               <button
                 key={t.key}
@@ -247,7 +294,7 @@ export default function FreshersReady() {
                     ? { backgroundColor: tabStyles[t.key]?.hex ?? activeHex }
                     : undefined
                 }
-                className={`px-3 py-2 sm:px-6 sm:py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+                className={`px-3 py-2 w-full sm:px-6 sm:py-2.5 rounded font-semibold transition-all flex items-center gap-2 ${
                   activeTab === t.key
                     ? "text-white shadow"
                     : "text-gray-700 hover:bg-gray-100"
@@ -260,13 +307,12 @@ export default function FreshersReady() {
         </div>
 
         {/* Main Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
-          {/* LEFT — CONTENT (2/5) */}
+        <div className="flex flex-col gap-10">
           <div className="lg:col-span-2 space-y-8">
             {/* Intro Card */}
             {content && (
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-100">
-                <div className="p-6 border-b">
+              <div className="">
+                <div className="py-6 border-b-4">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
                     {content.why}
                   </h2>
@@ -275,7 +321,7 @@ export default function FreshersReady() {
                   </p>
                 </div>
 
-                <div className="p-6 space-y-4">
+                <div className="py-6 space-y-4">
                   <h3 className="font-semibold text-gray-900">
                     Tips to Master
                   </h3>
@@ -311,63 +357,144 @@ export default function FreshersReady() {
             )}
           </div>
 
-          {/* RIGHT — PRACTICE TESTS (3/5) */}
+          {activeTab === "communication" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 space-x-12 space-y-8 md:space-y-0">
+              <div className="col-span-1 flex flex-col max-w-full md:max-w-sm leading-tight tracking-tight">
+                <p className="text-4xl font-bold font-mulish mb-6">
+                  Wanna ace your interviews? 👉
+                </p>
+                Check out our AI Bot that simulates real interview scenarios,
+                providing you with personalized feedback and tips to improve
+                your communication skills. It's like having a personal coach
+                available 24/7 to help you practice and boost your confidence
+                before the big day!
+              </div>
+              <div className="col-span-1 flex flex-col gap-6">
+                <a href="/Ai-Tutor" rel="noopener noreferrer">
+                  <img
+                    src="images/Ai-Bot-2.png"
+                    alt=""
+                    className="rounded-xl"
+                  />
+                </a>
+                <p className="leading-tight">
+                  TechNova Solutions specializes in cutting-edge software
+                  development, cloud infrastructure, and AI-driven enterprise
+                  applications. With a global client base, they are known for
+                  fostering technological innovation across industries.
+                </p>
+                <h2 className="font-bold">Self-Training Guidance</h2>
+                <ul className="list-disc pl-5 text-zinc-600">
+                  <li>
+                    AI-driven interview training adapted to your communication
+                    proficiency
+                  </li>
+                  <li>
+                    Multi-domain practice covering HR, technical, and real-world
+                    scenarios
+                  </li>
+                  <li>
+                    Instant feedback that identifies mistakes and suggests
+                    precise corrections
+                  </li>
+                  <li>
+                    Continuous improvement insights to strengthen confidence and
+                    performance
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+
           <div className="lg:col-span-3">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Practice Tests
-              </h2>
-              <p className="text-gray-600">
-                Test your skills with curated assessments
-              </p>
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Practice Tests
+                </h2>
+                <p className="text-gray-600">
+                  Test your skills with curated assessments
+                </p>
+              </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6">
-              {(loadingItems ? Array.from({ length: 4 }) : items).map(
-                (it: any, idx: number) => (
-                  <div
-                    key={it?.testId ?? idx}
-                    onClick={() =>
-                      it?.testId &&
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {paginatedItems.map((it: any, idx: number) => (
+                <div
+                  key={it?.testId ?? idx}
+                  onClick={() => {
+                    if (!it) return;
+
+                    if (!hasAccess) {
+                      toast.warning("Access should be granted by the admin");
+                      return;
+                    }
+
+                    it?.testId &&
                       navigate(
                         `/freshers-pratice/test/${
                           it.trackSlug ?? resolveSlugForTab(activeTab)
-                        }/${it.testId}`
-                      )
-                    }
-                    className="cursor-pointer bg-white rounded-xl border border-gray-100 shadow hover:shadow-lg transition-all"
-                  >
+                        }/${it.testId}`,
+                      );
+                  }}
+                  className={`relative bg-white border border-gray-100 transition-all
+                      ${
+                        hasAccess
+                          ? "cursor-pointer hover:shadow-lg"
+                          : "cursor-not-allowed opacity-80"
+                      }
+                    `}
+                >
+                  {!hasAccess && it && (
                     <div
-                      className="h-1"
-                      style={{ backgroundColor: activeHex }}
-                    />
-                    <div className="p-5">
-                      <h3 className="font-bold text-gray-900 mb-2">
-                        {it?.title ?? (
-                          <div className="h-5 bg-gray-200 rounded w-3/4 animate-pulse" />
-                        )}
-                      </h3>
+                      className="absolute inset-0 z-10 bg-white/70 flex items-center justify-center
+               opacity-0 hover:opacity-100 transition"
+                    >
+                      <div className="flex items-center gap-2 text-gray-700 font-semibold">
+                        <Lock className="w-5 h-5" />
+                        Locked
+                      </div>
+                    </div>
+                  )}
 
-                      {it && (
-                        <>
-                          <p className="text-sm text-gray-600 mb-3">
-                            {it.questionsCount ?? it.questions?.length ?? "—"}{" "}
-                            questions
-                          </p>
+                  <div className="h-1" style={{ backgroundColor: activeHex }} />
+                  <div className="p-5">
+                    <h3 className="font-bold text-gray-900 mb-2">
+                      {it?.title ?? (
+                        <div className="h-5 bg-gray-200 rounded w-3/4 animate-pulse" />
+                      )}
+                    </h3>
 
+                    {it && (
+                      <>
+                        <p className="text-sm text-gray-600 mb-3">
+                          {it.questionsCount ?? it.questions?.length ?? "—"}{" "}
+                          questions
+                        </p>
+
+                        {hasAccess ? (
                           <span
                             className="font-semibold text-sm"
                             style={{ color: activeHex }}
                           >
                             Start Test →
                           </span>
-                        </>
-                      )}
-                    </div>
+                        ) : (
+                          <span className="text-sm text-gray-400">
+                            Access Required
+                          </span>
+                        )}
+                      </>
+                    )}
                   </div>
-                )
-              )}
+                </div>
+              ))}
             </div>
+            {!loadingItems && totalPages > 1 && (
+              <div className="mt-8">
+                <Pagination />
+              </div>
+            )}
 
             {!loadingItems && items.length === 0 && !itemsError && (
               <div className="text-center py-16 bg-white rounded-xl shadow">

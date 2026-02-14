@@ -1,6 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Download, Loader, AlertCircle } from "lucide-react";
+import {
+  Download,
+  Loader,
+  AlertCircle,
+  Lock,
+  Check,
+  AlertTriangle,
+} from "lucide-react";
+import { useAuthContext } from "../context/AuthProvider";
+import { toast } from "sonner";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -45,6 +54,8 @@ function formatDate(dateString: string) {
 
 export default function ResumesPage() {
   const [, setPreviewContent] = useState<ResumeListItem | null>(null);
+  const { user } = useAuthContext();
+  const hasAccess = !!user?.accessGranted;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["resumes"],
@@ -55,6 +66,7 @@ export default function ResumesPage() {
 
   const openPreview = async (resumeId: string) => {
     try {
+      console.log("Fetching resume preview for ID:", user);
       const r = await fetchResume(resumeId);
       setPreviewContent(r);
     } catch {
@@ -67,111 +79,143 @@ export default function ResumesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 py-12">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-12">
-          <div className="flex items-center gap-3 mb-3">
-            <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-              Resume Library
-            </h1>
-          </div>
+    <div className="min-h-screen py-12 max-w-7xl mx-6 md:mx-6 xl:mx-auto">
+      {/* Header */}
+      <div className="mb-12 py-32 flex flex-col items-center justify-center space-y-8 font-mulish tracking-tighter leading-tight">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900">
+            Resumes Library.
+          </h1>
 
-          <p className="text-lg text-gray-700 max-w-3xl leading-relaxed">
-            Discover a curated collection of professionally designed resume
-            templates crafted to help you stand out, showcase your skills, and
-            land interviews faster.
+          <p className="text-3xl md:text-5xl text-gray-500 max-w-6xl font-bold">
+            Crafted to help you stand out, showcase your skills, and land
+            interviews faster.
           </p>
-
-          {/* Info badges */}
-          <div className="flex flex-wrap gap-3 mt-5">
-            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-100">
-              ✔ ATS-Friendly
-            </span>
-            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-50 text-green-700 border border-green-100">
-              ✔ Industry-Ready
-            </span>
-            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-purple-50 text-purple-700 border border-purple-100">
-              ✔ Easy to Customize
-            </span>
-            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-orange-50 text-orange-700 border border-orange-100">
-              ✔ Instant Download
-            </span>
-          </div>
         </div>
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600" />
-            <span className="text-red-800">Failed to load resumes</span>
-          </div>
-        )}
+        {/* Info badges */}
+        <div className="flex flex-col items-center md:flex-row gap-3">
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium">
+            <Check className="w-4 h-4 mr-1 text-green-500" /> ATS-Friendly
+          </span>
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium">
+            <Check className="w-4 h-4 mr-1 text-green-500" /> Industry-Ready
+          </span>
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium">
+            <Check className="w-4 h-4 mr-1 text-green-500" /> Easy to Customize
+          </span>
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium">
+            <Check className="w-4 h-4 mr-1 text-green-500" /> Instant Download
+          </span>
+        </div>
+      </div>
 
-        {isLoading ? (
-          <div className="flex justify-center py-20">
-            <Loader className="w-8 h-8 text-blue-600 animate-spin" />
-          </div>
-        ) : resumes.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">
-            No resumes available
-          </div>
-        ) : (
-          <>
-            {/* ✅ Resume Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {resumes.map((resume) => (
+      <div className="max-w-xl mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          Available Resumes
+        </h2>
+        <p>
+          Find your best-fit resume among our curated collection, designed to
+          help you land your dream job. Each template is crafted to highlight
+          your skills, experience, and achievements in a way that stands out to
+          recruiters and ATS systems alike.
+        </p>
+      </div>
+
+      {error && (
+        <div className="mb-12 p-6 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600" />
+          <span className="text-red-800">Failed to load resumes</span>
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className="flex justify-center py-20">
+          <Loader className="w-8 h-8 text-blue-600 animate-spin" />
+        </div>
+      ) : resumes.length === 0 ? (
+        <div className="text-center py-20 text-gray-500">
+          No resumes available
+        </div>
+      ) : (
+        <>
+          {!hasAccess && (
+            <div>
+              <div className="mt-12 p-6 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
+                <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                <span className="text-yellow-800">
+                  Access to downloads is restricted. Please contact
+                  support/admin to grant access.
+                </span>
+              </div>
+            </div>
+          )}
+          {/* ✅ Resume Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-14 gap-6">
+            {resumes.map((resume) => (
+              <div
+                key={resume._id}
+                className="transition overflow-hidden group"
+              >
+                {/* Image */}
                 <div
-                  key={resume._id}
-                  className="bg-white rounded-xl shadow-sm border hover:shadow-md transition overflow-hidden group"
+                  className="h-10/12 bg-white flex items-center rounded-xl justify-center cursor-pointer"
+                  onClick={() => openPreview(resume.resumeId)}
                 >
-                  {/* Image */}
-                  <div
-                    className="h-9/12 bg-gray-100 flex items-center justify-center cursor-pointer"
-                    onClick={() => openPreview(resume.resumeId)}
-                  >
-                    <img
-                      src={
-                        resume.imageUrl ||
-                        `${API}/api/resumes/${resume.resumeId}/image`
-                      }
-                      alt="Resume preview"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
-                    />
-                  </div>
+                  <img
+                    src={
+                      resume.imageUrl ||
+                      `${API}/api/resumes/${resume.resumeId}/image`
+                    }
+                    alt="Resume preview"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </div>
 
-                  {/* Content */}
-                  <div className="p-4 space-y-1">
-                    <h3 className="font-semibold text-gray-900 truncate">
+                {/* Content */}
+                <div className="w-full flex justify-between items-center">
+                  <div className="flex flex-col p-4">
+                    <h3 className="font-bold text-gray-900 truncate">
                       {resume.title || resume.resumeId}
                     </h3>
-                    <p className="text-sm text-gray-600 truncate">
-                      {resume.authorName || "—"}
-                    </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-sm text-gray-600">
                       {formatDate(resume.createdAt)}
                     </p>
                   </div>
 
                   {/* Actions */}
-                  <div className="px-4 pb-4 flex gap-2">
-                    <button
-                      onClick={() => downloadFile(resume.resumeId)}
-                      className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
-                    >
-                      <Download className="w-4 h-4" /> Download
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
 
-            {/* Optional Preview Modal (future enhancement) */}
-          </>
-        )}
-      </div>
+                  <button
+                    onClick={() => {
+                      if (!hasAccess) {
+                        toast.warning("Access should be granted by the admin");
+                        return;
+                      }
+                      downloadFile(resume.resumeId);
+                    }}
+                    className={`w-fit inline-flex items-center justify-center gap-1 px-3 py-2 text-sm ${hasAccess ? "bg-[#0AC4E0] hover:bg-[#0992C2]" : "bg-zinc-400 cursor-not-allowed"} text-white rounded-md`}
+                  >
+                    {hasAccess ? (
+                      <>
+                        <Download className="w-4 h-4" />
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Optional Preview Modal (future enhancement) */}
+        </>
+      )}
     </div>
   );
 }

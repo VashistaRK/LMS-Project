@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  BookOpen,
-  Menu,
-  X,
-  ChevronDown,
-  User,
-  Library,
-  Building2,
-} from "lucide-react";
+import { Menu, X, ChevronDown, User } from "lucide-react";
 import { useAuthContext } from "../context/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -17,10 +9,11 @@ const Admin_Header = () => {
   const { user, logout } = useAuthContext();
 
   const navigationItems = [
-    { name: "Courses", href: "/admin/courses", icon: BookOpen },
-    { name: "assessments", href: "/admin/assessments", icon: Library },
-    { name: "companies", href: "/admin/companies", icon: Building2 },
-    { name: "quizMan", href: "/admin/quizMan", icon: Building2 },
+    { name: "Home", href: "/admin" },
+    { name: "Courses", href: "/admin/courses" },
+    { name: "Assessments", href: "/admin/assessments" },
+    { name: "Companies", href: "/admin/companies" },
+    { name: "QuizMan", href: "/admin/quizMan" },
   ];
 
   const handleLogout = () => {
@@ -33,7 +26,10 @@ const Admin_Header = () => {
   };
 
   return (
-    <header className="top-0 z-50 w-full border-b border-white/20 bg-white/60 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.25)]">
+    <header
+      key="landing-header"
+      className="z-50 h-23 max-w-7xl mx-4 md:mx-auto sticky py-4"
+    >
       <div className="relative">
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,21 +40,19 @@ const Admin_Header = () => {
               <img
                 src="/images/Sunadh-Logo.png"
                 alt="Sunadh Logo"
-                className="relative h-10 w-auto transition-transform group-hover:scale-105"
+                className="relative h-14 w-auto transition-transform group-hover:scale-105"
               />
             </a>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-1">
               {navigationItems.map((item) => {
-                const Icon = item.icon;
                 return (
                   <a
                     key={item.name}
                     href={item.href}
-                    className="group relative flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-xl transition-all duration-200 hover:bg-white"
+                    className="group relative flex items-center space-x-2 px-3 py-2"
                   >
-                    <Icon className="w-4 h-4 transition-colors group-hover:text-[#C21817]" />
                     <span>{item.name}</span>
                     <span className="pointer-events-none absolute -inset-x-2 -bottom-1 h-px bg-gradient-to-r from-transparent via-[#C21817]/60 to-transparent opacity-0 group-hover:opacity-100 transition" />
                   </a>
@@ -145,7 +139,6 @@ const Admin_Header = () => {
             <div className="md:hidden border-t border-gray-200/70 bg-white/95 backdrop-blur-xl rounded-b-xl shadow-xl">
               <div className="py-3 space-y-1">
                 {navigationItems.map((item) => {
-                  const Icon = item.icon;
                   return (
                     <a
                       key={item.name}
@@ -153,7 +146,6 @@ const Admin_Header = () => {
                       className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      <Icon className="w-5 h-5" />
                       <span>{item.name}</span>
                     </a>
                   );

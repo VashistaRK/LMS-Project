@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchPurchasedCourses, fetchCoursesByIds } from "../services/userApi";
 import type { CourseData } from "../types/course";
@@ -7,47 +7,38 @@ import {
   BookOpen,
   ChevronLeft,
   ChevronRight,
-  LayoutGrid,
-  List,
   Play,
   Sparkles,
   Award,
-  Clock,
   Zap,
 } from "lucide-react";
 import { useAuthContext } from "../context/AuthProvider";
 import getThumbnailUrl from "@/utils/getThumbnailUrl";
+import { IoPricetagsSharp } from "react-icons/io5";
 
 const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [courses, setCourses] = useState<
     (CourseData & {
       progress: number;
       status: "Not Started" | "In Progress" | "Completed";
     })[]
   >([]);
-  const [filter, setFilter] = useState<
-    "All" | "Not Started" | "In Progress" | "Completed"
-  >("All");
   const [ContinueLearning, setContinueLearning] = useState<
     (CourseData & { progress: number; status: "In Progress" })[]
   >([]);
-  const [sortBy, setSortBy] = useState<"Title" | "Progress">("Title");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
 
   const { user } = useAuthContext();
 
-  const getInstructorNames = (course: CourseData) =>
-    (course.instructor || []).map((i: any) => i.name).join(", ");
   const getCourseId = (c: CourseData) => (c as any).id ?? (c as any)._id ?? "";
 
   const getTotalChapters = (course: CourseData) => {
     if (Array.isArray((course as any).sections)) {
       return (course as any).sections.reduce(
         (acc: number, s: any) => acc + (s.chapters?.length ?? 0),
-        0
+        0,
       );
     }
     return (course as any).chapters?.length ?? 0;
@@ -63,7 +54,7 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
         const enriched = (rawCourses || []).map((course: CourseData) => {
           const courseId = getCourseId(course);
           const purchasedItem = (purchased || []).find(
-            (p: any) => String(p.CourseId) === String(courseId)
+            (p: any) => String(p.CourseId) === String(courseId),
           );
 
           const total = getTotalChapters(course);
@@ -76,15 +67,17 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
             progress === 0
               ? "Not Started"
               : progress === 100
-              ? "Completed"
-              : "In Progress";
+                ? "Completed"
+                : "In Progress";
 
           return { ...(course as any), progress, status };
         });
 
         setCourses(enriched);
         setContinueLearning(
-          enriched.filter((c: { status: string }) => c.status === "In Progress")
+          enriched.filter(
+            (c: { status: string }) => c.status === "In Progress",
+          ),
         );
       } catch (err) {
         console.error("Failed to load courses:", err);
@@ -97,36 +90,14 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
     if (userId) loadCourses();
   }, [userId]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filter, sortBy, viewMode]);
-
-  const filtered = useMemo(
-    () =>
-      courses.filter((c) => (filter === "All" ? true : c.status === filter)),
-    [courses, filter]
-  );
-
-  const sorted = useMemo(() => {
-    const copy = [...filtered];
-    sortBy === "Title"
-      ? copy.sort((a, b) => a.title.localeCompare(b.title))
-      : copy.sort((a, b) => b.progress - a.progress);
-    return copy;
-  }, [filtered, sortBy]);
-
-  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
-  const paginatedCourses = sorted.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const totalPages = Math.max(1, Math.ceil(courses.length / pageSize));
 
   const totalProgress = courses.reduce((acc, c) => acc + (c.progress || 0), 0);
   const completionRate =
     courses.length > 0 ? Math.round(totalProgress / courses.length) : 0;
 
   const completedCourses = courses.filter(
-    (c) => c.status === "Completed"
+    (c) => c.status === "Completed",
   ).length;
 
   if (loading)
@@ -145,7 +116,7 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
     return (
       <div className="flex justify-center items-center min-h-[70vh] bg-gray-50">
         <div className="text-center p-8">
-          <BookOpen className="w-20 h-20 text-gray-300 mx-auto mb-4" />
+          <BookOpen className="w-20 h-20 text-gray-800 mx-auto mb-4" />
           <p className="text-gray-700 text-xl font-medium">
             Ready to start your learning journey?
           </p>
@@ -155,71 +126,63 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
     );
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="min-h-screen pb-16 font-mulish">
+      <div className="max-w-7xl mx-4 lg:mx-6 xl:mx-auto">
         {/* ---------------- HERO SECTION ---------------- */}
-        <header className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl mb-8 p-8 lg:p-12 shadow-xl">
-          {/* Subtle animated background pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 right-10 w-72 h-72 bg-white rounded-full blur-3xl animate-pulse"></div>
-            <div
-              className="absolute bottom-10 left-10 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse"
-              style={{ animationDelay: "2s" }}
-            ></div>
-          </div>
-
-          <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-8">
+        <header className="relative overflow-hidden">
+          <div className="relative py-24 xl:py-32 z-10 flex flex-col lg:flex-row justify-between items-center gap-8">
             {/* Left Text */}
             <aside className="flex flex-col justify-center text-center lg:text-left max-w-xl">
               <div className="flex items-center gap-2 justify-center lg:justify-start mb-3">
                 <Sparkles className="w-5 h-5 text-amber-400" />
-                <span className="text-gray-300 font-medium text-sm uppercase tracking-wider">
+                <span className="text-gray-800 font-medium text-sm uppercase tracking-wider">
                   Your Learning Hub
                 </span>
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3">
-                Welcome back, {user?.name || "Learner"}! 👋
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-3">
+                Welcome back
+                <br /> {user?.name || "Learner"}!
               </h1>
-              <p className="text-gray-300 text-lg">
+              <p className="text-gray-700 text-2xl sm:text-4xl font-bold mb-6">
                 Track your progress and continue your learning journey
               </p>
 
               {/* Stats Row */}
-              <div className="flex gap-4 mt-6 justify-center lg:justify-start flex-wrap">
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-white/20 p-2 rounded-lg">
-                      <BookOpen className="w-5 h-5 text-white" />
+              <div className="flex gap-8 mt-6 justify-center lg:justify-start flex-wrap">
+                <div className="rounded-2xl">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2">
+                      <BookOpen className="w-5 h-5" />
                     </div>
                     <div className="text-left">
                       <div className="text-2xl font-bold">{courses.length}</div>
-                      <div className="text-xs text-gray-300">Total Courses</div>
+                      <div className="text-xs text-gray-800">Total Courses</div>
                     </div>
                   </div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-white/20 p-2 rounded-lg">
-                      <Zap className="w-5 h-5 text-amber-400" />
+                <div className="rounded-2xl">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2">
+                      <Zap className="w-5 h-5" />
                     </div>
                     <div className="text-left">
                       <div className="text-2xl font-bold">
                         {ContinueLearning.length}
                       </div>
-                      <div className="text-xs text-gray-300">Active</div>
+                      <div className="text-xs text-gray-800">Active</div>
                     </div>
                   </div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-white/20 p-2 rounded-lg">
-                      <Award className="w-5 h-5 text-emerald-400" />
+                <div className="rounded-2xl">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2">
+                      <Award className="w-5 h-5" />
                     </div>
                     <div className="text-left">
                       <div className="text-2xl font-bold">
                         {completedCourses}
                       </div>
-                      <div className="text-xs text-gray-300">Completed</div>
+                      <div className="text-xs text-gray-800">Completed</div>
                     </div>
                   </div>
                 </div>
@@ -231,7 +194,7 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
               <div className="relative">
                 <svg className="w-44 h-44 -rotate-90 drop-shadow-2xl">
                   <circle
-                    className="text-white/20"
+                    className="text-black"
                     strokeWidth="10"
                     stroke="currentColor"
                     fill="transparent"
@@ -240,7 +203,7 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
                     cy="88"
                   />
                   <circle
-                    className="text-amber-400 transition-all duration-1000 ease-out"
+                    className="text-blue-400 transition-all duration-1000 ease-out"
                     strokeWidth="10"
                     strokeLinecap="round"
                     stroke="currentColor"
@@ -256,7 +219,7 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-4xl font-bold">{completionRate}%</span>
-                  <span className="text-xs text-gray-300 mt-1">Progress</span>
+                  <span className="text-xs text-gray-800 mt-1">Progress</span>
                 </div>
               </div>
             </aside>
@@ -283,14 +246,14 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
         {/* ----------- CONTINUE LEARNING SECTION ----------- */}
         {ContinueLearning.length > 0 && (
           <section className="mb-10">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-slate-800 p-2.5 rounded-xl">
-                <Clock className="w-6 h-6 text-white" />
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Continue Learning
-              </h2>
-            </div>
+            <h2 className="text-2xl mb-2 sm:text-3xl font-bold tracking-tight">
+              Continue Learning
+            </h2>
+            <p className="mb-12 leading-tight tracking-tight text-xl font-semibold text-zinc-500 max-w-2xl">
+              Gain a complete understanding of what these courses offers, key
+              objectives, and the unique approach used to teach essential skills
+              for your chosen field`s success.
+            </p>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {ContinueLearning.map((course) => {
@@ -299,7 +262,7 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
                   <Link
                     key={getCourseId(course)}
                     to={`/my-courses/${getCourseId(course)}`}
-                    className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
+                    className="group block rounded-md overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
                   >
                     <div className="relative overflow-hidden">
                       <img
@@ -321,9 +284,13 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
                       <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-slate-700 transition-colors">
                         {course.title}
                       </h3>
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-lg border border-amber-200">
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <span className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-md border border-amber-200">
                           In Progress
+                        </span>
+                        <span className="bg-[#9CCFFF] flex items-center justify-center text-zinc-700 rounded-md font-semibold flex-row px-2 uppercase">
+                          <IoPricetagsSharp className="h-3 pr-1" />
+                          {course.difficulty}
                         </span>
                       </div>
                       <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
@@ -339,152 +306,6 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
             </div>
           </section>
         )}
-
-        {/* ---------------- FILTERS & CONTROLS ---------------- */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-gray-100">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div className="flex items-center gap-4">
-              <div className="bg-gray-100 p-3 rounded-xl">
-                <BookOpen className="w-7 h-7 text-slate-800" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  All Courses
-                </h2>
-                <p className="text-sm text-gray-500">
-                  {sorted.length} courses total
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 flex-wrap">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-medium bg-white hover:border-gray-300 focus:border-slate-800 focus:outline-none transition-colors"
-              >
-                <option value="Title">Sort by Title</option>
-                <option value="Progress">Sort by Progress</option>
-              </select>
-
-              <div className="hidden sm:flex gap-2 bg-gray-100 p-1.5 rounded-xl">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-2.5 rounded-lg transition-all duration-300 ${
-                    viewMode === "grid"
-                      ? "bg-slate-800 text-white shadow-md"
-                      : "text-gray-600 hover:bg-gray-200"
-                  }`}
-                >
-                  <LayoutGrid size={18} />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-2.5 rounded-lg transition-all duration-300 ${
-                    viewMode === "list"
-                      ? "bg-slate-800 text-white shadow-md"
-                      : "text-gray-600 hover:bg-gray-200"
-                  }`}
-                >
-                  <List size={18} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Filter Buttons */}
-          <div className="flex flex-wrap gap-3 mt-6">
-            {["All", "Not Started", "In Progress", "Completed"].map(
-              (status) => (
-                <button
-                  key={status}
-                  onClick={() => setFilter(status as any)}
-                  className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${
-                    filter === status
-                      ? "bg-slate-800 text-white shadow-md"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  {status}
-                </button>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* ---------------- COURSES GRID/LIST ---------------- */}
-        <div
-          className={`grid gap-6 ${
-            viewMode === "grid"
-              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-              : "grid-cols-1"
-          }`}
-        >
-          {paginatedCourses.map((course) => {
-            const thumbUrl = getThumbnailUrl(course);
-            const instructorNames = getInstructorNames(course);
-            return (
-              <Link
-                key={getCourseId(course)}
-                to={`/my-courses/${getCourseId(course)}`}
-                className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={thumbUrl}
-                    alt={course.title}
-                    className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <div className="bg-white rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform shadow-2xl">
-                      <Play className="w-8 h-8 text-slate-800" />
-                    </div>
-                  </div>
-                  <div className="absolute top-4 right-4">
-                    <div className="bg-white/95 backdrop-blur-sm text-slate-800 text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
-                      {course.progress}%
-                    </div>
-                  </div>
-                  <div className="absolute top-4 left-4">
-                    <span
-                      className={`px-3 py-1.5 text-xs font-semibold rounded-full shadow-lg backdrop-blur-sm ${
-                        course.status === "Completed"
-                          ? "bg-emerald-500/90 text-white"
-                          : course.status === "In Progress"
-                          ? "bg-amber-500/90 text-white"
-                          : "bg-gray-500/90 text-white"
-                      }`}
-                    >
-                      {course.status}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-5">
-                  <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-slate-700 transition-colors">
-                    {course.title}
-                  </h3>
-                  <p className="text-sm text-gray-500 mb-3">
-                    {instructorNames || "Instructor"} •{" "}
-                    {course.difficulty ?? "All"} • {course.duration ?? ""}
-                  </p>
-                  {viewMode === "list" && (
-                    <p className="text-gray-600 mb-4 line-clamp-2">
-                      {(course as any).shortDescription}
-                    </p>
-                  )}
-                  <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-                    <div
-                      className="bg-slate-800 h-2.5 rounded-full transition-all duration-500"
-                      style={{ width: `${course.progress}%` }}
-                    />
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
 
         {/* ---------------- PAGINATION ---------------- */}
         {totalPages > 1 && (

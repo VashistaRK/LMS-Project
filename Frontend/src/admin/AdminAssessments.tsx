@@ -211,7 +211,7 @@ const AdminAssessments = () => {
 
     try {
       const res = await getQuestions(genre); // you may need to adjust API
-      const arr = (Array.isArray(res) ? res : res?.data ?? []) as any[];
+      const arr = (Array.isArray(res) ? res : (res?.data ?? [])) as any[];
       const normalized = arr
         .map((q) => {
           const id = resolveQuestionId(q);
@@ -364,8 +364,8 @@ const AdminAssessments = () => {
         entry.__source === "coding"
           ? "Coding"
           : entry.__source === "mcq" || entry.type === "MCQ"
-          ? "MCQ"
-          : "Question";
+            ? "MCQ"
+            : "Question";
 
       const label = entry.questionText || entry.question || entry.title || id;
       return `${prefix}: ${label}`;
@@ -385,7 +385,7 @@ const AdminAssessments = () => {
   };
 
   return (
-    <div className="bg-red-50 p-6 rounded-lg shadow-md">
+    <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-2xl font-bold">Admin Assessments</h1>
 
       {/* SHOWING LOADED QUESTIONS */}
@@ -606,7 +606,7 @@ const AdminAssessments = () => {
                               setTestForm((prev) => ({
                                 ...prev,
                                 questionIds: prev.questionIds.filter(
-                                  (q) => q !== id
+                                  (q) => q !== id,
                                 ),
                               }))
                             }
@@ -669,7 +669,7 @@ const AdminAssessments = () => {
                                   setTestForm((prev) => ({
                                     ...prev,
                                     questionIds: prev.questionIds.includes(
-                                      questionId
+                                      questionId,
                                     )
                                       ? prev.questionIds
                                       : [...prev.questionIds, questionId],
@@ -715,7 +715,7 @@ const AdminAssessments = () => {
                               setTestForm((prev) => ({
                                 ...prev,
                                 questionIds: prev.questionIds.includes(
-                                  questionId
+                                  questionId,
                                 )
                                   ? prev.questionIds
                                   : [...prev.questionIds, questionId],

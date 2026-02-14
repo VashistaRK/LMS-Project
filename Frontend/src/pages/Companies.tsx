@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../context/AuthProvider";
+import { Lock } from "lucide-react";
+import { toast } from "sonner";
 
 type Company = {
   name: string;
@@ -15,6 +18,9 @@ export default function CompaniesPage() {
   const PAGE_SIZE = 24;
   const [currentPage, setCurrentPage] = useState(0);
   const navigate = useNavigate();
+
+  const { user } = useAuthContext();
+  const hasAccess = !!user?.accessGranted;
 
   useEffect(() => {
     let cancelled = false;
@@ -42,27 +48,52 @@ export default function CompaniesPage() {
   }, [companies, currentPage]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen max-w-7xl mx-6 xl:mx-auto">
       {/* Header */}
+      <div className="text-5xl py-12 md:py-26 font-bold leading-tight tracking-tight font-mulish">
+        <h2 className="text-zinc-900 font-extrabold">Top Companies</h2>
+        <p className="text-gray-500 font-bold">
+          Browse leading organizations and discover self-training opportunities
+          with previous year question papers.
+        </p>
+      </div>
+
+      <div className="pb-32">
+        <h2 className="text-xl font-mulish font-bold text-zinc-900 mb-4">
+          Self-Training Guidance
+        </h2>
+
+        <p className="max-w-2xl text-sm sm:text-base font-semibold leading-relaxed text-zinc-500 tracking-tighter">
+          Unlock your potential by leveraging the resources provided by these
+          companies. Each organization offers unique programs, tools, or
+          learning paths designed to help you excel. Explore company profiles to
+          discover specific opportunities for growth, from free workshops to
+          advanced mentorship.
+        </p>
+        <br />
+        <p className="max-w-2xl text-sm sm:text-base font-semibold leading-relaxed text-zinc-500 tracking-tighter">
+          Take charge of your professional journey by proactively seeking out
+          trainings or certifications these companies support. Stay updated with
+          the latest industry skills and boost your employability with
+          structured self-paced learning from renowned institutions.
+        </p>
+      </div>
       <div
-        className="text-white border-b bg-cover bg-center mb-8"
+        className="relative rounded-2xl border-b bg-cover bg-center mb-8 before:absolute before:inset-0 before:bg-gray-100/10 before:backdrop-grayscale before:rounded-2xl"
         style={{
-          backgroundImage: `url(images/abstract_interview_preparation_concept.png)`,
+          backgroundImage: `url(images/men.jpg)`,
         }}
       >
-        <div className="mx-auto px-6 py-12 md:py-24 bg-gradient-to-r from-black/50 via-black/0 to-black/0">
-          <h1 className="text-3xl md:text-6xl max-w-xl font-bold font-sans mb-2">
+        <div className="mx-auto relative z-10 font-mulish flex flex-col w-full px-6 py-12 md:pt-52 rounded-2xl">
+          <h1 className="text-3xl md:text-6xl font-bold mb-2">
             Companies & Past Papers
           </h1>
-          <p className="text-lg">
-            Browse companies and access previous year question papers
-          </p>
         </div>
       </div>
 
-      <div className="max-w-[85rem] mx-auto px-6 py-8">
+      <div className="py-8">
         {/* Companies Grid */}
-        <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {(() => {
             const start = currentPage * PAGE_SIZE;
             const paginated = companies.slice(start, start + PAGE_SIZE);
@@ -72,9 +103,35 @@ export default function CompaniesPage() {
             return items.map((c, idx) => (
               <div
                 key={c?.slug ?? `${currentPage}-${idx}`}
-                className="bg-white rounded-lg border border-b-4 border-b-blue-600 p-6 hover:border-blue-200 hover:bg-blue-50 transition-all cursor-pointer"
-                onClick={() => c?.slug && navigate(`/companies/${c.slug}`)}
+                className={`relative bg-white rounded-lg border border-b-4 p-6 transition-all
+                  ${
+                    hasAccess
+                      ? "cursor-pointer border-b-blue-600 hover:border-blue-200 hover:bg-blue-50"
+                      : "cursor-not-allowed opacity-80 border-b-gray-300"
+                  }
+                `}
+                onClick={() => {
+                  if (!c) return;
+
+                  if (!hasAccess) {
+                    toast.warning("Access should be granted by the admin");
+                    return;
+                  }
+
+                  navigate(`/companies/${c.slug}`);
+                }}
               >
+                {!hasAccess && c && (
+                  <div
+                    className="absolute inset-0 bg-white/70 flex items-center justify-center
+                  opacity-0 hover:opacity-100 transition"
+                  >
+                    <div className="flex items-center gap-2 text-gray-700 font-medium">
+                      <Lock className="w-5 h-5" />
+                      Locked
+                    </div>
+                  </div>
+                )}
                 {c ? (
                   <>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -147,7 +204,10 @@ export default function CompaniesPage() {
                 className="px-3 py-1 bg-white border rounded disabled:opacity-50"
                 onClick={() =>
                   setCurrentPage((p) =>
-                    Math.min(p + 1, Math.ceil(companies.length / PAGE_SIZE) - 1)
+                    Math.min(
+                      p + 1,
+                      Math.ceil(companies.length / PAGE_SIZE) - 1,
+                    ),
                   )
                 }
                 disabled={

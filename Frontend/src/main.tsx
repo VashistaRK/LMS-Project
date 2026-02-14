@@ -11,13 +11,12 @@ import {
 } from "react-router-dom";
 import { ParallaxProvider } from "react-scroll-parallax";
 
-// import LandingPage from "./pages/LandingPage.tsx";
+import LandingPage from "./pages/LandingPage.tsx";
 import DreamJobPage from "./pages/Careers.tsx";
 import CourseCatalog from "./pages/Courses.tsx";
 import CourseDetailsPage from "./pages/[courseId]/CourseDetails.tsx";
 import CourseManagementAdmin from "./admin/Courses/[courseId]/CourseManagement.tsx";
 import { AuthProvider, useAuthContext } from "./context/AuthProvider.tsx";
-import Cart from "./pages/Cart.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import CoursesPage from "./admin/CoursePage.tsx";
 import Admin from "./admin/Admin.tsx";
@@ -49,6 +48,7 @@ import SuperAdmin from "./admin/SuperAdmin.tsx";
 import ResumesPage from "./pages/ResumesPage.tsx";
 import AdminResumesPage from "./admin/AdminResumes.tsx";
 import LandingPage1 from "./pages/LandingPage1.tsx";
+import { toast } from "sonner";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +57,17 @@ function RequireAuth() {
   const { user, loading } = useAuthContext();
   if (loading) return <p>Loading…</p>;
   return user ? <Outlet /> : <Navigate to="/Authenticate" replace />;
+}
+function AccessGranted() {
+  const { user, loading } = useAuthContext();
+  if (loading) return <p>Loading…</p>;
+  return user && user.accessGranted ? (
+    <Outlet />
+  ) : (
+    toast.error(
+      "Access denied. Please contact support if you believe this is an error.",
+    )
+  );
 }
 function MyLearningWrapper() {
   const { user } = useAuthContext();
@@ -68,11 +79,13 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />, // App should render <Outlet />
     children: [
-      { index: true, element: <LandingPage1 /> },
-      { path: "carrer-guidence", element: <DreamJobPage /> },
+      { index: true, element: <LandingPage /> },
+      { path: "carrer-guidance", element: <DreamJobPage /> },
       { path: "courses", element: <CourseCatalog /> },
       { path: "freshers-pratice", element: <FreshersReady /> },
       { path: "companies", element: <CompaniesPage /> },
+      { path: "land", element: <LandingPage1 /> },
+      { path: "resumes", element: <ResumesPage /> },
       {
         path: "course-details/:courseId",
         element: <CourseDetailsPage />,
@@ -80,21 +93,24 @@ const router = createBrowserRouter([
       {
         element: <RequireAuth />, // acts as guard
         children: [
-          { path: "cart", element: <Cart /> },
-          { path: "resumes", element: <ResumesPage /> },
           { path: "/profile", element: <ProfilePage /> },
-          { path: "/my-learning", element: <MyLearningWrapper /> },
-          { path: "companies/:slug", element: <CompanyPage /> },
           {
-            path: "companies/:slug/tests/:testId",
-            element: <CompanyTestTake />,
+            element: <AccessGranted />,
+            children: [
+              { path: "/my-learning", element: <MyLearningWrapper /> },
+              { path: "companies/:slug", element: <CompanyPage /> },
+              {
+                path: "companies/:slug/tests/:testId",
+                element: <CompanyTestTake />,
+              },
+            ],
           },
         ],
       },
     ],
   },
   {
-    element: <RequireAuth />, // acts as guard
+    element: <AccessGranted />, // acts as guard
     children: [
       { path: "my-courses/:courseId", element: <CourseLearningPage /> },
       { path: "my-courses/test/:testId", element: <TestPage1 /> },
@@ -115,7 +131,7 @@ const router = createBrowserRouter([
             path: "",
             element: <AdminLayout />,
             children: [
-              { path: "dashboard", element: <AdminPanel /> },
+              { index: true, element: <AdminPanel /> },
               { path: "students", element: <AdminMonitoringPage /> },
               { path: "analytics", element: <AdminAnalysisPage /> },
               { path: "FAQ", element: <AdminFaqsPage /> },
@@ -154,5 +170,5 @@ createRoot(document.getElementById("root")!).render(
         </ParallaxProvider>
       </AuthProvider>
     </QueryClientProvider>
-  </StrictMode>
+  </StrictMode>,
 );

@@ -2,7 +2,6 @@ import express from "express";
 import Faq from "../models/Faq.js";
 import { requireAdmin } from "../middleware/roles.js";
 import User from "../models/User.js";
-import PurchaseRequest from "../models/PurchaseRequest.js";
 import Course from "../models/Course.js";
 
 const router = express.Router();
@@ -37,7 +36,7 @@ router.post("/faqs/:id/answer", requireAdmin, async (req, res) => {
         answeredBy: "admin-system", // Replace with req.user.id when auth is enabled
         answeredAt: new Date(),
       },
-      { new: true }
+      { new: true },
     );
 
     if (!faq) return res.status(404).json({ error: "FAQ not found" });
@@ -52,57 +51,44 @@ router.post("/faqs/:id/answer", requireAdmin, async (req, res) => {
   }
 });
 
-router.post(
-  "/purchase-requests/:id/approve",
-  requireAdmin,
-  async (req, res) => {
-    const request = await PurchaseRequest.findById(req.params.id);
-    if (!request) return res.status(404).json({ message: "Request not found" });
+router.post("/users/:id/approve", requireAdmin, async (req, res) => {
+  const user = await User.findById(req.params.id);
 
-    if (request.status !== "pending")
-      return res.status(400).json({ message: "already processed" });
-
-    request.status = "approved";
-    request.approvedAt = new Date();
-    await request.save();
-
-    // add courses to user
-    const user = await User.findById(request.userId);
-
-    request.courseIds.forEach((cid) => {
-      if (!user.purchasedCourses.some((c) => c.CourseId === cid)) {
-        user.purchasedCourses.push({
-          CourseId: cid,
-          completedChapters: [],
-        });
-      }
-    });
-
-    await user.save();
-
-    return res.json({ message: "approved and courses added" });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
   }
-);
 
-router.post("/purchase-requests/:id/reject", requireAdmin, async (req, res) => {
-  const request = await PurchaseRequest.findById(req.params.id);
-  if (!request) return res.status(404).json({ message: "Request not found" });
+  if (user.accessGranted === true) {
+    return res.status(400).json({ message: "Access already granted" });
+  }
 
-  if (request.status !== "pending")
-    return res.status(400).json({ message: "already processed" });
+  user.accessGranted = true;
+  await user.save();
 
-  request.status = "rejected";
-  await request.save();
-
-  return res.json({ message: "request rejected" });
+  return res.json({
+    message: "User access approved",
+    accessGranted: true,
+  });
 });
 
-router.get("/purchase-requests", requireAdmin, async (req, res) => {
-  const requests = await PurchaseRequest.find()
-    .populate("userId", "name email")
-    .populate("courseIds", "title");
+router.post("/users/:id/revoke", requireAdmin, async (req, res) => {
+  const user = await User.findById(req.params.id);
 
-  res.json({ requests });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  if (user.accessGranted === false) {
+    return res.status(400).json({ message: "Access already revoked" });
+  }
+
+  user.accessGranted = false;
+  await user.save();
+
+  return res.json({
+    message: "User access revoked",
+    accessGranted: false,
+  });
 });
 
 router.post("/clean-invalid-purchases", requireAdmin, async (req, res) => {
@@ -110,15 +96,15 @@ router.post("/clean-invalid-purchases", requireAdmin, async (req, res) => {
     const users = await User.find({});
 
     // Step 1: get all valid UUID course IDs (NOT _id)
-    const allCourses = await Course.find({}, "id");   // ← UUID field
-    const validIds = new Set(allCourses.map(c => c.id));  // UUIDs
+    const allCourses = await Course.find({}, "id"); // ← UUID field
+    const validIds = new Set(allCourses.map((c) => c.id)); // UUIDs
 
     let cleanedCount = 0;
 
     for (const user of users) {
-      if (!Array.isArray(user.purchasedCourses)) continue;
+      if (!Array.isArray(user.startedCourses)) continue;
 
-      const cleaned = user.purchasedCourses.filter(pc => {
+      const cleaned = user.startedCourses.filter((pc) => {
         // user purchase may look like: pc.id OR pc.courseId OR string
         const uuid =
           pc?.id ||
@@ -129,8 +115,8 @@ router.post("/clean-invalid-purchases", requireAdmin, async (req, res) => {
         return uuid && validIds.has(uuid);
       });
 
-      if (cleaned.length !== user.purchasedCourses.length) {
-        user.purchasedCourses = cleaned;
+      if (cleaned.length !== user.startedCourses.length) {
+        user.startedCourses = cleaned;
         await user.save();
         cleanedCount++;
       }
@@ -162,7 +148,6 @@ router.get("/users", requireAdmin, async (req, res) => {
   }
 });
 
-
 // --------------------------------------------------
 // UPDATE USER (Admin) – name, email, role, status etc
 // --------------------------------------------------
@@ -177,7 +162,7 @@ router.patch("/users/:id", requireAdmin, async (req, res) => {
       "email",
       "role",
       "isActive",
-      "purchasedCourses",
+      "startedCourses",
       "phone",
     ];
 
@@ -191,11 +176,10 @@ router.patch("/users/:id", requireAdmin, async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { $set: safeUpdate },
-      { new: true }
+      { new: true },
     ).select("-password");
 
-    if (!updatedUser)
-      return res.status(404).json({ error: "User not found" });
+    if (!updatedUser) return res.status(404).json({ error: "User not found" });
 
     res.json({
       success: true,

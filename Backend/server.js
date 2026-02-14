@@ -17,8 +17,7 @@ import rateLimit from "express-rate-limit";
 
 import courseRoutes from "./src/routes/course.route.js";
 import localAuth from "./src/routes/auth.local.js";
-import oidcAuth from "./src/routes/auth.oidc.js";
-import cartRoutes from "./src/routes/cart.route.js";
+// import oidcAuth from "./src/routes/auth.oidc.js";
 import userRoutes from "./src/routes/user.route.js";
 import questionRoutes from "./src/routes/question.route.js";
 import uploadRoutes from "./src/routes/upload.route.js";
@@ -47,7 +46,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     exposedHeaders: ["Content-Length", "X-Request-Id"],
-  })
+  }),
 );
 
 // security headers
@@ -56,7 +55,7 @@ app.use(
     contentSecurityPolicy: false,
     crossOriginResourcePolicy: { policy: "cross-origin" },
     frameguard: false, // ❌ disable default SAMEORIGIN header
-  })
+  }),
 );
 
 // logging, compression, timings
@@ -74,6 +73,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // Mongo
 mongoose
   .connect(process.env.MONGO_URI, {
+    dbName: process.env.MONGO_DBNAME,
     maxPoolSize: 10,
     serverSelectionTimeoutMS: 5000,
   })
@@ -89,14 +89,13 @@ const apiLimiter = rateLimit({
 });
 
 // routes
-app.use("/auth/local", localAuth); // local login/register
-app.use("/auth", oidcAuth); // OIDC auth
+app.use("/auth/local", localAuth);
+// app.use("/auth", oidcAuth);
 app.use("/courses", apiLimiter, courseRoutes);
 app.use("/docs", docRoutes);
 app.use("/tests", testRoutes);
 app.use("/api/docs", docRoutes);
 app.use("/api/resumes", resumeRoutes);
-app.use("/cart", apiLimiter, cartRoutes);
 app.use("/api/user", apiLimiter, userRoutes);
 app.use("/api/analysis", apiLimiter, analysisRoutes);
 app.use("/api/questions", apiLimiter, questionRoutes);
@@ -160,7 +159,7 @@ const io = new Server(server, {
   } catch (error) {
     console.warn(
       "⚠️ Redis connection failed, using default adapter:",
-      error.message
+      error.message,
     );
     // Continue without Redis adapter
   }
@@ -239,7 +238,7 @@ global.io = io;
 const APP_JWT_ISS = process.env.APP_JWT_ISS;
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, "0.0.0.0", () =>
-  console.log(`🚀 Server running ${APP_JWT_ISS}:${PORT}`)
+  console.log(`🚀 Server running ${APP_JWT_ISS}`),
 );
 
 // graceful shutdown

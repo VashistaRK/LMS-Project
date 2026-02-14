@@ -4,10 +4,10 @@ import { useAuthContext } from "../context/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
+import api from "@/services/api";
 
 export default function AuthPage() {
-  const { user, loading, login } = useAuthContext();
-  const API = import.meta.env.VITE_API_URL;
+  const { user, loading } = useAuthContext();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,6 +16,7 @@ export default function AuthPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [role, setRole] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,30 +32,23 @@ export default function AuthPage() {
 
   const loginMutation = useMutation({
     mutationFn: async (payload: { email: string; password: string }) => {
-      const res = await fetch(`${API}/auth/local/login`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const msg = await res.json().catch(() => ({}));
-        throw new Error(msg.error || "Login failed");
-      }
-      // Parse the JSON payload. The backend may include a `blueirect` field for admin users.
-      const data = await res.json().catch(() => ({}));
+      const { data } = await api.post("/auth/local/login", payload);
 
-      if (data.blueirect) {
-        // Navigate the browser to the admin UI (this is a full navigation so the cookie is sent)
+      // backend may return redirect for admin
+      if (data?.blueirect) {
         window.location.href = data.blueirect;
         return true;
       }
 
-      // Otherwise reload so the auth provider re-checks /auth/me and updates user state
+      // re-check auth state
       window.location.reload();
       return true;
     },
-    onError: (err: any) => setError(err.message || "Login failed"),
+    onError: (err: any) => {
+      const message =
+        err?.response?.data?.error || err?.message || "Login failed";
+      setError(message);
+    },
   });
 
   const signupMutation = useMutation({
@@ -63,20 +57,18 @@ export default function AuthPage() {
       email: string;
       password: string;
       role: string;
+      phoneNumber: number | string;
     }) => {
-      const res = await fetch(`${API}/auth/local/register`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const msg = await res.json().catch(() => ({}));
-        throw new Error(msg.error || "Signup failed");
-      }
+      await api.post("/auth/local/register", payload);
+
+      window.location.reload();
       return true;
     },
-    onError: (err: any) => setError(err.message || "Signup failed"),
+    onError: (err: any) => {
+      const message =
+        err?.response?.data?.error || err?.message || "Signup failed";
+      setError(message);
+    },
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -88,12 +80,18 @@ export default function AuthPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    await signupMutation.mutateAsync({ name, email, password, role });
+    await signupMutation.mutateAsync({
+      name,
+      email,
+      password,
+      role,
+      phoneNumber,
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="h-screen grid md:grid-cols-2">
+    <div className="min-h-screen bg-zinc-200">
+      <div className="h-screen font-mulish flex items-center justify-center">
         <AnimatePresence mode="wait">
           {isLogin ? (
             <>
@@ -104,18 +102,19 @@ export default function AuthPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className="flex items-center justify-center p-8"
+                className="grid grid-cols-2 w-7xl p-8"
               >
-                <div className="w-full max-w-md">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                      Welcome back
-                    </h1>
-                    <p className="text-gray-600">
-                      Please enter your cblueentials to continue
-                    </p>
-                  </div>
-
+                <div className="mb-8">
+                  <h1 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-2">
+                    Welcome back <br />
+                    User
+                  </h1>
+                  <p className="text-gray-600">
+                    let’s pick up where you left off.
+                    <br /> Please enter your credentials to continue.
+                  </p>
+                </div>
+                <div className="w-full col-span-1 max-w-md">
                   {error && (
                     <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm text-blue-800">{error}</p>
@@ -133,7 +132,7 @@ export default function AuthPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        className="w-full px-4 py-2.5 ring ring-gray-300 rounded focus:border-l-4 focus:border-blue-500 outline-none transition"
                       />
                     </div>
 
@@ -148,7 +147,7 @@ export default function AuthPage() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           required
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition pr-10"
+                          className="w-full px-4 py-2.5 ring ring-gray-300 rounded focus:border-l-4 focus:border-blue-500 outline-none transition"
                         />
                         <button
                           type="button"
@@ -166,7 +165,7 @@ export default function AuthPage() {
                           type="checkbox"
                           checked={rememberMe}
                           onChange={() => setRememberMe(!rememberMe)}
-                          className="w-4 h-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500"
+                          className="w-4 h-4 border-gray-300 rounded text-green-600 focus:ring-green-500"
                         />
                         <span className="text-gray-600">Remember me</span>
                       </label>
@@ -181,7 +180,7 @@ export default function AuthPage() {
                     <button
                       type="submit"
                       disabled={loginMutation.isPending}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-zinc-600 hover:bg-zinc-700 text-white font-medium py-2.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loginMutation.isPending ? "Signing in..." : "Sign in"}
                     </button>
@@ -189,23 +188,8 @@ export default function AuthPage() {
 
                   <div className="flex items-center gap-4 my-6">
                     <div className="flex-1 border-t border-gray-300"></div>
-                    <span className="text-sm text-gray-500">or</span>
                     <div className="flex-1 border-t border-gray-300"></div>
                   </div>
-
-                  <button
-                    onClick={() => login()}
-                    className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-                  >
-                    <img
-                      src="images/Google.jpg"
-                      alt="Google"
-                      className="h-5 w-5"
-                    />
-                    <span className="font-medium text-gray-700">
-                      Continue with Google
-                    </span>
-                  </button>
 
                   <p className="text-center text-sm text-gray-600 mt-6">
                     Don't have an account?{" "}
@@ -219,61 +203,9 @@ export default function AuthPage() {
                   </p>
                 </div>
               </motion.div>
-
-              {/* Right: Image */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="hidden md:block relative bg-gradient-to-br from-blue-50 to-blue-100"
-              >
-                <div className="absolute inset-0 flex items-center justify-center p-12">
-                  <div className="relative">
-                    <img
-                      src="/images/loginbg.jpg"
-                      alt="Login"
-                      className="rounded-2xl shadow-2xl object-cover w-full h-[500px]"
-                    />
-                    <div className="absolute bottom-8 left-8 right-8 bg-white p-6 rounded-xl shadow-lg">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        Start your learning journey
-                      </h3>
-                      <p className="text-gray-600 text-sm">
-                        Access thousands of courses and grow your skills
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
             </>
           ) : (
             <>
-              {/* Left: Image for Signup */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="hidden md:block relative bg-gradient-to-br from-blue-50 to-blue-100"
-              >
-                <div className="absolute inset-0 flex items-center justify-center p-12">
-                  <div className="relative">
-                    <img
-                      src="/images/loginbg.jpg"
-                      alt="Signup"
-                      className="rounded-2xl shadow-2xl object-cover w-full h-[500px]"
-                    />
-                    <div className="absolute bottom-8 left-8 right-8 bg-white p-6 rounded-xl shadow-lg">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        Join our community
-                      </h3>
-                      <p className="text-gray-600 text-sm">
-                        Create an account and unlock unlimited learning
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
               {/* Right: Signup Form */}
               <motion.div
                 key="signupForm"
@@ -281,18 +213,26 @@ export default function AuthPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className="flex items-center justify-center p-8"
+                className="grid grid-cols-2 w-7xl p-8"
               >
+                <div className="mb-8 max-w-sm">
+                  <h1 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-2">
+                    Create account
+                  </h1>
+                  <br />
+                  <p className="text-gray-600">
+                    We’re excited to have you here. Create your account and
+                    start something great today.
+                  </p>
+                  <br />
+                  <p className="text-gray-600">
+                    Take the first step toward building something meaningful.
+                    Register now to access a platform designed to support your
+                    learning, growth, and success. Join a community that values
+                    progress, consistency, and excellence.
+                  </p>
+                </div>
                 <div className="w-full max-w-md">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                      Create account
-                    </h1>
-                    <p className="text-gray-600">
-                      Join us and start learning today
-                    </p>
-                  </div>
-
                   {error && (
                     <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm text-blue-800">{error}</p>
@@ -310,7 +250,21 @@ export default function AuthPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        className="w-full px-4 py-2.5 ring ring-gray-300 rounded focus:border-l-4 focus:border-blue-500 outline-none transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        placeholder="+91 ********"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        required
+                        className="w-full px-4 py-2.5 ring ring-gray-300 rounded focus:border-l-4 focus:border-blue-500 outline-none transition"
                       />
                     </div>
 
@@ -324,7 +278,7 @@ export default function AuthPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        className="w-full px-4 py-2.5 ring ring-gray-300 rounded focus:border-l-4 focus:border-blue-500 outline-none transition"
                       />
                     </div>
 
@@ -339,7 +293,7 @@ export default function AuthPage() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           required
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition pr-10"
+                          className="w-full px-4 py-2.5 ring ring-gray-300 rounded focus:border-l-4 focus:border-blue-500 outline-none transition pr-10"
                         />
                         <button
                           type="button"
@@ -358,7 +312,7 @@ export default function AuthPage() {
                       <select
                         value={role}
                         onChange={(e) => setRole(e.target.value)}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        className="w-full px-4 py-2.5 ring ring-gray-300 rounded focus:border-l-4 focus:border-blue-500 outline-none transition"
                         required
                       >
                         <option value="student">Student</option>
@@ -369,7 +323,7 @@ export default function AuthPage() {
                     <button
                       type="submit"
                       disabled={signupMutation.isPending}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-zinc-600 hover:bg-zinc-700 text-white font-medium py-2.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {signupMutation.isPending
                         ? "Creating account..."

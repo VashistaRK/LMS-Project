@@ -16,7 +16,7 @@ const fetchProfile = async (): Promise<User> => {
 
 // ⬇⬇ UPDATED to support multipart and file upload ⬇⬇
 const updateProfile = async (
-  payload: Partial<User> & { password?: string; pictureFile?: File | null }
+  payload: Partial<User> & { password?: string; pictureFile?: File | null },
 ) => {
   const formData = new FormData();
 
@@ -53,6 +53,7 @@ const ProfilePage: React.FC = () => {
   const [previewImage, setPreviewImage] = useState<string>("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<User["role"]>();
+  const [ChangeReq, setChaneReq] = useState(false);
 
   const mutation = useMutation({
     mutationFn: updateProfile,
@@ -99,52 +100,25 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen py-10 px-4 bg-gradient-to-br from-white via-[#fff6f6] to-white">
-      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl md:flex overflow-hidden">
-
-        {/* LEFT SIDEBAR */}
-        <aside className="md:w-1/3 bg-white p-8 flex flex-col items-center text-center">
-          <img
-            src={previewImage || "https://via.placeholder.com/120"}
-            alt="avatar"
-            className="w-32 h-32 rounded-full object-cover border-4 border-[#FCECEA] shadow-md mb-4"
-          />
-
-          {/* Upload New Profile Photo */}
-          <label className="cursor-pointer mt-2 text-sm text-red-700 hover:underline">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            Change Profile Photo
-          </label>
-
-          <h2 className="text-xl font-bold text-gray-800 mt-3">{user.name}</h2>
-          <p className="text-gray-600 text-sm mb-1">{user.email}</p>
-          <span className="text-xs bg-[#FCECEA] text-[#C21817] px-3 py-1 rounded-full">
-            {role ?? "User"}
-          </span>
-
-          <button
-            onClick={() => {
-              logout();
-              window.location.href = "/";
-            }}
-            className="mt-6 inline-block text-sm text-[#C21817] hover:underline"
-          >
-            Log Out
-          </button>
-        </aside>
-
-        {/* RIGHT FORM */}
-        <section className="flex-1 p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">
-            Edit Profile
-          </h1>
-
-          <div className="space-y-6">
+    <div className="min-h-screen leading-tight tracking-tight py-10 max-w-7xl mx-6 xl:mx-auto xl:px-6">
+      <div className="md:flex gap-12 space-y-12 md:justify-between max-h-fit py-12">
+        {/* LEFT FORM */}
+        <section className="flex-1 lg:max-w-2/3">
+          <header className="">
+            <h1 className="text-2xl xl:text-3xl font-extrabold text-gray-900 mb-6 font-mulish">
+              Edit Profile
+            </h1>
+            <p className="text-xl font-bold text-gray-500 mb-6 font-mulish">
+              Yooo!👋 Wanna Update Things!
+              <br />
+              It look's cool if you update your profile picture and name!
+              <br />
+              You can also change your password here!
+              <br />
+              Just click the "Save Changes" button when you're done!
+            </p>
+          </header>
+          <div className="space-y-6 lg:max-w-3/4">
             {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -154,51 +128,103 @@ const ProfilePage: React.FC = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-red-400 outline-none"
+                className="w-full text-xl font-semibold focus:pl-2 outline-none focus:border-l-2 focus:border-blue-400"
               />
             </div>
-
-            {/* Profile Picture URL */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Profile Picture URL (optional)
+                Email
               </label>
-              <input
-                type="text"
-                value={picture}
-                onChange={(e) => {
-                  setPicture(e.target.value);
-                  setPreviewImage(e.target.value);
-                  setPictureFile(null);
-                }}
-                placeholder="https://example.com/avatar.jpg"
-                className="w-full rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-red-400 outline-none"
-              />
+              <p className="w-full text-gray-500 select-none cursor-not-allowed outline-none">
+                {user.email}{" "}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone
+              </label>
+              <p className="w-full text-gray-500 select-none cursor-not-allowed outline-none">
+                {user?.phoneNumber}{" "}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                You are here as a
+              </label>
+              <p className="w-full uppercase text-gray-500 select-none cursor-not-allowed outline-none">
+                {role}{" "}
+              </p>
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                New Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Leave blank to keep current password"
-                className="w-full rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-red-400 outline-none"
-              />
+              <button
+                onClick={() => setChaneReq(!ChangeReq)}
+                className="underline mb-4"
+              >
+                {ChangeReq ? "Leave it!" : "wanna change password?"}
+              </button>
+              {ChangeReq && (
+                <>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Leave blank to keep current password"
+                    className="w-full rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-blue-400 outline-none"
+                  />
+                </>
+              )}
             </div>
 
             <button
               onClick={handleUpdate}
               disabled={mutation.isPending}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-white font-semibold rounded-md shadow-md bg-gradient-to-r from-[#C21817] to-[#A51515] transition disabled:opacity-60"
+              className="hidden md:inline-flex w-full items-center justify-center gap-2 px-4 py-3 text-white font-semibold rounded-md shadow-md bg-gradient-to-r from-[#17aec2] to-[#153ba5] transition disabled:opacity-60"
             >
               {mutation.isPending ? "Updating..." : "Save Changes"}
             </button>
           </div>
         </section>
+        {/* Right SIDEBAR */}
+        <aside className="md:w-1/3 flex flex-col items-center justify-start text-center">
+          <img
+            src={previewImage || "https://via.placeholder.com/120"}
+            alt="avatar"
+            className="w-full h-2/3 rounded-full object-cover border-4 border-[#eaf5fc] shadow-md mb-4"
+          />
+
+          {/* Upload New Profile Photo */}
+          <label className="cursor-pointer mt-2 text-sm text-blue-700 hover:underline">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            Change Profile Photo
+          </label>
+
+          <button
+            onClick={() => {
+              logout();
+              window.location.href = "/";
+            }}
+            className="mt-6 px-4 p-2 rounded-lg border-gray-400 hidden md:inline-block text-xl border font-bold hover:underline"
+          >
+            Log Out
+          </button>
+          <button
+            onClick={handleUpdate}
+            disabled={mutation.isPending}
+            className="relative md:hidden w-full text-center mt-6 px-4 py-3 text-white font-semibold rounded-md shadow-md bg-gradient-to-r from-[#17aec2] to-[#153ba5] transition disabled:opacity-60"
+          >
+            {mutation.isPending ? "Updating..." : "Save Changes"}
+          </button>
+        </aside>
       </div>
     </div>
   );

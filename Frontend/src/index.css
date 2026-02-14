@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Bytesized&family=Dancing+Script:wght@400..700&family=Goldman:wght@400;700&family=Macondo&family=Nova+Flat&family=Ojuju:wght@200..800&family=Orbitron:wght@400..900&family=Quicksand:wght@300..700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Rubik+Dirt&family=Syncopate:wght@400;700&family=Unica+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Bytesized&family=Dancing+Script:wght@400..700&family=Goldman:wght@400;700&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Macondo&family=Nova+Flat&family=Ojuju:wght@200..800&family=Orbitron:wght@400..900&family=Quicksand:wght@300..700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Rubik+Dirt&family=Syncopate:wght@400;700&family=Unica+One&display=swap");
 
 @import "tailwindcss";
 
@@ -102,6 +102,8 @@
   --color-orange3: #fbdebf;
   --color-textorange: #ffedd4;
   --font-heading: 'Outfit', sans-serif;
+  --font-nunito: 'Nunito', sans-serif;
+  --font-mulish: 'Mulish', sans-serif;
 
   --color-dark1: #1f2937;
   --color-dark2: #111827;
@@ -199,4 +201,15 @@
 
 .scroll-no-bounce {
   overflow-anchor: none;
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

@@ -7,6 +7,8 @@ import NotificationService from "../services/notificationService.js";
 import { requireAdmin } from "../middleware/roles.js";
 import path from "path";
 import fs from "fs";
+import User from "../models/User.js";
+import authMiddleware from "../middleware/auth.js";
 
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -20,15 +22,9 @@ const router = Router();
  * Helpers
  */
 const isLikelyJsonString = (s) =>
-  typeof s === "string" && (s.trim().startsWith("{") || s.trim().startsWith("["));
+  typeof s === "string" &&
+  (s.trim().startsWith("{") || s.trim().startsWith("["));
 
-/**
- * Sanitize & normalize sections/chapters coming from client so mongoose validators don't fail
- * - ensure section.title is non-empty string
- * - ensure chapter.title is non-empty string
- * - enforce chapter.type allowed values and fallback to 'video'
- * - ensure arrays are arrays
- */
 function sanitizeSections(rawSections) {
   if (!Array.isArray(rawSections)) return [];
 
@@ -36,27 +32,39 @@ function sanitizeSections(rawSections) {
     const title = (sec?.title ?? "").toString().trim() || `Section ${sIdx + 1}`;
     const lectureCount = Number.isFinite(Number(sec?.lectureCount))
       ? Number(sec.lectureCount)
-      : (Array.isArray(sec?.chapters) ? sec.chapters.length : 0);
+      : Array.isArray(sec?.chapters)
+        ? sec.chapters.length
+        : 0;
 
     const duration = sec?.duration ? String(sec.duration) : "";
 
     const chaptersRaw = Array.isArray(sec?.chapters) ? sec.chapters : [];
 
     const chapters = chaptersRaw.map((ch, cIdx) => {
-      const chTitle = (ch?.title ?? "").toString().trim() || `Chapter ${cIdx + 1}`;
+      const chTitle =
+        (ch?.title ?? "").toString().trim() || `Chapter ${cIdx + 1}`;
       const chDescription = ch?.description ?? "";
       const chDuration = ch?.duration ?? "";
       const allowedTypes = ["video", "quiz", "assignment"];
       const chType = allowedTypes.includes(ch?.type) ? ch.type : "video";
       const isPreviewable = !!ch?.isPreviewable;
-      const tags = Array.isArray(ch?.tags) ? ch.tags.map(String) : (typeof ch?.tags === "string" ? ch.tags.split(",").map(t => t.trim()).filter(Boolean) : []);
+      const tags = Array.isArray(ch?.tags)
+        ? ch.tags.map(String)
+        : typeof ch?.tags === "string"
+          ? ch.tags
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : [];
       const video = ch?.video ? String(ch.video) : "";
       const testId = ch?.testId ? String(ch.testId) : "";
       const notesId = ch?.notesId ? String(ch.notesId) : "";
-      const notes = Array.isArray(ch?.notes) ? ch.notes.map((n) => ({
-        heading: n?.heading ? String(n.heading) : "",
-        content: n?.content ? String(n.content) : ""
-      })) : [];
+      const notes = Array.isArray(ch?.notes)
+        ? ch.notes.map((n) => ({
+            heading: n?.heading ? String(n.heading) : "",
+            content: n?.content ? String(n.content) : "",
+          }))
+        : [];
 
       return {
         title: chTitle,
@@ -106,7 +114,7 @@ router.post("/", requireAdmin, async (req, res) => {
       await NotificationService.notifyCourseCreated(
         savedCourse.id,
         savedCourse.title,
-        req.user?._id
+        req.user?._id,
       );
     } catch (notificationError) {
       console.warn("Notification failed (non-fatal)", notificationError);
@@ -123,75 +131,89 @@ router.post("/", requireAdmin, async (req, res) => {
  * Update a course (including thumbnail + instructor)
  * Accepts multipart/form-data (thumbnail file or JSON/text fields)
  */
-router.put("/:courseId", requireAdmin, upload.single("thumbnail"), async (req, res) => {
-  try {
-    const { courseId } = req.params;
-    // clone req.body (may contain strings for JSON fields)
-    const updates = { ...req.body };
+router.put(
+  "/:courseId",
+  requireAdmin,
+  upload.single("thumbnail"),
+  async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      // clone req.body (may contain strings for JSON fields)
+      const updates = { ...req.body };
 
-    // Parse any JSON-like strings into objects/arrays
-    for (const key of Object.keys(updates)) {
-      const raw = updates[key];
-      if (isLikelyJsonString(raw)) {
-        try {
-          updates[key] = JSON.parse(raw);
-        } catch (err) {
-          // return clear client error for invalid JSON
-          return res.status(400).json({ error: `Invalid JSON for field: ${key}` });
+      // Parse any JSON-like strings into objects/arrays
+      for (const key of Object.keys(updates)) {
+        const raw = updates[key];
+        if (isLikelyJsonString(raw)) {
+          try {
+            updates[key] = JSON.parse(raw);
+          } catch (err) {
+            // return clear client error for invalid JSON
+            return res
+              .status(400)
+              .json({ error: `Invalid JSON for field: ${key}` });
+          }
         }
       }
-    }
 
-    // If req.body.sections exists (string or object), parse & sanitize, then set updates.sections
-    if (req.body.sections !== undefined) {
-      try {
-        const parsed = Array.isArray(req.body.sections) ? req.body.sections : (isLikelyJsonString(req.body.sections) ? JSON.parse(req.body.sections) : req.body.sections);
-        updates.sections = sanitizeSections(parsed);
-      } catch (err) {
-        console.error("Error parsing/sanitizing sections:", err);
-        return res.status(400).json({ error: "Invalid sections format" });
+      // If req.body.sections exists (string or object), parse & sanitize, then set updates.sections
+      if (req.body.sections !== undefined) {
+        try {
+          const parsed = Array.isArray(req.body.sections)
+            ? req.body.sections
+            : isLikelyJsonString(req.body.sections)
+              ? JSON.parse(req.body.sections)
+              : req.body.sections;
+          updates.sections = sanitizeSections(parsed);
+        } catch (err) {
+          console.error("Error parsing/sanitizing sections:", err);
+          return res.status(400).json({ error: "Invalid sections format" });
+        }
       }
-    }
 
-    // Thumbnail (file upload)
-    if (req.file) {
-      updates.thumbnail = {
-        data: req.file.buffer,
-        contentType: req.file.mimetype,
-      };
-    }
-
-    // Make sure we don't attempt to set prohibited fields (optional safety)
-    const prohibited = ["_id", "id", "createdAt", "updatedAt"];
-    for (const p of prohibited) {
-      if (updates[p] !== undefined) delete updates[p];
-    }
-
-    // Run update with validators, provide context for mongoose
-    const course = await Course.findOneAndUpdate(
-      { id: courseId },
-      { $set: updates },
-      { new: true, runValidators: true, context: "query" }
-    );
-
-    if (!course) return res.status(404).json({ error: "Course not found" });
-
-    res.json(course);
-  } catch (err) {
-    // If mongoose validation error, return details
-    if (err && err.name === "ValidationError") {
-      const details = {};
-      for (const k in err.errors) {
-        details[k] = err.errors[k].message;
+      // Thumbnail (file upload)
+      if (req.file) {
+        updates.thumbnail = {
+          data: req.file.buffer,
+          contentType: req.file.mimetype,
+        };
       }
-      console.error("Validation error updating course:", details);
-      return res.status(422).json({ error: "Validation failed", details });
-    }
 
-    console.error("UPDATE COURSE ERROR:", err);
-    res.status(500).json({ error: "Failed to update course", details: err.message || String(err) });
-  }
-});
+      // Make sure we don't attempt to set prohibited fields (optional safety)
+      const prohibited = ["_id", "id", "createdAt", "updatedAt"];
+      for (const p of prohibited) {
+        if (updates[p] !== undefined) delete updates[p];
+      }
+
+      // Run update with validators, provide context for mongoose
+      const course = await Course.findOneAndUpdate(
+        { id: courseId },
+        { $set: updates },
+        { new: true, runValidators: true, context: "query" },
+      );
+
+      if (!course) return res.status(404).json({ error: "Course not found" });
+
+      res.json(course);
+    } catch (err) {
+      // If mongoose validation error, return details
+      if (err && err.name === "ValidationError") {
+        const details = {};
+        for (const k in err.errors) {
+          details[k] = err.errors[k].message;
+        }
+        console.error("Validation error updating course:", details);
+        return res.status(422).json({ error: "Validation failed", details });
+      }
+
+      console.error("UPDATE COURSE ERROR:", err);
+      res.status(500).json({
+        error: "Failed to update course",
+        details: err.message || String(err),
+      });
+    }
+  },
+);
 
 /**
  * Upload chapter-specific files (video/thumbnail)
@@ -216,7 +238,10 @@ router.post(
       for (const section of course.sections || []) {
         for (const chapter of section.chapters || []) {
           // allow matching by title or notesId
-          if ((chapter.title || "").trim().toLowerCase() === normalizedTarget || (chapter.notesId || "") === chapterId) {
+          if (
+            (chapter.title || "").trim().toLowerCase() === normalizedTarget ||
+            (chapter.notesId || "") === chapterId
+          ) {
             targetChapter = chapter;
             break;
           }
@@ -225,11 +250,19 @@ router.post(
       }
 
       if (!targetChapter) {
-        return res.status(404).json({ error: "Chapter not found by title or notesId" });
+        return res
+          .status(404)
+          .json({ error: "Chapter not found by title or notesId" });
       }
 
-      const uploadDir = path.join(process.cwd(), "uploads", "courses", courseId);
-      if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+      const uploadDir = path.join(
+        process.cwd(),
+        "uploads",
+        "courses",
+        courseId,
+      );
+      if (!fs.existsSync(uploadDir))
+        fs.mkdirSync(uploadDir, { recursive: true });
 
       const saveBufferToFile = (file, prefix) => {
         const ext = path.extname(file.originalname) || "";
@@ -240,7 +273,10 @@ router.post(
       };
 
       if (req.files && req.files["video"] && req.files["video"][0]) {
-        const videoUrl = saveBufferToFile(req.files["video"][0], "chapter-video");
+        const videoUrl = saveBufferToFile(
+          req.files["video"][0],
+          "chapter-video",
+        );
         targetChapter.video = videoUrl;
       }
 
@@ -257,9 +293,12 @@ router.post(
       return res.json({ message: "Chapter files uploaded", course });
     } catch (err) {
       console.error("Chapter upload error:", err);
-      return res.status(500).json({ error: "Failed to upload chapter files", details: err.message || String(err) });
+      return res.status(500).json({
+        error: "Failed to upload chapter files",
+        details: err.message || String(err),
+      });
     }
-  }
+  },
 );
 
 /**
@@ -294,7 +333,8 @@ router.get("/:courseId", async (req, res) => {
  */
 router.post("/bulk-ids", async (req, res) => {
   let { ids } = req.body;
-  if (!Array.isArray(ids)) return res.status(400).json({ error: "Invalid IDs" });
+  if (!Array.isArray(ids))
+    return res.status(400).json({ error: "Invalid IDs" });
   ids = ids.filter((x) => typeof x === "string");
   const courses = await Course.find({ id: { $in: ids } });
   res.json({ courses });
@@ -306,8 +346,12 @@ router.post("/bulk-ids", async (req, res) => {
 router.get("/:courseId/thumbnail", async (req, res) => {
   try {
     const course = await Course.findOne({ id: req.params.courseId });
-    if (!course || !course.thumbnail?.data) return res.status(404).json({ message: "Thumbnail not found" });
-    res.set("Content-Type", course.thumbnail.contentType || "application/octet-stream");
+    if (!course || !course.thumbnail?.data)
+      return res.status(404).json({ message: "Thumbnail not found" });
+    res.set(
+      "Content-Type",
+      course.thumbnail.contentType || "application/octet-stream",
+    );
     res.send(course.thumbnail.data);
   } catch (err) {
     console.error("THUMBNAIL FETCH ERROR:", err);
@@ -337,8 +381,12 @@ router.get("/:courseId/related", async (req, res) => {
   try {
     const { courseId } = req.params;
     const currentCourse = await Course.findOne({ id: courseId });
-    if (!currentCourse) return res.status(404).json({ error: "Course not found" });
-    const related = await Course.find({ id: { $ne: courseId }, category: currentCourse.category });
+    if (!currentCourse)
+      return res.status(404).json({ error: "Course not found" });
+    const related = await Course.find({
+      id: { $ne: courseId },
+      category: currentCourse.category,
+    });
     res.json({ courses: related });
   } catch (err) {
     console.error("RELATED COURSES ERROR:", err);
@@ -347,48 +395,39 @@ router.get("/:courseId/related", async (req, res) => {
 });
 
 /**
- * Assign/unassign students to a course by user IDs
+ * adding started courses by user IDs
  */
-router.put("/:courseId/assign", requireAdmin, async (req, res) => {
+router.post("/:courseId/start", authMiddleware, async (req, res) => {
   try {
-    const { courseId } = req.params;
-    let { userIds } = req.body;
-    if (!Array.isArray(userIds) || userIds.length === 0) {
-      return res.status(400).json({ error: "userIds must be a non-empty array" });
+    if (!req.user || !req.user.email) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
-    // Implementation remains same as your original
-    const User = (await import("../models/User.js")).default;
-    const updated = await User.updateMany(
-      { _id: { $in: userIds } },
-      {
-        $addToSet: {
-          purchasedCourses: {
-            CourseId: courseId,
-            completedChapters: [],
-          },
-        },
-      }
-    );
-    return res.json({ message: "Users assigned", modifiedCount: updated.modifiedCount });
-  } catch (err) {
-    console.error("Assign users error:", err);
-    return res.status(500).json({ error: "Failed to assign users" });
-  }
-});
 
-router.put("/:courseId/unassign", requireAdmin, async (req, res) => {
-  try {
     const { courseId } = req.params;
-    let { userIds } = req.body;
-    if (!Array.isArray(userIds) || userIds.length === 0) {
-      return res.status(400).json({ error: "userIds must be a non-empty array" });
+    const email = req.user.email;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
-    const User = (await import("../models/User.js")).default;
-    const updated = await User.updateMany({ _id: { $in: userIds } }, { $pull: { purchasedCourses: { CourseId: courseId } } });
-    return res.json({ message: "Users unassigned", modifiedCount: updated.modifiedCount });
+
+    const alreadyStarted = user.startedCourses.some(
+      (c) => c.CourseId.toString() === courseId,
+    );
+
+    if (!alreadyStarted) {
+      user.startedCourses.push({
+        CourseId: courseId,
+        completedChapters: [],
+        scores: {},
+      });
+      await user.save();
+    }
+
+    res.json({ success: true });
   } catch (err) {
-    console.error("Unassign users error:", err);
-    return res.status(500).json({ error: "Failed to unassign users" });
+    console.error("Start course error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -439,7 +478,7 @@ router.post("/:courseId/reviews", async (req, res) => {
     // Update average rating
     const totalRating = course.reviews.reduce(
       (sum, r) => sum + (Number(r.rating) || 0),
-      0
+      0,
     );
     course.rating = Number((totalRating / course.reviews.length).toFixed(1));
 

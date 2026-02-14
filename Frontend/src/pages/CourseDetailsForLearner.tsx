@@ -3,9 +3,7 @@ import React, { useState } from "react";
 import {
   Star,
   Clock,
-  Users,
   BookOpen,
-  Award,
   CheckCircle2,
   PlayCircle,
   Target,
@@ -13,6 +11,7 @@ import {
   HelpCircle,
   ChevronDown,
   ChevronUp,
+  Check,
 } from "lucide-react";
 import type { Chapters, CourseData } from "../types/course";
 import NotesDisplay from "../components/NotesDisplay";
@@ -24,7 +23,7 @@ interface CourseDetailsProps {
 
 const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
   const [activeSection, setActiveSection] = useState<"chapter" | "course">(
-    "chapter"
+    "chapter",
   );
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
@@ -44,7 +43,7 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
             <button
               className={`relative py-2 px-1 text-sm font-medium transition-colors duration-200 ${
                 activeSection === "chapter"
-                  ? "text-purple-600 border-b-2 border-purple-600"
+                  ? "text-blue-600 border-b-2 border-blue-600"
                   : "text-gray-500 hover:text-black"
               }`}
               onClick={() => setActiveSection("chapter")}
@@ -57,7 +56,7 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
             <button
               className={`relative py-2 px-1 text-sm font-medium transition-colors duration-200 ${
                 activeSection === "course"
-                  ? "text-purple-600 border-b-2 border-purple-600"
+                  ? "text-blue-600 border-b-2 border-blue-600"
                   : "text-gray-500 hover:text-black"
               }`}
               onClick={() => setActiveSection("course")}
@@ -122,7 +121,7 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
           /* Course Overview Section */
           <div className="max-w-6xl mx-auto space-y-6">
             {/* Course Header */}
-            <div className="p-6 sm:p-8 border-l-4 border-purple-600 bg-purple-50 rounded-r-xl">
+            <div className="p-6 sm:p-8 border-l-4 border-blue-600 bg-blue-50 rounded-r-xl">
               <h1 className="text-2xl sm:text-3xl font-bold mb-3">
                 {course.title}
               </h1>
@@ -137,21 +136,6 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
                 icon={<Clock />}
                 label="Total Duration"
                 value={course.duration}
-              />
-              <StatCard
-                icon={<PlayCircle />}
-                label="Lectures"
-                value={course.chapterCount}
-              />
-              <StatCard
-                icon={<Award />}
-                label="Exercises"
-                value={course.exerciseCount}
-              />
-              <StatCard
-                icon={<Users />}
-                label="Students"
-                value={course.studentCount}
               />
             </div>
 
@@ -187,7 +171,7 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
                     <h3 className="text-xl font-semibold text-gray-900">
                       Prerequisites
                     </h3>
-                    <p className="text-gray-700">{course.prerequisites}</p>
+                    <p className="text-gray-700 ml-4">{course.prerequisites}</p>
                   </div>
                 )}
 
@@ -200,9 +184,9 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {course.features.map((feature, idx) => (
                         <div key={idx} className="flex items-start gap-3">
-                          <CheckCircle2
+                          <Check
                             size={16}
-                            className="text-purple-500 mt-1 flex-shrink-0"
+                            className="text-green-500 mt-1 flex-shrink-0"
                           />
                           <span className="text-gray-700">{feature}</span>
                         </div>
@@ -221,7 +205,7 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
                       {course.technologies.map((tech, idx) => (
                         <span
                           key={idx}
-                          className="px-3 py-2 bg-purple-100 text-purple-800 rounded-lg text-sm font-medium"
+                          className="ml-4 text-sm font-medium text-gray-700"
                         >
                           {tech}
                         </span>
@@ -236,11 +220,11 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
             {course.reviews?.length > 0 && (
               <div className="px-6">
                 <div className="flex items-center gap-2 mb-6">
-                  <MessageSquare size={20} className="text-purple-600" />
+                  <MessageSquare size={20} className="text-blue-600" />
                   <h3 className="text-xl font-semibold text-gray-900">
                     Student Reviews
                   </h3>
-                  <span className="px-2 text-purple-700 text-xs font-medium">
+                  <span className="px-2 text-blue-700 text-xs font-medium">
                     {course.reviewCount} reviews
                   </span>
                 </div>
@@ -269,7 +253,7 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, chapter }) => {
                             {Array.from({ length: review.rating }).map(
                               (_, i) => (
                                 <Star key={i} size={14} fill="currentColor" />
-                              )
+                              ),
                             )}
                           </div>
                           <p className="text-sm text-gray-600 leading-relaxed">
@@ -338,8 +322,8 @@ const StatCard = ({
   value: any;
 }) => {
   return (
-    <div className="p-3 sm:p-4 bg-white rounded-lg shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-3">
-      <div className="w-10 h-10 rounded-md bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+    <div className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      <div className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0">
         {icon}
       </div>
       <div className="min-w-0">
