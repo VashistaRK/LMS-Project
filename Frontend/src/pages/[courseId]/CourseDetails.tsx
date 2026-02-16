@@ -1,6 +1,11 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { AlertTriangle, Check, LoaderCircleIcon } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Check,
+  LoaderCircleIcon,
+} from "lucide-react";
 import { useMemo } from "react";
 import { Star, BookOpen } from "lucide-react";
 import getThumbnailUrl from "../../utils/getThumbnailUrl";
@@ -49,6 +54,13 @@ const CourseDetailsPage: React.FC = () => {
     <div className="max-w-7xl mx-6 xl:mx-auto py-8 font-mulish">
       <div className=" gap-8">
         <div className="space-y-2 py-12 mb-12">
+          <a
+            href="/courses"
+            className="w-fit flex items-center underline justify-center text-zinc-700 rounded-md font-semibold mb-12 px-2"
+          >
+            <ArrowLeft className="h-3 pr-1" />
+            Back to Courses.
+          </a>
           <span className="bg-[#9CCFFF] w-fit flex items-center justify-center text-zinc-700 rounded-md font-semibold px-2 uppercase">
             <IoPricetagsSharp className="h-3 pr-1" />
             {course.difficulty}

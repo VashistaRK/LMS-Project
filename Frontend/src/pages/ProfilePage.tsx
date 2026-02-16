@@ -33,7 +33,6 @@ const updateProfile = async (
 
   const { data } = await axios.put(`${api}/api/user/profile`, formData, {
     withCredentials: true,
-    headers: { "Content-Type": "multipart/form-data" },
   });
 
   return data.user;

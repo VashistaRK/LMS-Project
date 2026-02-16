@@ -46,10 +46,6 @@ export default function Header() {
   const location = useLocation();
   const isLanding = location.pathname === "/";
 
-  useEffect(() => {
-    console.log("Current user in Header:", user);
-  }, [user]);
-
   // Close user menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

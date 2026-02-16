@@ -187,12 +187,12 @@ const CourseCatalog: React.FC = () => {
                         >
                           <Link
                             to={`/course-details/${course.id}`}
-                            className="block rounded-2xl relative overflow-hidden"
+                            className="block rounded-2xl h-2/5 relative overflow-hidden"
                           >
                             <img
                               src={thumbUrl}
                               alt={course.title}
-                              className={`object-cover rounded-2xl transition-transform duration-300 group-hover:scale-105`}
+                              className={`object-contain w-full rounded-2xl h-full transition-transform duration-300 group-hover:scale-105`}
                             />
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
