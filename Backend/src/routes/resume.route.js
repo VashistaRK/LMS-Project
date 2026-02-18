@@ -66,25 +66,21 @@ router.post(
       const imageBytes = imageField ? imageField.size || 0 : 0;
 
       if (fileBytes > MAX_MONGO_DOC_BYTES) {
-        return res
-          .status(413)
-          .json({
-            error:
-              "Uploaded file exceeds MongoDB document size (16MB). Use GridFS or external storage.",
-          });
+        return res.status(413).json({
+          error:
+            "Uploaded file exceeds MongoDB document size (16MB). Use GridFS or external storage.",
+        });
       }
 
       if (fileBytes + imageBytes > MAX_MONGO_DOC_BYTES) {
-        return res
-          .status(413)
-          .json({
-            error:
-              "Combined file+image exceeds MongoDB document size (16MB). Use GridFS or external storage.",
-          });
+        return res.status(413).json({
+          error:
+            "Combined file+image exceeds MongoDB document size (16MB). Use GridFS or external storage.",
+        });
       }
 
       console.info(
-        `Resume upload: resumeId=${resumeId} fileBytes=${fileBytes} imageBytes=${imageBytes}`
+        `Resume upload: resumeId=${resumeId} fileBytes=${fileBytes} imageBytes=${imageBytes}`,
       );
 
       const exists = await Resume.findOne({ resumeId });
@@ -119,12 +115,10 @@ router.post(
           msg.includes("BSONObjectTooLarge") ||
           msg.toLowerCase().includes("document too large")
         ) {
-          return res
-            .status(413)
-            .json({
-              error:
-                "Document too large for MongoDB. Use GridFS or external storage.",
-            });
+          return res.status(413).json({
+            error:
+              "Document too large for MongoDB. Use GridFS or external storage.",
+          });
         }
 
         return res.status(500).json({ error: "Failed to save resume" });
@@ -145,7 +139,7 @@ router.post(
 
       res.status(500).json({ error: "Failed to upload resume" });
     }
-  }
+  },
 );
 
 // Lightweight DB health endpoint (useful on VPS to confirm local Mongo connection)
@@ -185,7 +179,7 @@ router.get("/:resumeId/image", async (req, res) => {
 
     res.setHeader(
       "Content-Type",
-      resume.imageType || "application/octet-stream"
+      resume.imageType || "application/octet-stream",
     );
     // small caching
     res.setHeader("Cache-Control", "public, max-age=86400");
@@ -207,7 +201,7 @@ router.get("/:resumeId/download", async (req, res) => {
     res.setHeader("Content-Type", resume.fileType);
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${resume.fileName}"`
+      `attachment; filename="${resume.fileName}"`,
     );
 
     res.send(resume.fileBuffer);
@@ -235,7 +229,7 @@ router.put("/:resumeId", requireAdmin, async (req, res) => {
     const resume = await Resume.findOneAndUpdate(
       { resumeId: req.params.resumeId },
       { $set: req.body },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     ).select("-fileBuffer -imageBuffer");
 
     if (!resume) return res.status(404).json({ error: "Resume not found" });
@@ -253,6 +247,7 @@ router.put("/:resumeId", requireAdmin, async (req, res) => {
 });
 
 router.delete("/:resumeId", requireAdmin, async (req, res) => {
+  console.log("FILES RECEIVED:", Object.keys(req.files || {}));
   try {
     const resume = await Resume.findOneAndDelete({
       resumeId: req.params.resumeId,

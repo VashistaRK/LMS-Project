@@ -10,8 +10,14 @@ import {
   Eye,
   Download,
 } from "lucide-react";
+import axios from "axios";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+const api = axios.create({
+  baseURL: API,
+  withCredentials: true, // replaces credentials: "include"
+});
 
 interface ResumeItem {
   _id: string;
@@ -27,39 +33,25 @@ interface ResumeItem {
 }
 
 async function fetchResumes(): Promise<ResumeItem[]> {
-  const res = await fetch(`${API}/api/resumes`, { credentials: "include" });
-  if (!res.ok) throw new Error("Failed to load resumes");
-  const data = await res.json();
+  const { data } = await api.get("/api/resumes");
   return data.items || [];
 }
 
 async function uploadResume(formData: FormData) {
-  const res = await fetch(`${API}/api/resumes/upload`, {
-    method: "POST",
-    body: formData,
-    credentials: "include",
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || "Upload failed");
-  }
-  return res.json();
+  console.log("uploading");
+  const { data } = await api.post("/api/resumes/upload", formData);
+
+  return data;
 }
 
 async function deleteResume(resumeId: string) {
-  const res = await fetch(`${API}/api/resumes/${resumeId}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
-  if (!res.ok) throw new Error("Delete failed");
+  console.log("Deleting:", resumeId);
+  await api.delete(`/api/resumes/${resumeId}`);
 }
 
 async function fetchResumeDetail(resumeId: string) {
-  const res = await fetch(`${API}/api/resumes/${resumeId}`, {
-    credentials: "include",
-  });
-  if (!res.ok) throw new Error("Failed to load resume details");
-  return res.json();
+  const { data } = await api.get(`/api/resumes/${resumeId}`);
+  return data;
 }
 
 function formatSize(bytes: number = 0) {
@@ -438,7 +430,7 @@ export default function AdminResumesPage() {
                   onClick={() =>
                     window.open(
                       `${API}/api/resumes/${preview.resumeId}/download`,
-                      "_blank"
+                      "_blank",
                     )
                   }
                   className="w-full py-2 bg-blue-600 text-white rounded-lg flex items-center justify-center gap-2 text-sm md:text-base"
