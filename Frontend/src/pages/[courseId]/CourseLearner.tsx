@@ -23,7 +23,7 @@ import {
   markChapterCompleted,
 } from "../../services/userApi";
 
-const FALLBACK_THUMB = "/images/no-image.png";
+const FALLBACK_THUMB = "/assets/no-image.png";
 
 export type VideoSource = {
   type: "youtube" | "drive" | "direct" | "other" | "none";
@@ -349,7 +349,7 @@ const CourseLearningPage: React.FC = () => {
         <main className="col-span-2 flex-1 min-h-screen bg-white">
           <header className="w-full flex justify-between px-8 py-3">
             <img
-              src="/images/Sunadh-Logo.png"
+              src="/assets/Sunadh-Logo.png"
               alt="Logo"
               className="h-16 w-auto"
             />

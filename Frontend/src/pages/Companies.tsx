@@ -1,9 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/AuthProvider";
-import { Lock } from "lucide-react";
+import { Lock, Search, ArrowRight, ChevronLeft, ChevronRight, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
+import { GlowCard } from "@/components/ui/spotlight-card";
+import { PageHero } from "@/components/ui/page-hero";
+import { LogoCloud } from "@/components/ui/logo-cloud-3";
+import TestimonialSlider from "@/components/ui/testimonial-slider";
+
+const COMPANY_LOGOS = [
+  { src: "https://svgl.app/library/google.svg", alt: "Google" },
+  { src: "https://svgl.app/library/microsoft.svg", alt: "Microsoft" },
+  { src: "https://svgl.app/library/github_wordmark_light.svg", alt: "GitHub" },
+  { src: "https://svgl.app/library/vercel_wordmark.svg", alt: "Vercel" },
+  { src: "https://svgl.app/library/nvidia-wordmark-light.svg", alt: "Nvidia" },
+  { src: "https://svgl.app/library/openai_wordmark_light.svg", alt: "OpenAI" },
+  { src: "https://svgl.app/library/supabase_wordmark_light.svg", alt: "Supabase" },
+  { src: "https://svgl.app/library/claude-ai-wordmark-icon_light.svg", alt: "Claude AI" },
+];
 
 type Company = {
   name: string;
@@ -12,11 +29,13 @@ type Company = {
   years?: number[];
 };
 
+const PAGE_SIZE = 24;
+
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
-  const PAGE_SIZE = 24;
   const [currentPage, setCurrentPage] = useState(0);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   const { user } = useAuthContext();
@@ -39,202 +58,276 @@ export default function CompaniesPage() {
     };
   }, []);
 
-  // Reset or clamp current page when companies change
+  const filtered = useMemo(() => {
+    if (!search.trim()) return companies;
+    const q = search.toLowerCase();
+    return companies.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.description?.toLowerCase().includes(q)
+    );
+  }, [companies, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
   useEffect(() => {
-    const totalPages = Math.max(1, Math.ceil(companies.length / PAGE_SIZE));
-    if (currentPage >= totalPages) {
-      setCurrentPage(totalPages - 1);
+    if (currentPage >= totalPages) setCurrentPage(Math.max(0, totalPages - 1));
+  }, [filtered, currentPage, totalPages]);
+
+  const paginated = filtered.slice(
+    currentPage * PAGE_SIZE,
+    (currentPage + 1) * PAGE_SIZE
+  );
+
+  const handleCardClick = (c: Company) => {
+    if (!hasAccess) {
+      toast.warning("Access should be granted by the admin");
+      return;
     }
-  }, [companies, currentPage]);
+    navigate(`/companies/${c.slug}`);
+  };
 
   return (
-    <div className="min-h-screen max-w-7xl mx-6 xl:mx-auto">
-      {/* Header */}
-      <div className="text-5xl py-12 md:py-26 font-bold leading-tight tracking-tight font-mulish">
-        <h2 className="text-zinc-900 font-extrabold">Top Companies</h2>
-        <p className="text-gray-500 font-bold">
-          Browse leading organizations and discover self-training opportunities
-          with previous year question papers.
-        </p>
-      </div>
+    <DarkGradientBg className="text-[#e5e1e4]">
 
-      <div className="pb-32">
-        <h2 className="text-xl font-mulish font-bold text-zinc-900 mb-4">
-          Self-Training Guidance
-        </h2>
-
-        <p className="max-w-2xl text-sm sm:text-base font-semibold leading-relaxed text-zinc-500 tracking-tighter">
-          Unlock your potential by leveraging the resources provided by these
-          companies. Each organization offers unique programs, tools, or
-          learning paths designed to help you excel. Explore company profiles to
-          discover specific opportunities for growth, from free workshops to
-          advanced mentorship.
-        </p>
-        <br />
-        <p className="max-w-2xl text-sm sm:text-base font-semibold leading-relaxed text-zinc-500 tracking-tighter">
-          Take charge of your professional journey by proactively seeking out
-          trainings or certifications these companies support. Stay updated with
-          the latest industry skills and boost your employability with
-          structured self-paced learning from renowned institutions.
-        </p>
-      </div>
-      <div
-        className="relative rounded-2xl border-b bg-cover bg-center mb-8 before:absolute before:inset-0 before:bg-gray-100/10 before:backdrop-grayscale before:rounded-2xl"
-        style={{
-          backgroundImage: `url(images/men.jpg)`,
-        }}
-      >
-        <div className="mx-auto relative z-10 font-mulish flex flex-col w-full px-6 py-12 md:pt-52 rounded-2xl">
-          <h1 className="text-3xl md:text-6xl font-bold mb-2">
-            Companies & Past Papers
-          </h1>
-        </div>
-      </div>
-
-      <div className="py-8">
-        {/* Companies Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {(() => {
-            const start = currentPage * PAGE_SIZE;
-            const paginated = companies.slice(start, start + PAGE_SIZE);
-            const items: (Company | undefined)[] = loading
-              ? new Array<Company | undefined>(PAGE_SIZE).fill(undefined)
-              : paginated;
-            return items.map((c, idx) => (
-              <div
-                key={c?.slug ?? `${currentPage}-${idx}`}
-                className={`relative bg-white rounded-lg border border-b-4 p-6 transition-all
-                  ${
-                    hasAccess
-                      ? "cursor-pointer border-b-blue-600 hover:border-blue-200 hover:bg-blue-50"
-                      : "cursor-not-allowed opacity-80 border-b-gray-300"
-                  }
-                `}
-                onClick={() => {
-                  if (!c) return;
-
-                  if (!hasAccess) {
-                    toast.warning("Access should be granted by the admin");
-                    return;
-                  }
-
-                  navigate(`/companies/${c.slug}`);
-                }}
-              >
-                {!hasAccess && c && (
-                  <div
-                    className="absolute inset-0 bg-white/70 flex items-center justify-center
-                  opacity-0 hover:opacity-100 transition"
-                  >
-                    <div className="flex items-center gap-2 text-gray-700 font-medium">
-                      <Lock className="w-5 h-5" />
-                      Locked
-                    </div>
-                  </div>
-                )}
-                {c ? (
-                  <>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {c.name}
-                    </h3>
-                    {c.description && (
-                      <p className="text-sm text-gray-600 mb-4">
-                        {c.description}
-                      </p>
-                    )}
-
-                    {c.years && c.years.length > 0 && (
-                      <div className="mb-4">
-                        <p className="text-xs text-gray-500 mb-2">
-                          Available Years:
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {c.years.map((y: number) => (
-                            <span
-                              key={y}
-                              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded font-medium"
-                            >
-                              {y}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="pt-3 border-t">
-                      <span className="text-blue-600 text-sm font-medium flex items-center gap-1">
-                        View Papers
-                        <span>→</span>
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="h-5 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
-                  </div>
-                )}
-              </div>
-            ));
-          })()}
-        </div>
-
-        {/* Pagination Controls */}
-        {!loading && companies.length > PAGE_SIZE && (
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              Showing {Math.min(companies.length, currentPage * PAGE_SIZE + 1)}{" "}
-              - {Math.min(companies.length, (currentPage + 1) * PAGE_SIZE)} of{" "}
-              {companies.length}
-            </div>
+      <main className="relative z-10 w-full max-w-[1440px] mx-auto px-6 py-8">
+        {/* Hero Section */}
+        <PageHero
+          label={loading ? "COMPANIES" : `${filtered.length} COMPANIES`}
+          title={<>Top Companies<span className="text-[#c0c1ff]">.</span></>}
+          subtitle="Explore comprehensive interview archives and coding patterns from the world's leading engineering teams."
+          image="assets/companies-hero.png"
+        >
+          <a href="#" className="inline-flex items-center gap-2 font-jetbrains text-xs text-[#c0c1ff] uppercase tracking-[0.2em] mb-6 border-b border-[#c0c1ff]/30 pb-1 hover:border-[#c0c1ff] transition-colors">
+            Self-Training Guidance <span className="text-sm">↗</span>
+          </a>
+          <div className="border-l-2 border-[#c0c1ff]/30 pl-6 mb-8 max-w-2xl">
+            <p className="font-jetbrains text-sm text-zinc-300 uppercase tracking-wide leading-relaxed mb-4">
+              "Practice with real papers. Crack real interviews."
+            </p>
+            <p className="font-dmsans text-sm text-zinc-500 leading-relaxed">
+              Unlock your potential by leveraging resources from <span className="text-zinc-300 underline decoration-zinc-600">leading organizations</span>. Each company offers unique programs, tools, and learning paths designed to help you excel. Take charge of your professional journey with <span className="text-zinc-300 underline decoration-zinc-600">structured self-paced learning</span> and previous year question papers from renowned institutions.
+            </p>
+          </div>
+          <div className="flex gap-6 flex-wrap">
             <div className="flex items-center gap-2">
+              <span className="font-satoshi text-2xl font-bold text-white">50+</span>
+              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">Companies</span>
+            </div>
+            <div className="w-px h-8 bg-white/10" />
+            <div className="flex items-center gap-2">
+              <span className="font-satoshi text-2xl font-bold text-white">200+</span>
+              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">Papers</span>
+            </div>
+            <div className="w-px h-8 bg-white/10" />
+            <div className="flex items-center gap-2">
+              <span className="font-satoshi text-2xl font-bold text-white">5+</span>
+              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">Years</span>
+            </div>
+            <div className="w-px h-8 bg-white/10" />
+            <div className="flex items-center gap-2">
+              <span className="font-satoshi text-2xl font-bold text-white">94%</span>
+              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">Success</span>
+            </div>
+          </div>
+        </PageHero>
+
+        {/* Logo Cloud */}
+        <section className="mb-12 max-w-3xl">
+          <p className="text-center font-dmsans text-sm text-zinc-500 mb-2">
+            <span className="text-zinc-600">Trusted by top companies.</span>{" "}
+            <span className="font-semibold text-zinc-400">Practice with real papers.</span>
+          </p>
+          <div className="h-px bg-white/5 [mask-image:linear-gradient(to_right,transparent,black,transparent)] mb-1" />
+          <LogoCloud logos={COMPANY_LOGOS} />
+          <div className="h-px bg-white/5 [mask-image:linear-gradient(to_right,transparent,black,transparent)]" />
+        </section>
+
+        {/* Search Bar */}
+        <motion.section
+          className="mb-12"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="relative w-full md:w-[480px]">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#908fa0]" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(0);
+              }}
+              className="w-full h-12 pl-12 pr-4 bg-[#201f22]/50 backdrop-blur-md border border-[#464554] rounded-lg font-dmsans text-[15px] text-[#e5e1e4] outline-none transition-all focus:ring-2 focus:ring-[#c0c1ff]/20 focus:border-[#c0c1ff] placeholder:text-[#908fa0]"
+              placeholder="Search companies, tech stacks, or domains..."
+            />
+          </div>
+        </motion.section>
+
+        {/* Company Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          {loading
+            ? Array.from({ length: 8 }).map((_, idx) => (
+                <div
+                  key={`skeleton-${idx}`}
+                  className="rounded-xl p-4 border border-white/[0.08] bg-[#18181b]/40 backdrop-blur-xl"
+                >
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="w-12 h-12 bg-white/5 rounded-lg animate-pulse" />
+                    <div className="flex gap-1">
+                      <div className="w-10 h-5 bg-[#353437] rounded animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="h-6 bg-[#353437] rounded animate-pulse w-3/4 mb-2" />
+                  <div className="h-4 bg-[#353437] rounded animate-pulse w-full mb-4" />
+                  <div className="h-px bg-white/5 w-full mb-4" />
+                  <div className="h-4 bg-[#353437] rounded animate-pulse w-1/3" />
+                </div>
+              ))
+            : paginated.map((c, idx) => (
+                <motion.div
+                  key={c.slug}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: Math.min(idx * 0.06, 0.48),
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                >
+                  <GlowCard
+                    glowColor="purple"
+                    customSize
+                    className={`!aspect-auto !p-0 group overflow-hidden transition-all duration-300
+                      ${hasAccess ? "cursor-pointer hover:-translate-y-1" : "cursor-not-allowed opacity-50"}
+                    `}
+                    onClick={() => handleCardClick(c)}
+                  >
+                    <div className="relative p-5 flex flex-col h-full z-10">
+                      {/* Locked overlay */}
+                      {!hasAccess && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-black/50 backdrop-blur-[2px] rounded-2xl">
+                          <Lock className="w-5 h-5 text-[#c0c1ff] mb-2" />
+                          <span className="font-jetbrains text-[10px] text-[#c0c1ff] tracking-widest uppercase">
+                            ACCESS REQUIRED
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Card header */}
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center border border-white/5">
+                          <span className="font-satoshi text-lg font-bold text-[#c0c1ff]/60">
+                            {c.name.charAt(0)}
+                          </span>
+                        </div>
+                        {c.years && c.years.length > 0 && (
+                          <div className="flex gap-1">
+                            {c.years.slice(0, 3).map((y) => (
+                              <span
+                                key={y}
+                                className="font-jetbrains text-[10px] bg-[#353437] px-2 py-0.5 rounded text-[#c7c4d7]"
+                              >
+                                {y}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Card body */}
+                      <h3 className="font-satoshi text-2xl font-semibold tracking-[-0.02em] leading-[1.3] mb-1">
+                        {c.name}
+                      </h3>
+                      {c.description && (
+                        <p className="font-dmsans text-[13px] leading-relaxed text-[#908fa0] mb-4">
+                          {c.description}
+                        </p>
+                      )}
+
+                      {/* Divider + Link */}
+                      <div className="mt-auto">
+                        <div className="h-px bg-white/5 w-full mb-4" />
+                        {hasAccess ? (
+                          <span className="inline-flex items-center text-[#c0c1ff] font-jetbrains text-xs group-hover:gap-2 transition-all">
+                            View Papers
+                            <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center text-[#908fa0] font-jetbrains text-xs">
+                            View Papers
+                            <Lock className="w-3 h-3 ml-1" />
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </GlowCard>
+                </motion.div>
+              ))}
+        </div>
+
+        {/* Empty State */}
+        {!loading && filtered.length === 0 && (
+          <motion.div
+            className="text-center py-20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/[0.08]">
+              <Building2 className="w-7 h-7 text-[#908fa0]" />
+            </div>
+            <h3 className="font-satoshi text-lg font-semibold text-[#e5e1e4] mb-1">
+              No Companies Found
+            </h3>
+            <p className="font-dmsans text-sm text-[#908fa0]">
+              {search
+                ? "Try a different search term."
+                : "Check back soon for company papers."}
+            </p>
+          </motion.div>
+        )}
+
+        {/* Pagination */}
+        {!loading && filtered.length > PAGE_SIZE && (
+          <motion.footer
+            className="mt-20 flex justify-between items-center py-6 border-t border-white/5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="font-jetbrains text-xs text-[#908fa0] uppercase tracking-wider">
+              Page{" "}
+              <span className="text-[#e5e1e4]">
+                {String(currentPage + 1).padStart(2, "0")}
+              </span>{" "}
+              / {String(totalPages).padStart(2, "0")}
+            </div>
+            <div className="flex gap-4">
               <button
-                className="px-3 py-1 bg-white border rounded disabled:opacity-50"
+                className="px-6 py-2 border border-[#464554] rounded-lg font-jetbrains text-xs text-[#c7c4d7] hover:bg-white/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
                 onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
                 disabled={currentPage === 0}
               >
-                Prev
+                <ChevronLeft className="w-3.5 h-3.5" />
+                PREV
               </button>
-              <div className="text-sm text-gray-700">
-                Page {currentPage + 1} of{" "}
-                {Math.max(1, Math.ceil(companies.length / PAGE_SIZE))}
-              </div>
               <button
-                className="px-3 py-1 bg-white border rounded disabled:opacity-50"
+                className="px-6 py-2 bg-[#c0c1ff] text-[#0d0096] rounded-lg font-jetbrains text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
                 onClick={() =>
-                  setCurrentPage((p) =>
-                    Math.min(
-                      p + 1,
-                      Math.ceil(companies.length / PAGE_SIZE) - 1,
-                    ),
-                  )
+                  setCurrentPage((p) => Math.min(p + 1, totalPages - 1))
                 }
-                disabled={
-                  currentPage >= Math.ceil(companies.length / PAGE_SIZE) - 1
-                }
+                disabled={currentPage >= totalPages - 1}
               >
-                Next
+                NEXT
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
-          </div>
+          </motion.footer>
         )}
+      </main>
 
-        {/* Empty State */}
-        {!loading && companies.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-lg border">
-            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">🏢</span>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">
-              No Companies Available
-            </h3>
-            <p className="text-sm text-gray-600">
-              Check back soon for company papers.
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
+      <TestimonialSlider />
+    </DarkGradientBg>
   );
 }

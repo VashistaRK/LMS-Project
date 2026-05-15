@@ -3,8 +3,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuthContext } from "../context/AuthProvider";
-import { Lock } from "lucide-react";
+import { Lock, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
+import { GlowCard } from "@/components/ui/spotlight-card";
+import { PageHero } from "@/components/ui/page-hero";
+import TestimonialSlider from "@/components/ui/testimonial-slider";
 
 export default function FreshersReady() {
   const navigate = useNavigate();
@@ -33,42 +38,109 @@ export default function FreshersReady() {
   }, []);
 
   const tabs = [
-    {
-      key: "communication",
-      label: "Communication",
-      id: "communication",
-    },
-    {
-      key: "aptitude",
-      label: "Logical & Aptitude",
-      id: "logical-aptitude",
-    },
-    {
-      key: "technical",
-      label: "Technical Skills",
-      id: "technical-skills",
-    },
+    { key: "communication", label: "COMMUNICATION", id: "communication" },
+    { key: "aptitude", label: "DSA_LOGIC", id: "logical-aptitude" },
+    { key: "technical", label: "TECHNICAL", id: "technical-skills" },
   ];
 
-  // Per-tab color settings (hex used for inline styles, tailwind-safe classes for fallbacks)
-  const tabStyles: Record<
+  const tabHeroContent: Record<
     string,
-    { hex: string; tailwindBg: string; tailwindText: string }
+    { heading: string; sub: string; image: string }
   > = {
     communication: {
-      hex: "#540863",
-      tailwindBg: "bg-purple-700",
-      tailwindText: "#DDA7FA",
-    },
-    technical: {
-      hex: "#576A8F",
-      tailwindBg: "bg-violet-700",
-      tailwindText: "#A7BFFA",
+      heading: "Master Communication.",
+      sub: "Ace interviews with verbal, written, and presentation practice modules.",
+      image: "assets/communication-hero.png",
     },
     aptitude: {
-      hex: "#31694E",
-      tailwindBg: "bg-green-600",
-      tailwindText: "#ABFAA7",
+      heading: "Elevate Your Engineering Score.",
+      sub: "Systematic technical prep. Real-world scenarios, rigorous testing, and precise data feedback.",
+      image: "assets/courses-hero.png",
+    },
+    technical: {
+      heading: "Build With Modern Tech.",
+      sub: "Hands-on coding, system design, and core CS fundamentals for placement rounds.",
+      image: "assets/courses-hero.png",
+    },
+  };
+
+  const tabContent: Record<
+    string,
+    {
+      whyTitle: string;
+      whyDesc: string;
+      tips: string[];
+      ctaTitle: string;
+      ctaDesc: string;
+      trainingTitle: string;
+      trainingBullets: string[];
+    }
+  > = {
+    communication: {
+      whyTitle: "Why Communication Skills Matter",
+      whyDesc:
+        "Effective communication is the cornerstone of professional success. The ability to articulate ideas clearly, listen actively, and adapt your message to different audiences is invaluable.",
+      tips: [
+        "Practice active listening — understanding others is as important as being understood",
+        "Develop clarity in written communication — emails and reports reflect your professionalism",
+        "Master verbal articulation — speak confidently in meetings and presentations",
+        "Build emotional intelligence — read the room and adapt your style",
+        "Embrace feedback — constructive criticism refines your approach",
+      ],
+      ctaTitle: "Wanna ace your interviews?",
+      ctaDesc:
+        "Try our AI Bot — simulates real interview scenarios with personalized feedback. Like a personal coach 24/7 to boost your confidence before the big day.",
+      trainingTitle: "Self-Training Guidance",
+      trainingBullets: [
+        "AI-driven interview training adapted to your communication proficiency",
+        "Multi-domain practice covering HR, technical, and real-world scenarios",
+        "Instant feedback that identifies mistakes and suggests precise corrections",
+        "Continuous improvement insights to strengthen confidence and performance",
+      ],
+    },
+    aptitude: {
+      whyTitle: "Why Logical & Aptitude Skills Matter",
+      whyDesc:
+        "Aptitude and reasoning form the gateway to most placement rounds. Strong numerical, logical, and verbal reasoning unlocks tier-1 companies and high-paying roles.",
+      tips: [
+        "Master speed math — shortcuts beat formulas under time pressure",
+        "Practice pattern recognition — series, analogies, syllogisms recur every test",
+        "Solve real previous-year papers — companies repeat question templates",
+        "Time yourself daily — accuracy under pressure separates top scorers",
+        "Track weak topics — focused weak-area drills compound faster than broad practice",
+      ],
+      ctaTitle: "Wanna crack the aptitude round?",
+      ctaDesc:
+        "Try our AI Tutor — adaptive aptitude drills, instant solutions, and weak-topic insights. Practice the exact pattern your dream company asks.",
+      trainingTitle: "Self-Training Guidance",
+      trainingBullets: [
+        "Adaptive aptitude drills tuned to your accuracy and speed level",
+        "Topic-wise practice across logic, math, verbal, and data interpretation",
+        "Step-by-step solutions explaining the shortcut behind every answer",
+        "Weak-area heatmaps that pinpoint exactly what to revise next",
+      ],
+    },
+    technical: {
+      whyTitle: "Why Technical Skills Matter",
+      whyDesc:
+        "Tech rounds decide your offer letter. Strong DSA, system design, and core CS fundamentals win interviews at product companies and unlock 2x salary jumps.",
+      tips: [
+        "Master the 75 must-do DSA problems before any interview",
+        "Build 3 real projects end-to-end — depth beats breadth on resumes",
+        "Practice system design fundamentals — scalability, caching, databases",
+        "Solve coding problems daily — consistency builds pattern recognition",
+        "Mock-interview weekly — interview skill ≠ coding skill",
+      ],
+      ctaTitle: "Wanna nail the coding round?",
+      ctaDesc:
+        "Try our AI Coach — live code review, complexity analysis, and personalized DSA paths. Practice with real FAANG-tier questions.",
+      trainingTitle: "Self-Training Guidance",
+      trainingBullets: [
+        "Curated DSA roadmap from arrays to dynamic programming and beyond",
+        "Hands-on coding labs covering frontend, backend, and full-stack tracks",
+        "Real-time code review with complexity analysis and refactor hints",
+        "Interview-style mock tests modeled on FAANG and Indian product giants",
+      ],
     },
   };
 
@@ -76,10 +148,8 @@ export default function FreshersReady() {
   const [items, setItems] = useState<any[]>([]);
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
   const [itemsError, setItemsError] = useState<string | null>(null);
-  const [trackDetails, setTrackDetails] = useState<any | null>(null);
 
   const ITEMS_PER_PAGE = 12;
-
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -90,104 +160,16 @@ export default function FreshersReady() {
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
   const paginatedItems = loadingItems
-    ? Array.from({ length: ITEMS_PER_PAGE })
+    ? Array.from({ length: 6 })
     : items.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE,
       );
 
-  const goToPage = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
-  };
-
-  const Pagination = () => (
-    <div className="flex justify-end items-center gap-3">
-      <button
-        onClick={() => goToPage(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="px-4 py-2 text-sm font-semibold rounded-lg border
-        disabled:opacity-50 disabled:cursor-not-allowed
-        hover:bg-gray-100"
-      >
-        Prev
-      </button>
-
-      <span className="text-sm font-semibold text-gray-600">
-        Page {currentPage} of {totalPages || 1}
-      </span>
-
-      <button
-        onClick={() => goToPage(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="px-4 py-2 text-sm font-semibold rounded-lg border
-        disabled:opacity-50 disabled:cursor-not-allowed
-        hover:bg-gray-100"
-      >
-        Next
-      </button>
-    </div>
-  );
-
   const defaultSlugs: Record<string, string> = {
     communication: "communication",
     aptitude: "logical-aptitude",
     technical: "technical-skills",
-  };
-
-  // Category-specific content
-  const categoryContent: Record<
-    string,
-    {
-      heroContent: string;
-      intro: string;
-      tips: string[];
-      why: string;
-      img: string;
-    }
-  > = {
-    communication: {
-      heroContent: "Master the Art of Communication",
-      intro:
-        "Effective communication is the cornerstone of professional success. In today's workplace, the ability to articulate ideas clearly, listen actively, and adapt your message to different audiences is invaluable.",
-      why: "Why Communication Skills Matter",
-      tips: [
-        "Practice active listening - Understanding others is as important as being understood",
-        "Develop clarity in written communication - Emails and reports reflect your professionalism",
-        "Master verbal articulation - Speak confidently in meetings and presentations",
-        "Build emotional intelligence - Read the room and adapt your communication style",
-        "Embrace feedback - Constructive criticism helps refine your communication approach",
-      ],
-      img: "images/abstract_communication_concept.png",
-    },
-    aptitude: {
-      heroContent: "Crack Every Exam With Confidence",
-      intro:
-        "Logical reasoning and aptitude form the foundation of problem-solving in any profession. These skills help you analyze situations, make sound decisions, and approach challenges systematically.",
-      why: "Why Logical & Aptitude Skills Matter",
-      tips: [
-        "Practice pattern recognition - Train your brain to identify trends and relationships",
-        "Solve problems daily - Regular practice sharpens your analytical thinking",
-        "Break complex problems into smaller parts - Divide and conquer for better solutions",
-        "Time management - Learn to solve problems efficiently under pressure",
-        "Learn from mistakes - Each error is an opportunity to strengthen your approach",
-      ],
-      img: "images/abstract_logic_and_aptitude_concept.png",
-    },
-    technical: {
-      heroContent: "Build the Future with Modern Tech",
-      intro:
-        "Technical skills are the practical knowledge and abilities required to perform specialized tasks. In the modern workplace, technical proficiency combined with problem-solving creates a powerful competitive advantage.",
-      why: "Why Technical Skills Matter",
-      tips: [
-        "Stay current with industry trends - Technology evolves rapidly, keep learning",
-        "Build hands-on experience - Theory is important, but practice makes perfect",
-        "Master the fundamentals - Strong basics enable you to learn advanced concepts faster",
-        "Develop debugging skills - Finding and fixing errors is as important as writing code",
-        "Create personal projects - Practical application solidifies your knowledge",
-      ],
-      img: "images/abstract_technology_concept.png",
-    },
   };
 
   const resolveSlugForTab = (tabKey: string) => {
@@ -209,18 +191,14 @@ export default function FreshersReady() {
       setItemsError(null);
       try {
         const slug = resolveSlugForTab(activeTab);
-        const [trackRes, testsRes] = await Promise.all([
-          api.get<any>(`/api/assessments/tracks`),
-          api.get<any[]>(`/api/assessments/tracks/${slug}/tests`),
-        ]);
-        if (!cancelled) {
-          setTrackDetails(trackRes.data || null);
-          setItems(testsRes.data || []);
-        }
+        const testsRes = await api.get<any[]>(
+          `/api/assessments/tracks/${slug}/tests`,
+        );
+        if (!cancelled) setItems(testsRes.data || []);
       } catch (err: any) {
         if (!cancelled) {
           setItems([]);
-          setItemsError("Failed to load tests for this category");
+          setItemsError("Failed to load tests");
         }
       } finally {
         if (!cancelled) setLoadingItems(false);
@@ -234,278 +212,505 @@ export default function FreshersReady() {
   useEffect(() => {
     if (window.location.hash) {
       const hash = window.location.hash.replace("#", "");
-
       const tab = tabs.find((t) => t.id === hash);
-      if (tab) {
-        setActiveTab(tab.key);
-      }
+      if (tab) setActiveTab(tab.key);
     }
-  }, [tabs]);
+  }, []);
 
-  const content = categoryContent[activeTab];
-  const activeStyle = tabStyles[activeTab] || tabStyles.communication;
-  const activeHex = activeStyle.hex;
-  const activeTailwindText = activeStyle.tailwindText;
+  const hero = tabHeroContent[activeTab] || tabHeroContent.aptitude;
 
   return (
-    <div className="min-h-screen max-w-7xl mx-6 lg:mx-auto pt-10">
-      {/* Hero Section */}
-      <div
-        className="bg-cover bg-center rounded-md"
-        style={{ backgroundImage: `url(${content.img})` }}
-      >
-        <div className="py-16 md:py-32 rounded-md bg-gradient-to-r from-black/60 via-black/0 to-black/0">
-          <div className="mx-auto px-8">
-            <div className="flex flex-col lg:justify-between gap-6">
-              <div>
-                <h1 className="text-4xl text-white md:text-6xl md:max-w-3xl bg-clip-text font-extrabold font-mulish mb-3 tracking-tight">
-                  {content.heroContent}
-                </h1>
-                <p className="text-lg md:text-xl text-gray-100/90 max-w-2xl">
-                  Master essential skills through comprehensive practice tests
-                  and expert guidance
-                </p>
-              </div>
+    <DarkGradientBg className="text-[#e5e1e4]">
+      {/* Hero */}
+      <main className="relative z-10 py-8 px-6 md:px-10 max-w-7xl mx-auto">
+        <PageHero
+          label="PRACTICE_SESSION"
+          title={<>{hero.heading}</>}
+          subtitle={hero.sub}
+          image={hero.image}
+        >
+          <a
+            href="#"
+            className="inline-flex items-center gap-2 font-jetbrains text-xs text-[#c0c1ff] uppercase tracking-[0.2em] mb-6 border-b border-[#c0c1ff]/30 pb-1 hover:border-[#c0c1ff] transition-colors"
+          >
+            My Attempts <span className="text-sm">↗</span>
+          </a>
+          <div className="border-l-2 border-[#c0c1ff]/30 pl-6 mb-8 max-w-2xl">
+            <p className="font-jetbrains text-sm text-zinc-300 uppercase tracking-wide leading-relaxed mb-4">
+              "Practice does not make perfect. Perfect practice makes perfect."
+            </p>
+            <p className="font-dmsans text-sm text-zinc-500 leading-relaxed">
+              Sharpen your skills with{" "}
+              <span className="text-zinc-300 underline decoration-zinc-600">
+                topic-wise practice tests
+              </span>{" "}
+              that mirror real placement rounds. Track your mastery, build your
+              streak, and identify weak areas before the interview — with{" "}
+              <span className="text-zinc-300 underline decoration-zinc-600">
+                instant feedback and detailed analytics
+              </span>
+              .
+            </p>
+          </div>
+          <div className="flex gap-6 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="font-satoshi text-2xl font-bold text-white">
+                156
+              </span>
+              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">
+                Tests
+              </span>
+            </div>
+            <div className="w-px h-8 bg-white/10" />
+            <div className="flex items-center gap-2">
+              <span className="font-satoshi text-2xl font-bold text-white">
+                12
+              </span>
+              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">
+                Topics
+              </span>
+            </div>
+            <div className="w-px h-8 bg-white/10" />
+            <div className="flex items-center gap-2">
+              <span className="font-satoshi text-2xl font-bold text-white">
+                45m
+              </span>
+              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">
+                Avg Duration
+              </span>
+            </div>
+            <div className="w-px h-8 bg-white/10" />
+            <div className="flex items-center gap-2">
+              <span className="font-satoshi text-2xl font-bold text-white">
+                87%
+              </span>
+              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">
+                Pass Rate
+              </span>
+            </div>
+          </div>
+        </PageHero>
 
-              <div className="flex items-center gap-3">
-                <span
-                  className="text-4xl font-bold font-mulish text-white"
-                  style={{ color: activeTailwindText }}
-                >
-                  {tabs.find((t) => t.key === activeTab)?.label}
+        {/* Stats */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          {[
+            { label: "MASTERY_LEVEL", value: "84.2", unit: "PERCENTILE" },
+            {
+              label: "TESTS_COMPLETED",
+              value: String(items.length || "—"),
+              unit: "UNITS",
+            },
+            { label: "TIME_INVESTED", value: "42.5", unit: "HOURS" },
+            { label: "STREAK_VALUE", value: "12", unit: "DAYS_ACTIVE" },
+          ].map((s, i) => (
+            <motion.div
+              key={s.label}
+              className="p-6 flex flex-col gap-1 rounded-none bg-[rgba(24,24,27,0.6)] backdrop-blur-xl border border-white/[0.08]"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: i * 0.06,
+                duration: 0.4,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+            >
+              <span className="font-jetbrains text-[12px] text-zinc-500 uppercase tracking-[0.05em]">
+                {s.label}
+              </span>
+              <div className="flex items-end gap-2">
+                <span className="font-satoshi text-[32px] font-semibold tracking-[-0.03em] text-white leading-[1.2]">
+                  {s.value}
+                </span>
+                <span className="font-jetbrains text-sm text-zinc-500 mb-1">
+                  {s.unit}
                 </span>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </motion.div>
+          ))}
+        </section>
 
-      <div className="py-12">
-        {/* Tabs */}
-        <div className="mb-10">
-          <div className="bg-white rounded-md shadow-lg p-2 md:inline-flex gap-2">
-            {tabs.map((t) => (
-              <button
-                key={t.key}
-                id={t.id}
-                onClick={() => setActiveTab(t.key)}
-                style={
-                  activeTab === t.key
-                    ? { backgroundColor: tabStyles[t.key]?.hex ?? activeHex }
-                    : undefined
-                }
-                className={`px-3 py-2 w-full sm:px-6 sm:py-2.5 rounded font-semibold transition-all flex items-center gap-2 ${
-                  activeTab === t.key
-                    ? "text-white shadow"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
+        {/* Filter Tabs */}
+        <section className="flex gap-3 mb-8 flex-wrap">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              className={`relative px-6 py-3 font-jetbrains text-sm font-semibold uppercase tracking-[0.1em] transition-all duration-200 ${
+                activeTab === t.key
+                  ? "bg-[#c0c1ff] text-[#0d0096] border-2 border-[#c0c1ff] shadow-[0_0_24px_rgba(192,193,255,0.4)]"
+                  : "bg-white/5 border-2 border-white/20 text-zinc-200 hover:border-[#c0c1ff]/60 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </section>
+
+        {/* Educational Content: Why + Tips + CTA */}
+        <section className="mb-16 grid lg:grid-cols-3 gap-6">
+          {/* Why Matters */}
+          <motion.div
+            key={`why-${activeTab}`}
+            className="lg:col-span-2 p-8 bg-[rgba(24,24,27,0.6)] backdrop-blur-xl border border-white/[0.08]"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <span className="font-jetbrains text-[10px] text-[#c0c1ff] uppercase tracking-[0.1em] mb-3 block">
+              FOUNDATION
+            </span>
+            <h2 className="font-satoshi text-3xl font-bold tracking-[-0.03em] text-white mb-4">
+              {tabContent[activeTab]?.whyTitle}
+            </h2>
+            <p className="font-dmsans text-[15px] text-zinc-400 leading-relaxed mb-8">
+              {tabContent[activeTab]?.whyDesc}
+            </p>
+
+            <div className="border-t border-white/5 pt-6">
+              <span className="font-jetbrains text-[10px] text-[#4edea3] uppercase tracking-[0.1em] mb-4 block">
+                TIPS_TO_MASTER
+              </span>
+              <ul className="space-y-3">
+                {tabContent[activeTab]?.tips.map((tip, i) => (
+                  <motion.li
+                    key={tip}
+                    className="flex gap-4 items-start"
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05, duration: 0.3 }}
+                  >
+                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center font-jetbrains text-[11px] text-[#c0c1ff]">
+                      {i + 1}
+                    </span>
+                    <p className="font-dmsans text-sm text-zinc-300 leading-relaxed pt-1">
+                      {tip}
+                    </p>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
+
+          {/* AI Bot CTA */}
+          <motion.div
+            key={`cta-${activeTab}`}
+            className="relative overflow-hidden p-8 bg-gradient-to-br from-[#c0c1ff]/10 via-[rgba(24,24,27,0.8)] to-[#4edea3]/10 backdrop-blur-xl border border-[#c0c1ff]/20 flex flex-col justify-between"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#c0c1ff]/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10">
+              <span className="font-jetbrains text-[10px] text-[#4edea3] uppercase tracking-[0.1em] mb-3 block">
+                AI_POWERED ↗
+              </span>
+              <h3 className="font-satoshi text-2xl font-bold tracking-[-0.02em] text-white mb-3 leading-tight">
+                {tabContent[activeTab]?.ctaTitle}
+              </h3>
+              <p className="font-dmsans text-sm text-zinc-400 leading-relaxed mb-6">
+                {tabContent[activeTab]?.ctaDesc}
+              </p>
+            </div>
+
+            {/* Robot mascot + speech bubble */}
+            <div className="relative z-10 mb-6 flex items-start gap-3">
+              <motion.div
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="relative bg-white/90 text-[#0d0096] font-jetbrains text-xs font-semibold px-3 py-2 rounded-2xl rounded-bl-none shadow-lg"
               >
-                {t.label}
-              </button>
+                Hi! Click Me
+                <span className="absolute -bottom-1.5 left-3 w-3 h-3 bg-white/90 rotate-45" />
+              </motion.div>
+              <motion.img
+                src="/assets/Ai-Bot-2.png"
+                alt="AI Bot"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+                className="w-20 h-20 object-contain drop-shadow-[0_0_24px_rgba(192,193,255,0.4)]"
+                animate={{ y: [0, -6, 0] }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            </div>
+
+            <a
+              href="/Ai-Tutor"
+              className="relative z-10 inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#c0c1ff] text-[#0d0096] font-jetbrains text-xs font-semibold uppercase tracking-wider hover:opacity-90 transition-opacity"
+            >
+              LAUNCH_AI_TUTOR →
+            </a>
+          </motion.div>
+        </section>
+
+        {/* Self-Training Guidance */}
+        <motion.section
+          key={`training-${activeTab}`}
+          className="mb-16 p-8 bg-[rgba(24,24,27,0.6)] backdrop-blur-xl border border-white/[0.08]"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="flex items-baseline justify-between mb-6 flex-wrap gap-2">
+            <h3 className="font-satoshi text-2xl font-bold tracking-[-0.02em] text-white">
+              {tabContent[activeTab]?.trainingTitle}
+            </h3>
+            <span className="font-jetbrains text-[10px] text-[#4edea3] uppercase tracking-[0.1em]">
+              SELF_PACED // AI_ASSISTED
+            </span>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {tabContent[activeTab]?.trainingBullets.map((b, i) => (
+              <motion.div
+                key={b}
+                className="flex gap-4 items-start p-4 border border-white/5 bg-white/[0.02]"
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.06, duration: 0.3 }}
+              >
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#4edea3]/10 border border-[#4edea3]/30 flex items-center justify-center font-jetbrains text-[10px] text-[#4edea3]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <p className="font-dmsans text-sm text-zinc-300 leading-relaxed">
+                  {b}
+                </p>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.section>
 
-        {/* Main Layout */}
-        <div className="flex flex-col gap-10">
-          <div className="lg:col-span-2 space-y-8">
-            {/* Intro Card */}
-            {content && (
-              <div className="">
-                <div className="py-6 border-b-4">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    {content.why}
-                  </h2>
-                  <p className="text-gray-700 leading-relaxed">
-                    {content.intro}
-                  </p>
-                </div>
+        {/* Practice Cards Grid */}
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+          {paginatedItems.map((it: any, idx: number) => {
+            const isLoading = !it || !it.testId;
 
-                <div className="py-6 space-y-4">
-                  <h3 className="font-semibold text-gray-900">
-                    Tips to Master
-                  </h3>
-                  {content.tips.map((tip, idx) => (
-                    <div key={idx} className="flex gap-3">
-                      <span
-                        className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold"
-                        style={{ backgroundColor: activeHex }}
-                      >
-                        {idx + 1}
-                      </span>
-                      <p className="text-gray-700 text-sm">{tip}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Track Details */}
-            {trackDetails && trackDetails.content && (
-              <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                <h3 className="text-xl font-bold mb-3">{trackDetails.title}</h3>
-                {trackDetails.description && (
-                  <p className="text-gray-600 mb-4">
-                    {trackDetails.description}
-                  </p>
-                )}
+            if (isLoading) {
+              return (
                 <div
-                  className="prose max-w-none text-gray-700"
-                  dangerouslySetInnerHTML={{ __html: trackDetails.content }}
-                />
-              </div>
-            )}
-          </div>
+                  key={`skeleton-${idx}`}
+                  className="p-6 flex flex-col gap-6 bg-[rgba(24,24,27,0.6)] backdrop-blur-xl border border-white/[0.08]"
+                >
+                  <div className="w-16 h-5 bg-[#353437] rounded-sm animate-pulse" />
+                  <div>
+                    <div className="h-7 bg-[#353437] rounded animate-pulse w-3/4 mb-2" />
+                    <div className="h-4 bg-[#353437] rounded animate-pulse w-full" />
+                  </div>
+                  <div className="pt-4 border-t border-white/5 flex justify-between">
+                    <div className="h-4 bg-[#353437] rounded animate-pulse w-24" />
+                    <div className="h-4 bg-[#353437] rounded animate-pulse w-20" />
+                  </div>
+                </div>
+              );
+            }
 
-          {activeTab === "communication" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 space-x-12 space-y-8 md:space-y-0">
-              <div className="col-span-1 flex flex-col max-w-full md:max-w-sm leading-tight tracking-tight">
-                <p className="text-4xl font-bold font-mulish mb-6">
-                  Wanna ace your interviews? 👉
-                </p>
-                Check out our AI Bot that simulates real interview scenarios,
-                providing you with personalized feedback and tips to improve
-                your communication skills. It's like having a personal coach
-                available 24/7 to help you practice and boost your confidence
-                before the big day!
-              </div>
-              <div className="col-span-1 flex flex-col gap-6">
-                <a href="/Ai-Tutor" rel="noopener noreferrer">
-                  <img
-                    src="images/Ai-Bot-2.png"
-                    alt=""
-                    className="rounded-xl"
-                  />
-                </a>
-                <p className="leading-tight">
-                  TechNova Solutions specializes in cutting-edge software
-                  development, cloud infrastructure, and AI-driven enterprise
-                  applications. With a global client base, they are known for
-                  fostering technological innovation across industries.
-                </p>
-                <h2 className="font-bold">Self-Training Guidance</h2>
-                <ul className="list-disc pl-5 text-zinc-600">
-                  <li>
-                    AI-driven interview training adapted to your communication
-                    proficiency
-                  </li>
-                  <li>
-                    Multi-domain practice covering HR, technical, and real-world
-                    scenarios
-                  </li>
-                  <li>
-                    Instant feedback that identifies mistakes and suggests
-                    precise corrections
-                  </li>
-                  <li>
-                    Continuous improvement insights to strengthen confidence and
-                    performance
-                  </li>
-                </ul>
-              </div>
-            </div>
-          )}
+            const questionsCount =
+              it.questionsCount ?? it.questions?.length ?? "—";
 
-          <div className="lg:col-span-3">
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Practice Tests
-                </h2>
-                <p className="text-gray-600">
-                  Test your skills with curated assessments
-                </p>
-              </div>
-            </div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {paginatedItems.map((it: any, idx: number) => (
-                <div
-                  key={it?.testId ?? idx}
+            return (
+              <motion.div
+                key={it.testId}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.4,
+                  delay: Math.min(idx * 0.06, 0.36),
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+              >
+                <GlowCard
+                  glowColor="purple"
+                  customSize
+                  className={`!aspect-auto !p-0 group overflow-hidden transition-all duration-300
+                    ${hasAccess ? "cursor-pointer hover:-translate-y-1" : "cursor-not-allowed opacity-50"}
+                  `}
                   onClick={() => {
-                    if (!it) return;
-
                     if (!hasAccess) {
                       toast.warning("Access should be granted by the admin");
                       return;
                     }
-
-                    it?.testId &&
-                      navigate(
-                        `/freshers-pratice/test/${
-                          it.trackSlug ?? resolveSlugForTab(activeTab)
-                        }/${it.testId}`,
-                      );
+                    navigate(
+                      `/freshers-pratice/test/${
+                        it.trackSlug ?? resolveSlugForTab(activeTab)
+                      }/${it.testId}`,
+                    );
                   }}
-                  className={`relative bg-white border border-gray-100 transition-all
-                      ${
-                        hasAccess
-                          ? "cursor-pointer hover:shadow-lg"
-                          : "cursor-not-allowed opacity-80"
-                      }
-                    `}
                 >
-                  {!hasAccess && it && (
-                    <div
-                      className="absolute inset-0 z-10 bg-white/70 flex items-center justify-center
-               opacity-0 hover:opacity-100 transition"
-                    >
-                      <div className="flex items-center gap-2 text-gray-700 font-semibold">
-                        <Lock className="w-5 h-5" />
-                        Locked
+                  <div className="relative p-6 flex flex-col gap-6 h-full z-10">
+                    {/* Locked overlay */}
+                    {!hasAccess && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-black/50 backdrop-blur-[2px] rounded-2xl">
+                        <Lock className="w-5 h-5 text-[#c0c1ff] mb-2" />
+                        <span className="font-jetbrains text-[10px] text-[#c0c1ff] tracking-widest uppercase">
+                          ACCESS REQUIRED
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Difficulty badge */}
+                    <div className="flex justify-between items-start">
+                      <div className="bg-indigo-500/10 border border-indigo-500/20 px-2 py-1 rounded-sm">
+                        <span className="font-jetbrains text-[10px] text-[#c0c1ff] uppercase">
+                          {activeTab === "technical"
+                            ? "CODING"
+                            : activeTab === "aptitude"
+                              ? "LOGIC"
+                              : "VERBAL"}
+                        </span>
                       </div>
                     </div>
-                  )}
 
-                  <div className="h-1" style={{ backgroundColor: activeHex }} />
-                  <div className="p-5">
-                    <h3 className="font-bold text-gray-900 mb-2">
-                      {it?.title ?? (
-                        <div className="h-5 bg-gray-200 rounded w-3/4 animate-pulse" />
+                    {/* Title + desc */}
+                    <div>
+                      <h3 className="font-satoshi text-2xl font-semibold tracking-[-0.02em] text-zinc-100 mb-2">
+                        {it.title}
+                      </h3>
+                      <p className="font-dmsans text-[13px] text-zinc-500 leading-relaxed">
+                        {it.description ||
+                          `${questionsCount} questions to test your skills.`}
+                      </p>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-auto">
+                      <span className="font-jetbrains text-sm text-zinc-400 uppercase">
+                        {questionsCount} QUESTIONS
+                      </span>
+                      {hasAccess ? (
+                        <button className="text-[#c0c1ff] font-jetbrains text-xs uppercase group-hover:underline">
+                          Start_Now
+                        </button>
+                      ) : (
+                        <span className="text-zinc-600 font-jetbrains text-xs uppercase">
+                          LOCKED
+                        </span>
                       )}
-                    </h3>
-
-                    {it && (
-                      <>
-                        <p className="text-sm text-gray-600 mb-3">
-                          {it.questionsCount ?? it.questions?.length ?? "—"}{" "}
-                          questions
-                        </p>
-
-                        {hasAccess ? (
-                          <span
-                            className="font-semibold text-sm"
-                            style={{ color: activeHex }}
-                          >
-                            Start Test →
-                          </span>
-                        ) : (
-                          <span className="text-sm text-gray-400">
-                            Access Required
-                          </span>
-                        )}
-                      </>
-                    )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            {!loadingItems && totalPages > 1 && (
-              <div className="mt-8">
-                <Pagination />
-              </div>
-            )}
+                </GlowCard>
+              </motion.div>
+            );
+          })}
+        </section>
 
-            {!loadingItems && items.length === 0 && !itemsError && (
-              <div className="text-center py-16 bg-white rounded-xl shadow">
-                <p className="text-gray-600">
-                  No tests available for this category.
+        {/* Empty state */}
+        {!loadingItems && items.length === 0 && !itemsError && (
+          <motion.div
+            className="text-center py-20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mx-auto mb-4 border border-white/[0.08]">
+              <span className="font-satoshi text-2xl text-zinc-500">?</span>
+            </div>
+            <h3 className="font-satoshi text-lg font-semibold text-[#e5e1e4] mb-1">
+              No Tests Available
+            </h3>
+            <p className="font-dmsans text-sm text-[#908fa0]">
+              No tests for this category yet. Check back soon.
+            </p>
+          </motion.div>
+        )}
+
+        {/* Pagination */}
+        {!loadingItems && totalPages > 1 && (
+          <motion.footer
+            className="flex justify-between items-center py-6 border-t border-white/5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="font-jetbrains text-xs text-[#908fa0] uppercase tracking-wider">
+              Page{" "}
+              <span className="text-[#e5e1e4]">
+                {String(currentPage).padStart(2, "0")}
+              </span>{" "}
+              / {String(totalPages).padStart(2, "0")}
+            </div>
+            <div className="flex gap-4">
+              <button
+                className="px-6 py-2 border border-[#464554] font-jetbrains text-xs text-[#c7c4d7] hover:bg-white/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+                PREV
+              </button>
+              <button
+                className="px-6 py-2 bg-[#c0c1ff] text-[#0d0096] font-jetbrains text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
+                }
+                disabled={currentPage >= totalPages}
+              >
+                NEXT
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </motion.footer>
+        )}
+
+        {/* AI Tutor promo (communication tab only) */}
+        {activeTab === "communication" && (
+          <motion.section
+            className="mt-16 p-8 bg-[rgba(24,24,27,0.6)] backdrop-blur-xl border border-white/[0.08] rounded-none"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div>
+                <span className="font-jetbrains text-xs text-[#4edea3] uppercase tracking-[0.1em] mb-3 block">
+                  AI_POWERED
+                </span>
+                <h2 className="font-satoshi text-3xl font-bold tracking-[-0.03em] text-white mb-4">
+                  Ace Interviews With AI Coach
+                </h2>
+                <p className="font-dmsans text-[15px] text-zinc-400 leading-relaxed mb-6">
+                  AI Bot simulates real interview scenarios with personalized
+                  feedback. Like a personal coach available 24/7.
                 </p>
+                <a
+                  href="/Ai-Tutor"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#c0c1ff] text-[#0d0096] font-jetbrains text-xs font-medium uppercase hover:opacity-90 transition-opacity"
+                >
+                  LAUNCH_TUTOR
+                </a>
               </div>
-            )}
-          </div>
-        </div>
+              <div>
+                <a href="/Ai-Tutor">
+                  <img
+                    src="/assets/Ai-Bot-2.png"
+                    alt="AI Tutor"
+                    className="rounded-lg border border-white/[0.08] w-full"
+                  />
+                </a>
+              </div>
+            </div>
+          </motion.section>
+        )}
+      </main>
+
+      <TestimonialSlider />
+
+      {/* FAB */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <button
+          onClick={() => {
+            if (!hasAccess) {
+              toast.warning("Access should be granted by the admin");
+              return;
+            }
+          }}
+          className="bg-indigo-500 hover:bg-indigo-600 text-white p-4 rounded-full shadow-2xl flex items-center justify-center group transition-all hover:scale-105 active:scale-95 border border-white/20"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
       </div>
-    </div>
+    </DarkGradientBg>
   );
 }

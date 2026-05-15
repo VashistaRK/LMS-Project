@@ -4,6 +4,7 @@ import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { User } from "../hooks/useAuth";
 import { useAuthContext } from "../context/AuthProvider";
+import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
 
 const api = import.meta.env.VITE_API_URL;
 
@@ -99,7 +100,8 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen leading-tight tracking-tight py-10 max-w-7xl mx-6 xl:mx-auto xl:px-6">
+    <DarkGradientBg className="text-[#e5e1e4]">
+    <div className="relative z-10 min-h-screen leading-tight tracking-tight py-10 max-w-7xl mx-6 xl:mx-auto xl:px-6">
       <div className="md:flex gap-12 space-y-12 md:justify-between max-h-fit py-12">
         {/* LEFT FORM */}
         <section className="flex-1 lg:max-w-2/3">
@@ -226,6 +228,7 @@ const ProfilePage: React.FC = () => {
         </aside>
       </div>
     </div>
+    </DarkGradientBg>
   );
 };
 

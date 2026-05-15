@@ -40,7 +40,7 @@ const ExpertProfessionals = () => {
         </p>
 
         <img
-          src="images/bg.jpg"
+          src="/assets/bg.jpg"
           alt=""
           className="ml-auto w-full mt-8 rounded-xl"
         />

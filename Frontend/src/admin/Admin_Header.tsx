@@ -38,7 +38,7 @@ const Admin_Header = () => {
             <a className="relative group" href="/admin">
               <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/0 via-blue-500/10 to-purple-500/0 blur opacity-0 group-hover:opacity-100 transition" />
               <img
-                src="/images/Sunadh-Logo.png"
+                src="/assets/Sunadh-Logo.png"
                 alt="Sunadh Logo"
                 className="relative h-14 w-auto transition-transform group-hover:scale-105"
               />

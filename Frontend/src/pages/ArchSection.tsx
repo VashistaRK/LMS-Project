@@ -13,28 +13,28 @@ const archInfo = [
     title: "Role‑Based Training by Certified Trainers",
     desc: "Learn from certified, industry‑experienced mentors using a role‑based approach that mirrors real project workflows and responsibilities. Our LMS features personalized learning paths for Frontend Developer, Backend Engineer, Full-Stack Developer, Data Scientist, Cloud Architect, and Cybersecurity Specialist roles, with curriculum designed by industry experts from top tech companies.",
     color: "#D5FF37",
-    img: "images/Arch4.png",
+    img: "/assets/Arch4.png",
   },
   {
     id: "blue",
     title: "Live Projects and Practical Labs",
     desc: "Work on live, production‑style projects with hands‑on labs so you build portfolio‑ready artifacts and job‑relevant confidence. Our LMS includes 50+ guided projects, interactive coding environments, real-time collaboration tools, and automated code review systems that simulate professional development workflows.",
     color: "#7DD6FF",
-    img: "images/Arch3.png",
+    img: "/assets/Arch3.png",
   },
   {
     id: "pink",
     title: "Certification and Placement Support",
     desc: "Earn recognized certifications and get placement support with interview prep, resume reviews, and access to hiring partners. Our LMS provides industry-recognized certificates, mock interview platforms with AI feedback, resume optimization tools, and direct connections to 500+ hiring partners including FAANG companies and startups.",
     color: "#FFA0B0",
-    img: "images/Arch2.png",
+    img: "/assets/Arch2.png",
   },
   {
     id: "orange",
     title: "Flexible, Affordable Learning Options",
     desc: "Choose online or classroom sessions, convenient schedules, and industry‑aligned curricula—without compromising on quality. Our LMS offers self-paced learning, live instructor-led sessions, mobile app access, lifetime content updates, and flexible payment plans starting from $9/month with money-back guarantee.",
     color: "#FFA17B",
-    img: "images/Arch1.png",
+    img: "/assets/Arch1.png",
   },
 ];
 

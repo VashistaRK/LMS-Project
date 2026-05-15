@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useCourses } from "@/hooks/queries/courses";
 import { useEffect, useRef, useState } from "react";
+import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
 
 const LandingPage1 = () => {
   const videoScrollerRef = useRef<HTMLDivElement>(null);
@@ -40,21 +41,21 @@ const LandingPage1 = () => {
       id: 0,
       title: "Card One",
       color: "bg-blue-700/70",
-      image: "images/modern_student_studying_with_laptop.png",
+      image: "/assets/modern_student_studying_with_laptop.png",
       description: "Launch Your Career",
     },
     {
       id: 1,
       title: "Card Two",
       color: "bg-blue-800/70",
-      image: "images/working.jpeg",
+      image: "/assets/working.jpeg",
       description: "Learn with Purpose",
     },
     {
       id: 2,
       title: "Card Three",
       color: "bg-blue-900/70",
-      image: "images/fresher.jpg",
+      image: "/assets/fresher.jpg",
       description: "Turn Ideas into Reality",
     },
   ];
@@ -88,7 +89,7 @@ const LandingPage1 = () => {
       description:
         "Executive presence, public speaking, and business writing mastery.",
       icon: MessageSquare,
-      image: "images/abstract_communication_concept.png",
+      image: "/assets/abstract_communication_concept.png",
       href: "#communications",
       color:
         "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
@@ -106,7 +107,7 @@ const LandingPage1 = () => {
       description:
         "Critical thinking and problem-solving for competitive assessments.",
       icon: BrainCircuit,
-      image: "images/abstract_logic_and_aptitude_concept.png",
+      image: "/assets/abstract_logic_and_aptitude_concept.png",
       href: "#logical-aptitude",
       color:
         "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
@@ -124,7 +125,7 @@ const LandingPage1 = () => {
       description:
         "Industry-standard software development and engineering tracks.",
       icon: Code,
-      image: "images/abstract_technology_concept.png",
+      image: "/assets/abstract_technology_concept.png",
       href: "#technical-skills",
       color: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300",
       featurePoints: [
@@ -141,7 +142,7 @@ const LandingPage1 = () => {
       description:
         "Direct access to top-tier employment opportunities and placement.",
       icon: Briefcase,
-      image: "images/abstract_career_and_growth_concept.png",
+      image: "/assets/abstract_career_and_growth_concept.png",
       href: "/jobsite",
       color:
         "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
@@ -237,7 +238,8 @@ const LandingPage1 = () => {
     : sampleFeatured;
 
   return (
-    <div className="text-gray-800 flex flex-col items-center font-Quick">
+    <DarkGradientBg className="text-[#e5e1e4]">
+    <div className="relative z-10 text-gray-800 flex flex-col items-center font-Quick">
       {/* Hero Section */}
       <section className="relative w-full flex items-start justify-center">
         <div className="relative mx-auto max-w-[85rem] px-6 py-8 lg:py-18">
@@ -310,14 +312,14 @@ const LandingPage1 = () => {
               <div
                 className="absolute top-0 right-0 w-[380px] h-[380px] rounded-full bg-no-repeat bg-cover bg-center"
                 style={{
-                  backgroundImage: "url('images/fresher.jpg')",
+                  backgroundImage: "url('/assets/fresher.jpg')",
                 }}
               />
               <div className="absolute bottom-[120px] left-[40px] w-[260px] h-[260px] rounded-full bg-[#f7f7f4]" />
               <div
                 className="absolute bottom-0 left-0 w-[120px] h-[120px] rounded-full bg-no-repeat bg-cover bg-center"
                 style={{
-                  backgroundImage: "url('images/fresher.jpg')",
+                  backgroundImage: "url('/assets/fresher.jpg')",
                   backgroundPosition: "left bottom",
                 }}
               />
@@ -366,7 +368,7 @@ const LandingPage1 = () => {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img
-            src="images/group_of_diverse_students.png"
+            src="/assets/group_of_diverse_students.png"
             alt="Background"
             className="w-full h-full object-cover"
           />
@@ -1127,6 +1129,7 @@ const LandingPage1 = () => {
         </div>
       </section>
     </div>
+    </DarkGradientBg>
   );
 };
 

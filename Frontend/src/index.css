@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Bytesized&family=Dancing+Script:wght@400..700&family=Goldman:wght@400;700&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Macondo&family=Nova+Flat&family=Ojuju:wght@200..800&family=Orbitron:wght@400..900&family=Quicksand:wght@300..700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Rubik+Dirt&family=Syncopate:wght@400;700&family=Unica+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Bytesized&family=Dancing+Script:wght@400..700&family=Goldman:wght@400;700&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Macondo&family=Nova+Flat&family=Ojuju:wght@200..800&family=Orbitron:wght@400..900&family=Quicksand:wght@300..700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Rubik+Dirt&family=Syncopate:wght@400;700&family=Unica+One&family=DM+Sans:opsz,wght@9..40,300..700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,900&display=swap");
 
 @import "tailwindcss";
 
@@ -104,9 +105,13 @@
   --font-heading: 'Outfit', sans-serif;
   --font-nunito: 'Nunito', sans-serif;
   --font-mulish: 'Mulish', sans-serif;
+  --font-satoshi: 'Satoshi', sans-serif;
+  --font-dmsans: 'DM Sans', sans-serif;
+  --font-jetbrains: 'JetBrains Mono', monospace;
 
   --color-dark1: #1f2937;
   --color-dark2: #111827;
+
 }
 @layer utilities {
   .scrollbar-hide {
@@ -174,10 +179,41 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
+  html, body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  @media (max-width: 640px) {
+    html { font-size: 15px; }
   }
 }
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
 .clipped-box {
   clip-path: path(
     "M 0,140 A 20,20 0,0,1 20,120 L 240,120 A 60,60 0,0,0 300,60 L 300,20 A 20,20 0,0,1 320,0 L 1460,0 L 1460,1200 L 0,1200 Z"
@@ -202,6 +238,24 @@
 .scroll-no-bounce {
   overflow-anchor: none;
 }
+@keyframes ripple {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(0.9); }
+}
+
+@keyframes orbit {
+  0% { transform: rotate(0deg) translateY(calc(var(--radius) * 1px)) rotate(0deg); }
+  100% { transform: rotate(360deg) translateY(calc(var(--radius) * 1px)) rotate(-360deg); }
+}
+
+.animate-ripple {
+  animation: ripple 2s ease calc(var(--i, 0) * 0.2s) infinite;
+}
+
+.animate-orbit {
+  animation: orbit calc(var(--duration) * 1s) linear infinite;
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;

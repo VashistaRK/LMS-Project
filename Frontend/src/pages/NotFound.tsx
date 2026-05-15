@@ -1,19 +1,20 @@
 import { Link } from "react-router-dom";
+import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
 
 export default function NotFound() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-center">
-      <h1 className="text-6xl font-bold text-red-500">404</h1>
-      <h2 className="text-2xl mt-4 text-gray-800">Page Not Found</h2>
-      <p className="mt-2 text-gray-600">
-        Sorry, the page you are looking for does not exist.
-      </p>
-      <Link
-        to="/admin"
-        className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-      >
-        Go Back Home
-      </Link>
-    </div>
+    <DarkGradientBg className="text-[#e5e1e4]">
+      <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-6">
+        <span className="font-jetbrains text-[120px] font-bold leading-none bg-linear-to-r from-[#c0c1ff] to-[#4edea3] bg-clip-text text-transparent">404</span>
+        <h2 className="font-satoshi text-2xl font-bold mt-4">Page Not Found</h2>
+        <p className="mt-2 text-zinc-500 font-dmsans">Sorry, this page does not exist.</p>
+        <Link
+          to="/"
+          className="mt-8 px-6 py-3 bg-[#c0c1ff] text-[#0d0096] rounded-lg font-jetbrains text-xs uppercase font-medium hover:opacity-90 transition"
+        >
+          Go Home
+        </Link>
+      </div>
+    </DarkGradientBg>
   );
 }

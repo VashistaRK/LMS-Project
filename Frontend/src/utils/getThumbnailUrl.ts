@@ -1,7 +1,7 @@
 /* eslint-disable */
 import type { CourseData, ThumbnailData } from "../types/course";
 
-const FALLBACK_THUMB = "images/no-image.png";
+const FALLBACK_THUMB = "/assets/no-image.png";
 
 export default function getThumbnailUrl(course: CourseData): string {
   const t = (course as any)?.thumbnail as

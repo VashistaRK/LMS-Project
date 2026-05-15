@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
+import DOMPurify from "dompurify";
+import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
 
 /* --- types --- */
 type Paper = {
@@ -164,7 +166,8 @@ export default function CompanyPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <DarkGradientBg className="text-[#e5e1e4]">
+    <div className="relative z-10 min-h-screen">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-6 py-12">
@@ -187,7 +190,13 @@ export default function CompanyPage() {
             </h2>
             <div
               className="prose prose-sm max-w-none text-gray-700"
-              dangerouslySetInnerHTML={{ __html: company.guidance }}
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(company.guidance, {
+                  ALLOWED_TAGS: ["p", "br", "strong", "em", "u", "a", "ul", "ol", "li", "h1", "h2", "h3", "h4", "blockquote", "code", "pre"],
+                  ALLOWED_ATTR: ["href", "target", "rel"],
+                  ALLOW_DATA_ATTR: false,
+                }),
+              }}
             />
           </div>
         )}
@@ -365,5 +374,6 @@ export default function CompanyPage() {
         )}
       </div>
     </div>
+    </DarkGradientBg>
   );
 }

@@ -144,7 +144,7 @@ const CareerPreparation: React.FC = () => {
               "Build rapport and work effectively in teams. Develop the ability to collaborate, empathize, and create positive working relationships.",
           },
         ]}
-        image="images/Verbal Communication.png"
+        image="/assets/Verbal Communication.png"
       />
 
       {/* Logical Skills */}
@@ -169,7 +169,7 @@ const CareerPreparation: React.FC = () => {
               "Learn systematic approaches to break down complex challenges into manageable components for efficient solutions.",
           },
         ]}
-        image="images/Quantitative Aptitude.png"
+        image="/assets/Quantitative Aptitude.png"
       />
 
       {/* Technical Skills */}
@@ -194,7 +194,7 @@ const CareerPreparation: React.FC = () => {
               "Develop proficiency in HTML, CSS, modern frameworks, and API integration for full-stack development capabilities.",
           },
         ]}
-        image="images/technical.png"
+        image="/assets/technical.png"
       />
 
       {/* Company Preparation */}
@@ -219,7 +219,7 @@ const CareerPreparation: React.FC = () => {
               "Analyze organizational values, work environment, and team dynamics to align your approach with company expectations.",
           },
         ]}
-        image="images/company.jpg"
+        image="/assets/company.jpg"
       />
 
       {/* Get Placed */}
