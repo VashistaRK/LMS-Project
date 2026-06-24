@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import DOMPurify from "dompurify";
-import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
+import { LightGlassBg } from "@/components/ui/light-glass-bg";
 
 /* --- types --- */
 type Paper = {
@@ -166,7 +166,7 @@ export default function CompanyPage() {
   );
 
   return (
-    <DarkGradientBg className="text-[#e5e1e4]">
+    <LightGlassBg className="text-zinc-900">
     <div className="relative z-10 min-h-screen">
       {/* Header */}
       <div className="bg-white border-b">
@@ -374,6 +374,6 @@ export default function CompanyPage() {
         )}
       </div>
     </div>
-    </DarkGradientBg>
+    </LightGlassBg>
   );
 }

@@ -34,7 +34,7 @@ const App = () => {
   }, []);
 
   return (
-    <div className="bg-[#09090B] font-dmsans">
+    <div className="bg-white font-dmsans">
       <Toaster richColors position="bottom-right" />
       <Header />
       <Outlet />

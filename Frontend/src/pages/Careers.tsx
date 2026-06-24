@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles, Target, Compass, Play } from "lucide-react";
-import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
+import { LightGlassBg } from "@/components/ui/light-glass-bg";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { PageHero } from "@/components/ui/page-hero";
 
@@ -15,20 +15,20 @@ const DreamJobPage = () => {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
 
   return (
-    <DarkGradientBg className="text-[#e5e1e4]">
-      <div className="max-w-[1440px] mx-auto px-6 py-8">
+    <LightGlassBg className="text-zinc-900">
+      <div className="max-w-[1440px] mx-auto px-6 pt-28 pb-8">
         <PageHero
-          label="CAREER_GUIDANCE"
-          title={<>Your Dream Job<br /><span className="bg-linear-to-r from-[#c0c1ff] to-[#4edea3] bg-clip-text text-transparent">Is Still Possible</span></>}
+          label="Career Guidance"
+          title={<>Your Dream Job<br /><span className="bg-linear-to-r from-[#6366F1] to-[#4edea3] bg-clip-text text-transparent">Is Still Possible</span></>}
           subtitle="Whether you are confused, unplaced, or unsure about your future — you are not late. You just need direction."
         >
           <div className="flex gap-4 flex-wrap mt-4">
             {[
-              { icon: <Compass className="w-5 h-5 text-[#c0c1ff]" />, label: "No Clarity" },
+              { icon: <Compass className="w-5 h-5 text-[#6366F1]" />, label: "No Clarity" },
               { icon: <Target className="w-5 h-5 text-[#4edea3]" />, label: "Dream Companies" },
               { icon: <Sparkles className="w-5 h-5 text-[#fbbf24]" />, label: "Step-by-Step Path" },
             ].map((item) => (
-              <div key={item.label} className="flex items-center gap-3 bg-white/5 backdrop-blur-xl border border-white/[0.08] px-5 py-3 rounded-xl">
+              <div key={item.label} className="flex items-center gap-3 bg-white/40 backdrop-blur-xl border border-white/[0.08] px-5 py-3 rounded-xl">
                 {item.icon}
                 <span className="text-zinc-200 font-dmsans text-sm">{item.label}</span>
               </div>
@@ -65,7 +65,7 @@ const DreamJobPage = () => {
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <span className="font-jetbrains text-xs text-[#c0c1ff] uppercase tracking-[0.2em] mb-2 block">WATCH_AND_LEARN</span>
+            <span className="text-sm font-bold text-[#6366F1] mb-2 block">Watch and Learn</span>
             <h2 className="font-satoshi text-3xl md:text-4xl font-bold text-white">Watch. Feel. Transform.</h2>
           </div>
 
@@ -117,7 +117,7 @@ const DreamJobPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </DarkGradientBg>
+    </LightGlassBg>
   );
 };
 

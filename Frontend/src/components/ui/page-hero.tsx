@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import type { ReactNode } from "react";
+import { ReactNode } from "react";
 
 interface PageHeroProps {
   label: string;
@@ -9,42 +9,41 @@ interface PageHeroProps {
   image?: string;
 }
 
-export function PageHero({
-  label,
-  title,
-  subtitle,
-  children,
-  image = "assets/courses-hero.png",
-}: PageHeroProps) {
+export function PageHero({ label, title, subtitle, children, image = "assets/courses-hero.png" }: PageHeroProps) {
   return (
     <motion.header
-      className="mb-12 relative overflow-hidden rounded-2xl border border-white/[0.06]"
+      className="mb-12 relative overflow-hidden rounded-3xl border border-zinc-400 bg-white/60 backdrop-blur-xl shadow-[0_35px_80px_-10px_rgba(0,0,0,0.75)] ring-1 ring-zinc-900/20"
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="absolute inset-0">
-        <img
-          src={image}
-          alt=""
-          className="absolute right-0 top-0 w-2/3 h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#09090B] from-30% via-[#09090B]/70 via-50% to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#09090B] via-transparent to-[#09090B]/50" />
-      </div>
-      <div className="relative z-10 px-8 py-10 md:py-12">
-        <span className="font-jetbrains text-xs text-[#c0c1ff] uppercase tracking-[0.2em] mb-4 block">
-          {label}
-        </span>
-        <h1 className="font-satoshi text-4xl md:text-6xl font-bold tracking-[-0.04em] text-white mb-4">
-          {title}
-        </h1>
-        {subtitle && (
-          <p className="font-satoshi text-xl md:text-2xl font-bold tracking-[-0.03em] text-zinc-500 mb-6 max-w-2xl leading-tight">
-            {subtitle}
-          </p>
-        )}
-        {children}
+      <div className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] items-stretch">
+        {/* Text column — white panel */}
+        <div className="relative z-10 px-5 py-8 sm:px-8 sm:py-10 md:py-12 bg-white">
+          <span className="text-sm font-bold text-zinc-900 mb-4 block">
+            {label}
+          </span>
+          <h1 className="font-satoshi text-3xl sm:text-4xl md:text-6xl font-bold tracking-[-0.04em] text-zinc-900 mb-4">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="font-satoshi text-lg sm:text-xl md:text-2xl font-bold tracking-[-0.03em] text-zinc-900 mb-6 leading-tight">
+              {subtitle}
+            </p>
+          )}
+          {children}
+        </div>
+
+        {/* Image column — full visible, no overlay */}
+        <div className="relative min-h-[200px] md:min-h-full">
+          <img
+            src={image}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          {/* Thin left edge fade so image meets text panel softly */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white to-transparent" />
+        </div>
       </div>
     </motion.header>
   );

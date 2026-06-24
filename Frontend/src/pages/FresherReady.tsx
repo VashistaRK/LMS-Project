@@ -1,12 +1,12 @@
 /* eslint-disable */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuthContext } from "../context/AuthProvider";
 import { Lock, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
+import { LightGlassBg } from "@/components/ui/light-glass-bg";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { PageHero } from "@/components/ui/page-hero";
 import TestimonialSlider from "@/components/ui/testimonial-slider";
@@ -38,15 +38,12 @@ export default function FreshersReady() {
   }, []);
 
   const tabs = [
-    { key: "communication", label: "COMMUNICATION", id: "communication" },
-    { key: "aptitude", label: "DSA_LOGIC", id: "logical-aptitude" },
-    { key: "technical", label: "TECHNICAL", id: "technical-skills" },
+    { key: "communication", label: "Communication", id: "communication" },
+    { key: "aptitude", label: "DSA & Logic", id: "logical-aptitude" },
+    { key: "technical", label: "Technical", id: "technical-skills" },
   ];
 
-  const tabHeroContent: Record<
-    string,
-    { heading: string; sub: string; image: string }
-  > = {
+  const tabHeroContent: Record<string, { heading: string; sub: string; image: string }> = {
     communication: {
       heading: "Master Communication.",
       sub: "Ace interviews with verbal, written, and presentation practice modules.",
@@ -64,18 +61,15 @@ export default function FreshersReady() {
     },
   };
 
-  const tabContent: Record<
-    string,
-    {
-      whyTitle: string;
-      whyDesc: string;
-      tips: string[];
-      ctaTitle: string;
-      ctaDesc: string;
-      trainingTitle: string;
-      trainingBullets: string[];
-    }
-  > = {
+  const tabContent: Record<string, {
+    whyTitle: string;
+    whyDesc: string;
+    tips: string[];
+    ctaTitle: string;
+    ctaDesc: string;
+    trainingTitle: string;
+    trainingBullets: string[];
+  }> = {
     communication: {
       whyTitle: "Why Communication Skills Matter",
       whyDesc:
@@ -220,108 +214,76 @@ export default function FreshersReady() {
   const hero = tabHeroContent[activeTab] || tabHeroContent.aptitude;
 
   return (
-    <DarkGradientBg className="text-[#e5e1e4]">
+    <LightGlassBg className="text-zinc-900">
       {/* Hero */}
-      <main className="relative z-10 py-8 px-6 md:px-10 max-w-7xl mx-auto">
+      <main className="relative z-10 pt-28 pb-8 px-6 md:px-10 max-w-7xl mx-auto">
         <PageHero
-          label="PRACTICE_SESSION"
+          label="Practice Session"
           title={<>{hero.heading}</>}
           subtitle={hero.sub}
           image={hero.image}
         >
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 font-jetbrains text-xs text-[#c0c1ff] uppercase tracking-[0.2em] mb-6 border-b border-[#c0c1ff]/30 pb-1 hover:border-[#c0c1ff] transition-colors"
-          >
+          <a href="#" className="inline-flex items-center gap-2 text-sm font-bold text-[#6366F1] mb-6 border-b border-[#6366F1]/30 pb-1 hover:border-[#6366F1] transition-colors">
             My Attempts <span className="text-sm">↗</span>
           </a>
-          <div className="border-l-2 border-[#c0c1ff]/30 pl-6 mb-8 max-w-2xl">
-            <p className="font-jetbrains text-sm text-zinc-300 uppercase tracking-wide leading-relaxed mb-4">
+          <div className="border-l-2 border-[#6366F1]/30 pl-6 mb-8 max-w-2xl">
+            <p className="text-base font-bold text-zinc-900 leading-relaxed mb-4">
               "Practice does not make perfect. Perfect practice makes perfect."
             </p>
             <p className="font-dmsans text-sm text-zinc-500 leading-relaxed">
-              Sharpen your skills with{" "}
-              <span className="text-zinc-300 underline decoration-zinc-600">
-                topic-wise practice tests
-              </span>{" "}
-              that mirror real placement rounds. Track your mastery, build your
-              streak, and identify weak areas before the interview — with{" "}
-              <span className="text-zinc-300 underline decoration-zinc-600">
-                instant feedback and detailed analytics
-              </span>
-              .
+              Sharpen your skills with <span className="text-zinc-700 underline decoration-zinc-600">topic-wise practice tests</span> that mirror real placement rounds. Track your mastery, build your streak, and identify weak areas before the interview — with <span className="text-zinc-700 underline decoration-zinc-600">instant feedback and detailed analytics</span>.
             </p>
           </div>
-          <div className="flex gap-6 flex-wrap">
-            <div className="flex items-center gap-2">
-              <span className="font-satoshi text-2xl font-bold text-white">
-                156
-              </span>
-              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">
-                Tests
-              </span>
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+            <div className="flex flex-shrink-0 items-center gap-2">
+              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">156</span>
+              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">Tests</span>
             </div>
-            <div className="w-px h-8 bg-white/10" />
-            <div className="flex items-center gap-2">
-              <span className="font-satoshi text-2xl font-bold text-white">
-                12
-              </span>
-              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">
-                Topics
-              </span>
+            <div className="hidden h-8 w-px bg-zinc-300 sm:block" />
+            <div className="flex flex-shrink-0 items-center gap-2">
+              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">12</span>
+              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">Topics</span>
             </div>
-            <div className="w-px h-8 bg-white/10" />
-            <div className="flex items-center gap-2">
-              <span className="font-satoshi text-2xl font-bold text-white">
-                45m
-              </span>
-              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">
-                Avg Duration
-              </span>
+            <div className="hidden h-8 w-px bg-zinc-300 sm:block" />
+            <div className="flex flex-shrink-0 items-center gap-2">
+              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">45m</span>
+              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">Avg Duration</span>
             </div>
-            <div className="w-px h-8 bg-white/10" />
-            <div className="flex items-center gap-2">
-              <span className="font-satoshi text-2xl font-bold text-white">
-                87%
-              </span>
-              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">
-                Pass Rate
-              </span>
+            <div className="hidden h-8 w-px bg-zinc-300 sm:block" />
+            <div className="flex flex-shrink-0 items-center gap-2">
+              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">87%</span>
+              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">Pass Rate</span>
             </div>
           </div>
         </PageHero>
 
         {/* Stats */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-12">
           {[
-            { label: "MASTERY_LEVEL", value: "84.2", unit: "PERCENTILE" },
+            { label: "Mastery Level", value: "84.2", unit: "Percentile" },
             {
-              label: "TESTS_COMPLETED",
+              label: "Tests Completed",
               value: String(items.length || "—"),
-              unit: "UNITS",
+              unit: "Units",
             },
-            { label: "TIME_INVESTED", value: "42.5", unit: "HOURS" },
-            { label: "STREAK_VALUE", value: "12", unit: "DAYS_ACTIVE" },
+            { label: "Time Invested", value: "42.5", unit: "Hours" },
+            { label: "Streak Value", value: "12", unit: "Days Active" },
           ].map((s, i) => (
             <motion.div
               key={s.label}
-              className="p-6 flex flex-col gap-1 rounded-none bg-[rgba(24,24,27,0.6)] backdrop-blur-xl border border-white/[0.08]"
+              className="p-4 sm:p-6 flex flex-col gap-1 rounded-none bg-white/60 backdrop-blur-xl border border-zinc-200/60"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: i * 0.06,
-                duration: 0.4,
-                ease: [0.16, 1, 0.3, 1],
-              }}
+              transition={{ delay: i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             >
-              <span className="font-jetbrains text-[12px] text-zinc-500 uppercase tracking-[0.05em]">
+              <span className="text-sm font-bold text-zinc-600">
                 {s.label}
               </span>
               <div className="flex items-end gap-2">
-                <span className="font-satoshi text-[32px] font-semibold tracking-[-0.03em] text-white leading-[1.2]">
+                <span className="font-satoshi text-[24px] sm:text-[32px] font-bold tracking-[-0.03em] text-zinc-900 leading-[1.2]">
                   {s.value}
                 </span>
-                <span className="font-jetbrains text-sm text-zinc-500 mb-1">
+                <span className="text-sm font-bold text-zinc-500 mb-1">
                   {s.unit}
                 </span>
               </div>
@@ -335,10 +297,10 @@ export default function FreshersReady() {
             <button
               key={t.key}
               onClick={() => setActiveTab(t.key)}
-              className={`relative px-6 py-3 font-jetbrains text-sm font-semibold uppercase tracking-[0.1em] transition-all duration-200 ${
+              className={`relative px-6 py-3 text-base font-bold transition-all duration-200 ${
                 activeTab === t.key
-                  ? "bg-[#c0c1ff] text-[#0d0096] border-2 border-[#c0c1ff] shadow-[0_0_24px_rgba(192,193,255,0.4)]"
-                  : "bg-white/5 border-2 border-white/20 text-zinc-200 hover:border-[#c0c1ff]/60 hover:text-white hover:bg-white/10"
+                  ? "bg-[#6366F1] text-white border-2 border-[#6366F1] shadow-[0_0_24px_rgba(192,193,255,0.4)]"
+                  : "bg-white/40 border-2 border-zinc-300 text-zinc-700 hover:border-[#6366F1]/60 hover:text-zinc-900 hover:bg-white/60"
               }`}
             >
               {t.label}
@@ -351,24 +313,24 @@ export default function FreshersReady() {
           {/* Why Matters */}
           <motion.div
             key={`why-${activeTab}`}
-            className="lg:col-span-2 p-8 bg-[rgba(24,24,27,0.6)] backdrop-blur-xl border border-white/[0.08]"
+            className="lg:col-span-2 p-8 bg-white/60 backdrop-blur-xl border border-zinc-200/60"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span className="font-jetbrains text-[10px] text-[#c0c1ff] uppercase tracking-[0.1em] mb-3 block">
-              FOUNDATION
+            <span className="text-sm font-bold text-[#6366F1] mb-3 block">
+              Foundation
             </span>
-            <h2 className="font-satoshi text-3xl font-bold tracking-[-0.03em] text-white mb-4">
+            <h2 className="font-satoshi text-3xl font-bold tracking-[-0.03em] text-zinc-900 mb-4">
               {tabContent[activeTab]?.whyTitle}
             </h2>
-            <p className="font-dmsans text-[15px] text-zinc-400 leading-relaxed mb-8">
+            <p className="font-dmsans text-[15px] text-zinc-600 leading-relaxed mb-8">
               {tabContent[activeTab]?.whyDesc}
             </p>
 
-            <div className="border-t border-white/5 pt-6">
-              <span className="font-jetbrains text-[10px] text-[#4edea3] uppercase tracking-[0.1em] mb-4 block">
-                TIPS_TO_MASTER
+            <div className="border-t border-zinc-200/60 pt-6">
+              <span className="text-sm font-bold text-emerald-600 mb-4 block">
+                Tips to Master
               </span>
               <ul className="space-y-3">
                 {tabContent[activeTab]?.tips.map((tip, i) => (
@@ -379,10 +341,10 @@ export default function FreshersReady() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05, duration: 0.3 }}
                   >
-                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center font-jetbrains text-[11px] text-[#c0c1ff]">
+                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center font-jetbrains text-[11px] text-[#6366F1]">
                       {i + 1}
                     </span>
-                    <p className="font-dmsans text-sm text-zinc-300 leading-relaxed pt-1">
+                    <p className="font-dmsans text-sm text-zinc-700 leading-relaxed pt-1">
                       {tip}
                     </p>
                   </motion.li>
@@ -394,20 +356,20 @@ export default function FreshersReady() {
           {/* AI Bot CTA */}
           <motion.div
             key={`cta-${activeTab}`}
-            className="relative overflow-hidden p-8 bg-gradient-to-br from-[#c0c1ff]/10 via-[rgba(24,24,27,0.8)] to-[#4edea3]/10 backdrop-blur-xl border border-[#c0c1ff]/20 flex flex-col justify-between"
+            className="relative overflow-hidden p-8 bg-gradient-to-br from-[#6366F1]/10 via-white/70 to-[#4edea3]/10 backdrop-blur-xl border border-[#6366F1]/20 flex flex-col justify-between"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#c0c1ff]/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#6366F1]/10 rounded-full blur-3xl pointer-events-none" />
             <div className="relative z-10">
-              <span className="font-jetbrains text-[10px] text-[#4edea3] uppercase tracking-[0.1em] mb-3 block">
-                AI_POWERED ↗
+              <span className="text-sm font-bold text-emerald-600 mb-3 block">
+                AI Powered ↗
               </span>
-              <h3 className="font-satoshi text-2xl font-bold tracking-[-0.02em] text-white mb-3 leading-tight">
+              <h3 className="font-satoshi text-2xl font-bold tracking-[-0.02em] text-zinc-900 mb-3 leading-tight">
                 {tabContent[activeTab]?.ctaTitle}
               </h3>
-              <p className="font-dmsans text-sm text-zinc-400 leading-relaxed mb-6">
+              <p className="font-dmsans text-sm text-zinc-600 leading-relaxed mb-6">
                 {tabContent[activeTab]?.ctaDesc}
               </p>
             </div>
@@ -418,32 +380,26 @@ export default function FreshersReady() {
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="relative bg-white/90 text-[#0d0096] font-jetbrains text-xs font-semibold px-3 py-2 rounded-2xl rounded-bl-none shadow-lg"
+                className="relative bg-zinc-900 text-white font-jetbrains text-xs font-semibold px-3 py-2 rounded-2xl rounded-bl-none shadow-lg"
               >
                 Hi! Click Me
-                <span className="absolute -bottom-1.5 left-3 w-3 h-3 bg-white/90 rotate-45" />
+                <span className="absolute -bottom-1.5 left-3 w-3 h-3 bg-zinc-900 rotate-45" />
               </motion.div>
               <motion.img
                 src="/assets/Ai-Bot-2.png"
                 alt="AI Bot"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 className="w-20 h-20 object-contain drop-shadow-[0_0_24px_rgba(192,193,255,0.4)]"
                 animate={{ y: [0, -6, 0] }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               />
             </div>
 
             <a
               href="/Ai-Tutor"
-              className="relative z-10 inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#c0c1ff] text-[#0d0096] font-jetbrains text-xs font-semibold uppercase tracking-wider hover:opacity-90 transition-opacity"
+              className="relative z-10 inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#6366F1] text-white text-sm font-bold hover:opacity-90 transition-opacity"
             >
-              LAUNCH_AI_TUTOR →
+              Launch AI Tutor →
             </a>
           </motion.div>
         </section>
@@ -451,16 +407,16 @@ export default function FreshersReady() {
         {/* Self-Training Guidance */}
         <motion.section
           key={`training-${activeTab}`}
-          className="mb-16 p-8 bg-[rgba(24,24,27,0.6)] backdrop-blur-xl border border-white/[0.08]"
+          className="mb-16 p-8 bg-white/60 backdrop-blur-xl border border-zinc-200/60"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="flex items-baseline justify-between mb-6 flex-wrap gap-2">
-            <h3 className="font-satoshi text-2xl font-bold tracking-[-0.02em] text-white">
+            <h3 className="font-satoshi text-2xl font-bold tracking-[-0.02em] text-zinc-900">
               {tabContent[activeTab]?.trainingTitle}
             </h3>
-            <span className="font-jetbrains text-[10px] text-[#4edea3] uppercase tracking-[0.1em]">
+            <span className="font-jetbrains text-[10px] text-emerald-600 uppercase tracking-[0.1em]">
               SELF_PACED // AI_ASSISTED
             </span>
           </div>
@@ -468,17 +424,15 @@ export default function FreshersReady() {
             {tabContent[activeTab]?.trainingBullets.map((b, i) => (
               <motion.div
                 key={b}
-                className="flex gap-4 items-start p-4 border border-white/5 bg-white/[0.02]"
+                className="flex gap-4 items-start p-4 border border-zinc-200/60 bg-white/40"
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.06, duration: 0.3 }}
               >
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#4edea3]/10 border border-[#4edea3]/30 flex items-center justify-center font-jetbrains text-[10px] text-[#4edea3]">
-                  {String(i + 1).padStart(2, "0")}
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-jetbrains text-[10px] text-emerald-600">
+                  {String(i + 1).padStart(2, '0')}
                 </span>
-                <p className="font-dmsans text-sm text-zinc-300 leading-relaxed">
-                  {b}
-                </p>
+                <p className="font-dmsans text-sm text-zinc-700 leading-relaxed">{b}</p>
               </motion.div>
             ))}
           </div>
@@ -493,16 +447,16 @@ export default function FreshersReady() {
               return (
                 <div
                   key={`skeleton-${idx}`}
-                  className="p-6 flex flex-col gap-6 bg-[rgba(24,24,27,0.6)] backdrop-blur-xl border border-white/[0.08]"
+                  className="p-6 flex flex-col gap-6 bg-white/60 backdrop-blur-xl border border-zinc-200/60"
                 >
-                  <div className="w-16 h-5 bg-[#353437] rounded-sm animate-pulse" />
+                  <div className="w-16 h-5 bg-zinc-200 rounded-sm animate-pulse" />
                   <div>
-                    <div className="h-7 bg-[#353437] rounded animate-pulse w-3/4 mb-2" />
-                    <div className="h-4 bg-[#353437] rounded animate-pulse w-full" />
+                    <div className="h-7 bg-zinc-200 rounded animate-pulse w-3/4 mb-2" />
+                    <div className="h-4 bg-zinc-200 rounded animate-pulse w-full" />
                   </div>
-                  <div className="pt-4 border-t border-white/5 flex justify-between">
-                    <div className="h-4 bg-[#353437] rounded animate-pulse w-24" />
-                    <div className="h-4 bg-[#353437] rounded animate-pulse w-20" />
+                  <div className="pt-4 border-t border-zinc-200/60 flex justify-between">
+                    <div className="h-4 bg-zinc-200 rounded animate-pulse w-24" />
+                    <div className="h-4 bg-zinc-200 rounded animate-pulse w-20" />
                   </div>
                 </div>
               );
@@ -544,8 +498,8 @@ export default function FreshersReady() {
                     {/* Locked overlay */}
                     {!hasAccess && (
                       <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-black/50 backdrop-blur-[2px] rounded-2xl">
-                        <Lock className="w-5 h-5 text-[#c0c1ff] mb-2" />
-                        <span className="font-jetbrains text-[10px] text-[#c0c1ff] tracking-widest uppercase">
+                        <Lock className="w-5 h-5 text-[#6366F1] mb-2" />
+                        <span className="font-jetbrains text-[10px] text-[#6366F1] tracking-widest uppercase">
                           ACCESS REQUIRED
                         </span>
                       </div>
@@ -554,7 +508,7 @@ export default function FreshersReady() {
                     {/* Difficulty badge */}
                     <div className="flex justify-between items-start">
                       <div className="bg-indigo-500/10 border border-indigo-500/20 px-2 py-1 rounded-sm">
-                        <span className="font-jetbrains text-[10px] text-[#c0c1ff] uppercase">
+                        <span className="font-jetbrains text-[10px] text-[#6366F1] uppercase">
                           {activeTab === "technical"
                             ? "CODING"
                             : activeTab === "aptitude"
@@ -566,22 +520,21 @@ export default function FreshersReady() {
 
                     {/* Title + desc */}
                     <div>
-                      <h3 className="font-satoshi text-2xl font-semibold tracking-[-0.02em] text-zinc-100 mb-2">
+                      <h3 className="font-satoshi text-2xl font-semibold tracking-[-0.02em] text-zinc-900 mb-2">
                         {it.title}
                       </h3>
                       <p className="font-dmsans text-[13px] text-zinc-500 leading-relaxed">
-                        {it.description ||
-                          `${questionsCount} questions to test your skills.`}
+                        {it.description || `${questionsCount} questions to test your skills.`}
                       </p>
                     </div>
 
                     {/* Footer */}
-                    <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-auto">
-                      <span className="font-jetbrains text-sm text-zinc-400 uppercase">
+                    <div className="flex justify-between items-center pt-4 border-t border-zinc-200/60 mt-auto">
+                      <span className="font-jetbrains text-sm text-zinc-600 uppercase">
                         {questionsCount} QUESTIONS
                       </span>
                       {hasAccess ? (
-                        <button className="text-[#c0c1ff] font-jetbrains text-xs uppercase group-hover:underline">
+                        <button className="text-[#6366F1] font-jetbrains text-xs uppercase group-hover:underline">
                           Start_Now
                         </button>
                       ) : (
@@ -604,13 +557,13 @@ export default function FreshersReady() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mx-auto mb-4 border border-white/[0.08]">
+            <div className="w-16 h-16 bg-white/40 rounded-lg flex items-center justify-center mx-auto mb-4 border border-zinc-200/60">
               <span className="font-satoshi text-2xl text-zinc-500">?</span>
             </div>
-            <h3 className="font-satoshi text-lg font-semibold text-[#e5e1e4] mb-1">
+            <h3 className="font-satoshi text-lg font-semibold text-zinc-900 mb-1">
               No Tests Available
             </h3>
-            <p className="font-dmsans text-sm text-[#908fa0]">
+            <p className="font-dmsans text-sm text-zinc-500">
               No tests for this category yet. Check back soon.
             </p>
           </motion.div>
@@ -619,21 +572,21 @@ export default function FreshersReady() {
         {/* Pagination */}
         {!loadingItems && totalPages > 1 && (
           <motion.footer
-            className="flex justify-between items-center py-6 border-t border-white/5"
+            className="flex justify-between items-center py-6 border-t border-zinc-200/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <div className="font-jetbrains text-xs text-[#908fa0] uppercase tracking-wider">
+            <div className="font-jetbrains text-xs text-zinc-500 uppercase tracking-wider">
               Page{" "}
-              <span className="text-[#e5e1e4]">
+              <span className="text-zinc-900">
                 {String(currentPage).padStart(2, "0")}
               </span>{" "}
               / {String(totalPages).padStart(2, "0")}
             </div>
             <div className="flex gap-4">
               <button
-                className="px-6 py-2 border border-[#464554] font-jetbrains text-xs text-[#c7c4d7] hover:bg-white/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+                className="px-6 py-2 border border-zinc-300 font-jetbrains text-xs text-zinc-700 hover:bg-white/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
               >
@@ -641,7 +594,7 @@ export default function FreshersReady() {
                 PREV
               </button>
               <button
-                className="px-6 py-2 bg-[#c0c1ff] text-[#0d0096] font-jetbrains text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+                className="px-6 py-2 bg-[#6366F1] text-white font-jetbrains text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
                 onClick={() =>
                   setCurrentPage((p) => Math.min(p + 1, totalPages))
                 }
@@ -657,26 +610,26 @@ export default function FreshersReady() {
         {/* AI Tutor promo (communication tab only) */}
         {activeTab === "communication" && (
           <motion.section
-            className="mt-16 p-8 bg-[rgba(24,24,27,0.6)] backdrop-blur-xl border border-white/[0.08] rounded-none"
+            className="mt-16 p-8 bg-white/60 backdrop-blur-xl border border-zinc-200/60 rounded-none"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
-                <span className="font-jetbrains text-xs text-[#4edea3] uppercase tracking-[0.1em] mb-3 block">
-                  AI_POWERED
+                <span className="text-sm font-bold text-emerald-600 mb-3 block">
+                  AI Powered
                 </span>
-                <h2 className="font-satoshi text-3xl font-bold tracking-[-0.03em] text-white mb-4">
+                <h2 className="font-satoshi text-3xl font-bold tracking-[-0.03em] text-zinc-900 mb-4">
                   Ace Interviews With AI Coach
                 </h2>
-                <p className="font-dmsans text-[15px] text-zinc-400 leading-relaxed mb-6">
+                <p className="font-dmsans text-[15px] text-zinc-600 leading-relaxed mb-6">
                   AI Bot simulates real interview scenarios with personalized
                   feedback. Like a personal coach available 24/7.
                 </p>
                 <a
                   href="/Ai-Tutor"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#c0c1ff] text-[#0d0096] font-jetbrains text-xs font-medium uppercase hover:opacity-90 transition-opacity"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#6366F1] text-white font-jetbrains text-xs font-medium uppercase hover:opacity-90 transition-opacity"
                 >
                   LAUNCH_TUTOR
                 </a>
@@ -686,7 +639,7 @@ export default function FreshersReady() {
                   <img
                     src="/assets/Ai-Bot-2.png"
                     alt="AI Tutor"
-                    className="rounded-lg border border-white/[0.08] w-full"
+                    className="rounded-lg border border-zinc-200/60 w-full"
                   />
                 </a>
               </div>
@@ -711,6 +664,6 @@ export default function FreshersReady() {
           <Plus className="w-5 h-5" />
         </button>
       </div>
-    </DarkGradientBg>
+    </LightGlassBg>
   );
 }

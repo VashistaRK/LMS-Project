@@ -7,7 +7,7 @@ import type { CourseData } from "../types/course";
 import ActionButton from "../components/funui/AddTo-Button";
 import { useCourses } from "../hooks/queries/courses";
 import getThumbnailUrl from "@/utils/getThumbnailUrl";
-import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
+import { LightGlassBg } from "@/components/ui/light-glass-bg";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { motion } from "framer-motion";
 import { PageHero } from "@/components/ui/page-hero";
@@ -68,7 +68,7 @@ const CourseCatalog: React.FC = () => {
 
   const difficultyBadge = (d: string) => {
     const map: Record<string, string> = {
-      Beginner: "bg-[#c0c1ff]/10 text-[#c0c1ff] border-[#c0c1ff]/20",
+      Beginner: "bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20",
       Intermediate: "bg-amber-500/10 text-amber-400 border-amber-500/20",
       Advanced: "bg-red-500/10 text-red-400 border-red-500/20",
       Expert: "bg-[#4edea3]/10 text-[#4edea3] border-[#4edea3]/20",
@@ -77,38 +77,38 @@ const CourseCatalog: React.FC = () => {
   };
 
   return (
-    <DarkGradientBg className="text-[#e5e1e4]">
-      <main className="relative z-10 min-h-screen py-8 max-w-[1440px] mx-auto px-6">
+    <LightGlassBg className="text-zinc-900">
+      <main className="relative z-10 min-h-screen pt-28 pb-8 max-w-[1440px] mx-auto px-6">
         <PageHero
-          label="COURSE_CATALOG"
-          title={<>Learn Smarter<span className="text-[#c0c1ff]">.</span></>}
+          label="Course Catalog"
+          title={<>Learn Smarter<span className="text-[#6366F1]">.</span></>}
           subtitle="Build Real Skills. Launch Your Tech Career."
         >
-          <a href="/my-learning" className="inline-flex items-center gap-2 font-jetbrains text-xs text-[#c0c1ff] uppercase tracking-[0.2em] mb-6 border-b border-[#c0c1ff]/30 pb-1 hover:border-[#c0c1ff] transition-colors">
+          <a href="/my-learning" className="inline-flex items-center gap-2 text-sm font-bold text-[#6366F1] mb-6 border-b border-[#6366F1]/30 pb-1 hover:border-[#6366F1] transition-colors">
             My Learnings <span className="text-sm">↗</span>
           </a>
-          <div className="border-l-2 border-[#c0c1ff]/30 pl-6 mb-8 max-w-2xl">
-            <p className="font-jetbrains text-sm text-zinc-300 uppercase tracking-wide leading-relaxed mb-4">
+          <div className="border-l-2 border-[#6366F1]/30 pl-6 mb-8 max-w-2xl">
+            <p className="text-base font-bold text-zinc-900 leading-relaxed mb-4">
               "The world will ask who you are, and if you do not know, the world will tell you."
             </p>
             <p className="font-dmsans text-sm text-zinc-500 leading-relaxed">
-              Join a new-age learning platform designed for <span className="text-zinc-300 underline decoration-zinc-600">freshers, students, and passionate learners</span> who want more than just certificates. Learn directly from <span className="text-zinc-300 underline decoration-zinc-600">top IIT-trained educators and industry experts</span>, work on real-world projects, and gain the confidence to build, deploy, and succeed.
+              Join a new-age learning platform designed for <span className="text-zinc-700 underline decoration-zinc-600">freshers, students, and passionate learners</span> who want more than just certificates. Learn directly from <span className="text-zinc-700 underline decoration-zinc-600">top IIT-trained educators and industry experts</span>, work on real-world projects, and gain the confidence to build, deploy, and succeed.
             </p>
           </div>
           <div className="flex gap-6">
             <div className="flex items-center gap-2">
-              <span className="font-satoshi text-2xl font-bold text-white">120+</span>
-              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">Courses</span>
+              <span className="font-satoshi text-2xl font-bold text-zinc-900">120+</span>
+              <span className="text-sm font-bold text-zinc-900">Courses</span>
             </div>
-            <div className="w-px h-8 bg-white/10" />
+            <div className="w-px h-8 bg-zinc-300" />
             <div className="flex items-center gap-2">
-              <span className="font-satoshi text-2xl font-bold text-white">50+</span>
-              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">Topics</span>
+              <span className="font-satoshi text-2xl font-bold text-zinc-900">50+</span>
+              <span className="text-sm font-bold text-zinc-900">Topics</span>
             </div>
-            <div className="w-px h-8 bg-white/10" />
+            <div className="w-px h-8 bg-zinc-300" />
             <div className="flex items-center gap-2">
-              <span className="font-satoshi text-2xl font-bold text-white">4.8</span>
-              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">Avg Rating</span>
+              <span className="font-satoshi text-2xl font-bold text-zinc-900">4.8</span>
+              <span className="text-sm font-bold text-zinc-900">Avg Rating</span>
             </div>
           </div>
         </PageHero>
@@ -122,22 +122,22 @@ const CourseCatalog: React.FC = () => {
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); applyFilters(e.target.value, filters); }}
               placeholder="Search courses..."
-              className="w-full h-12 pl-12 pr-4 bg-white/5 border border-white/10 rounded-lg font-dmsans text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#c0c1ff]/50 transition"
+              className="w-full h-12 pl-12 pr-4 bg-white/40 border border-white/50 rounded-lg font-dmsans text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#6366F1]/50 transition"
             />
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => { setFilter("subjects"); setIsFilterOpen(!isFilterOpen); }}
-              className={`px-4 py-2 font-jetbrains text-xs uppercase tracking-[0.05em] border rounded-lg transition ${
-                isFilterOpen && filter === "subjects" ? "bg-[#c0c1ff]/10 border-[#c0c1ff]/50 text-[#c0c1ff]" : "border-white/10 text-zinc-500 hover:text-zinc-200"
+              className={`px-4 py-2 text-sm font-bold border rounded-lg transition ${
+                isFilterOpen && filter === "subjects" ? "bg-[#6366F1]/10 border-[#6366F1]/50 text-[#6366F1]" : "border-zinc-300 text-zinc-900 hover:bg-white/50"
               }`}
             >
               <Filter className="w-3.5 h-3.5 inline mr-1.5" />By Language
             </button>
             <button
               onClick={() => { setFilter("difficulties"); setIsFilterOpen(!isFilterOpen); }}
-              className={`px-4 py-2 font-jetbrains text-xs uppercase tracking-[0.05em] border rounded-lg transition ${
-                isFilterOpen && filter === "difficulties" ? "bg-[#c0c1ff]/10 border-[#c0c1ff]/50 text-[#c0c1ff]" : "border-white/10 text-zinc-500 hover:text-zinc-200"
+              className={`px-4 py-2 text-sm font-bold border rounded-lg transition ${
+                isFilterOpen && filter === "difficulties" ? "bg-[#6366F1]/10 border-[#6366F1]/50 text-[#6366F1]" : "border-zinc-300 text-zinc-900 hover:bg-white/50"
               }`}
             >
               <Filter className="w-3.5 h-3.5 inline mr-1.5" />By Level
@@ -147,7 +147,7 @@ const CourseCatalog: React.FC = () => {
 
         {/* Filter Panel */}
         {isFilterOpen && (
-          <div className="mb-8 p-4 bg-white/5 border border-white/[0.08] rounded-xl backdrop-blur-xl">
+          <div className="mb-8 p-4 bg-white/40 border border-white/[0.08] rounded-xl backdrop-blur-xl">
             <FilterPanel filters={filters} filterOption={filter} onFilterChange={handleFilterChange} />
           </div>
         )}
@@ -155,7 +155,7 @@ const CourseCatalog: React.FC = () => {
         {/* Loading */}
         {isLoading ? (
           <div className="flex justify-center items-center py-20">
-            <div className="w-12 h-12 border-4 border-zinc-700 border-t-[#c0c1ff] rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-zinc-700 border-t-[#6366F1] rounded-full animate-spin" />
           </div>
         ) : (
           <>
@@ -200,7 +200,7 @@ const CourseCatalog: React.FC = () => {
                             </span>
                           </div>
                           <Link to={`/course-details/${course.id}`}>
-                            <h3 className="font-satoshi text-base font-bold text-zinc-100 line-clamp-2 mb-1 hover:text-[#c0c1ff] transition-colors">
+                            <h3 className="font-satoshi text-base font-bold text-zinc-100 line-clamp-2 mb-1 hover:text-[#6366F1] transition-colors">
                               {course.title}
                             </h3>
                             <p className="font-dmsans text-xs text-zinc-500 line-clamp-2 mb-3">{course.shortDescription}</p>
@@ -218,14 +218,14 @@ const CourseCatalog: React.FC = () => {
             {renderedCourses.length === 0 && (
               <div className="text-center py-20">
                 <BookOpen className="w-16 h-16 mx-auto text-zinc-600 mb-4" />
-                <h3 className="font-satoshi text-lg font-medium text-zinc-300 mb-2">No courses found</h3>
+                <h3 className="font-satoshi text-lg font-medium text-zinc-700 mb-2">No courses found</h3>
                 <p className="text-zinc-500 font-dmsans">Try adjusting your search or filters</p>
               </div>
             )}
           </>
         )}
       </main>
-    </DarkGradientBg>
+    </LightGlassBg>
   );
 };
 

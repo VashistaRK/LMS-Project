@@ -13,6 +13,7 @@ import { ParallaxProvider } from "react-scroll-parallax";
 
 import LandingPage from "./pages/LandingPage.tsx";
 import DreamJobPage from "./pages/Careers.tsx";
+
 import CourseCatalog from "./pages/Courses.tsx";
 import CourseDetailsPage from "./pages/[courseId]/CourseDetails.tsx";
 import CourseManagementAdmin from "./admin/Courses/[courseId]/CourseManagement.tsx";

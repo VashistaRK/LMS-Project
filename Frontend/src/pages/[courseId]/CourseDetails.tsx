@@ -16,7 +16,7 @@ import FaqList from "../../components/FaqList";
 import { useAuthContext } from "../../context/AuthProvider";
 import ReviewsList from "../../components/ReviewList";
 import { useCourse } from "../../hooks/queries/courses";
-import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
+import { LightGlassBg } from "@/components/ui/light-glass-bg";
 import RelatedCourses from "../RelatedCourse";
 
 const CourseDetailsPage: React.FC = () => {
@@ -52,7 +52,7 @@ const CourseDetailsPage: React.FC = () => {
   }
 
   return (
-    <DarkGradientBg className="text-[#e5e1e4]">
+    <LightGlassBg className="text-zinc-900">
     <div className="relative z-10 max-w-7xl mx-6 xl:mx-auto py-8 font-mulish">
       <div className=" gap-8">
         <div className="space-y-2 py-12 mb-12">
@@ -187,7 +187,7 @@ const CourseDetailsPage: React.FC = () => {
         <RelatedCourses />
       </div>
     </div>
-    </DarkGradientBg>
+    </LightGlassBg>
   );
 };
 

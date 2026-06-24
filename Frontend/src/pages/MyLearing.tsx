@@ -6,7 +6,7 @@ import type { CourseData } from "../types/course";
 import { BookOpen, ChevronLeft, ChevronRight, Play, Award, Zap } from "lucide-react";
 import { useAuthContext } from "../context/AuthProvider";
 import getThumbnailUrl from "@/utils/getThumbnailUrl";
-import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
+import { LightGlassBg } from "@/components/ui/light-glass-bg";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { motion } from "framer-motion";
 import { PageHero } from "@/components/ui/page-hero";
@@ -55,16 +55,16 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
 
   if (loading)
     return (
-      <DarkGradientBg className="text-[#e5e1e4]">
+      <LightGlassBg className="text-zinc-900">
         <div className="flex justify-center items-center min-h-[70vh]">
-          <div className="w-12 h-12 border-4 border-zinc-700 border-t-[#c0c1ff] rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-zinc-700 border-t-[#6366F1] rounded-full animate-spin" />
         </div>
-      </DarkGradientBg>
+      </LightGlassBg>
     );
 
   if (!courses.length)
     return (
-      <DarkGradientBg className="text-[#e5e1e4]">
+      <LightGlassBg className="text-zinc-900">
         <div className="flex justify-center items-center min-h-[70vh]">
           <div className="text-center p-8">
             <BookOpen className="w-16 h-16 text-zinc-600 mx-auto mb-4" />
@@ -72,21 +72,21 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
             <p className="text-zinc-500 mt-2 font-dmsans">Explore courses and begin today!</p>
           </div>
         </div>
-      </DarkGradientBg>
+      </LightGlassBg>
     );
 
   return (
-    <DarkGradientBg className="text-[#e5e1e4]">
-      <main className="relative z-10 min-h-screen py-8 max-w-[1440px] mx-auto px-6">
+    <LightGlassBg className="text-zinc-900">
+      <main className="relative z-10 min-h-screen pt-28 pb-8 max-w-[1440px] mx-auto px-6">
         {/* Hero */}
         <PageHero
-          label="MY_LEARNING"
-          title={<>Welcome back,<br />{user?.name || "Learner"}<span className="text-[#c0c1ff]">.</span></>}
+          label="My Learning"
+          title={<>Welcome back,<br />{user?.name || "Learner"}<span className="text-[#6366F1]">.</span></>}
           subtitle="Track your progress and continue your learning journey."
         >
           <div className="flex flex-wrap gap-6 mt-4">
             {[
-              { icon: <BookOpen className="w-5 h-5 text-[#c0c1ff]" />, val: courses.length, label: "TOTAL" },
+              { icon: <BookOpen className="w-5 h-5 text-[#6366F1]" />, val: courses.length, label: "TOTAL" },
               { icon: <Zap className="w-5 h-5 text-amber-400" />, val: ContinueLearning.length, label: "ACTIVE" },
               { icon: <Award className="w-5 h-5 text-[#4edea3]" />, val: completedCourses, label: "DONE" },
               { icon: null, val: `${completionRate}%`, label: "PROGRESS" },
@@ -134,10 +134,10 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
                             <h3 className="font-satoshi font-bold text-zinc-100 mb-3 line-clamp-2">{course.title}</h3>
                             <div className="flex items-center justify-between mb-3">
                               <span className="font-jetbrains text-[10px] uppercase text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">In Progress</span>
-                              <span className="font-jetbrains text-[10px] uppercase text-[#c0c1ff] bg-[#c0c1ff]/10 border border-[#c0c1ff]/20 px-2 py-0.5 rounded-full">{course.difficulty}</span>
+                              <span className="font-jetbrains text-[10px] uppercase text-[#6366F1] bg-[#6366F1]/10 border border-[#6366F1]/20 px-2 py-0.5 rounded-full">{course.difficulty}</span>
                             </div>
-                            <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                              <div className="h-full rounded-full transition-all duration-500" style={{ width: `${course.progress}%`, background: "linear-gradient(90deg, #c0c1ff, #4edea3)" }} />
+                            <div className="w-full h-1.5 bg-white/40 rounded-full overflow-hidden">
+                              <div className="h-full rounded-full transition-all duration-500" style={{ width: `${course.progress}%`, background: "linear-gradient(90deg, #6366F1, #4edea3)" }} />
                             </div>
                           </div>
                         </div>
@@ -156,7 +156,7 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
             <button
               onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
               disabled={currentPage === 1}
-              className="p-2.5 border border-white/10 rounded-lg text-zinc-400 hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              className="p-2.5 border border-white/50 rounded-lg text-zinc-600 hover:bg-white/40 disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -166,14 +166,14 @@ const MyLearning: React.FC<{ userId: string }> = ({ userId }) => {
             <button
               onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="p-2.5 border border-white/10 rounded-lg text-zinc-400 hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              className="p-2.5 border border-white/50 rounded-lg text-zinc-600 hover:bg-white/40 disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         )}
       </main>
-    </DarkGradientBg>
+    </LightGlassBg>
   );
 };
 

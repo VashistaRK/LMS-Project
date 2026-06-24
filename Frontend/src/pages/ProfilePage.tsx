@@ -4,7 +4,7 @@ import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { User } from "../hooks/useAuth";
 import { useAuthContext } from "../context/AuthProvider";
-import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
+import { LightGlassBg } from "@/components/ui/light-glass-bg";
 
 const api = import.meta.env.VITE_API_URL;
 
@@ -100,9 +100,9 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <DarkGradientBg className="text-[#e5e1e4]">
+    <LightGlassBg className="text-zinc-900">
     <div className="relative z-10 min-h-screen leading-tight tracking-tight py-10 max-w-7xl mx-6 xl:mx-auto xl:px-6">
-      <div className="md:flex gap-12 space-y-12 md:justify-between max-h-fit py-12">
+      <div className="flex flex-col md:flex-row gap-12 space-y-12 md:space-y-0 md:justify-between max-h-fit py-12">
         {/* LEFT FORM */}
         <section className="flex-1 lg:max-w-2/3">
           <header className="">
@@ -191,11 +191,11 @@ const ProfilePage: React.FC = () => {
           </div>
         </section>
         {/* Right SIDEBAR */}
-        <aside className="md:w-1/3 flex flex-col items-center justify-start text-center">
+        <aside className="md:w-1/3 mx-auto md:mx-0 w-full max-w-[260px] flex flex-col items-center justify-start text-center">
           <img
             src={previewImage || "https://via.placeholder.com/120"}
             alt="avatar"
-            className="w-full h-2/3 rounded-full object-cover border-4 border-[#eaf5fc] shadow-md mb-4"
+            className="w-full aspect-square rounded-full object-cover border-4 border-[#eaf5fc] shadow-md mb-4"
           />
 
           {/* Upload New Profile Photo */}
@@ -228,7 +228,7 @@ const ProfilePage: React.FC = () => {
         </aside>
       </div>
     </div>
-    </DarkGradientBg>
+    </LightGlassBg>
   );
 };
 

@@ -11,55 +11,7 @@ services:
       context: ./Backend
       dockerfile: Dockerfile
     restart: unless-stopped
-    environment:
-      - OIDC_CLIENT_ID=#
-      - OIDC_CLIENT_SECRET=#
-      - OIDC_ISSUER=#
-      - OIDC_REDIRECT_URI=#
-      - APP_JWT_SECRET=#
-      - APP_JWT_ISS=#
-      - APP_JWT_AUD=my-backend-api
-      - PORT=3000
-      - WEB_ORIGIN=#
-      - MONGO_URI=#
-      - MONGO_DBNAME=#
-      - OPENAI_API_KEY=
-    ports:
-      - "3000:3000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
       - redis
     volumes:
       - ./Backend/uploads:/app/uploads
-
-  frontend:
-    build:
-      context: ./Frontend
-      dockerfile: Dockerfile
-      args:
-        - VITE_API_URL=https://fresherready.com/api
-        - VITE_API_URL_CMR=https://fresherready.com/api_cmr # or your own URL
-        - VITE_SOCKET_URL=https://fresherready.com
-    restart: unless-stopped
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
-    environment:
-      - VITE_API_URL=https://fresherready.com/api
-      - VITE_API_URL_CMR=https://fresherready.com/api_cmr # or your own URL
-      - VITE_SOCKET_URL=https://fresherready.com
-
-  english-tutor:
-    build:
-      context: ./EnglishTutor
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    environment:
-      - OPENAI_API_KEY=
-    ports:
-      - "8000:8000"
-
-volumes:
-  mongo_data:

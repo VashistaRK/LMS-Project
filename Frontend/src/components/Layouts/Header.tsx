@@ -29,6 +29,8 @@ export default function Header() {
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState<SearchItem[]>([]);
+  const [isHidden, setIsHidden] = useState(false);
+  const lastScrollY = useRef(0);
 
   const { user, logout } = useAuthContext();
   const userMenuRef = useRef<HTMLDivElement | null>(null);
@@ -43,6 +45,20 @@ export default function Header() {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      if (currentY > lastScrollY.current && currentY > 80) {
+        setIsHidden(true);
+      } else {
+        setIsHidden(false);
+      }
+      lastScrollY.current = currentY;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleLogout = () => {
@@ -68,14 +84,38 @@ export default function Header() {
     setIsSearchOpen(false);
   };
 
+  const isLanding = location.pathname === "/";
+  const navText = isLanding ? "text-white" : "text-zinc-800";
+  const navTextActive = isLanding ? "text-fuchsia-200" : "text-fuchsia-600";
+  const navHoverBg = isLanding ? "hover:bg-white/15" : "hover:bg-white/40";
+  const navActiveBg = isLanding ? "bg-white/15" : "bg-white/40";
+  const logoFilter = isLanding ? "brightness-0 invert drop-shadow" : "";
+
   return (
     <>
-      <header className="sticky top-0 w-full z-50 bg-gradient-to-r from-[#0a0a1a]/90 via-[#0d0d20]/90 to-[#0a0a1a]/90 backdrop-blur-xl border-b border-[#c0c1ff]/10 shadow-[0_4px_24px_-8px_rgba(99,102,241,0.15)]">
-        <div className="max-w-[1440px] mx-auto px-6">
-          <div className="flex justify-between items-center h-20">
+      <header
+        className={`fixed top-4 left-4 right-4 md:left-8 md:right-8 z-50 transition-transform duration-300 ${
+          isHidden ? "-translate-y-[150%]" : "translate-y-0"
+        }`}
+      >
+        <div
+          className="relative max-w-[1400px] mx-auto rounded-full px-6 overflow-hidden border border-white/40"
+          style={{
+            backgroundColor: "rgba(255,255,255,0.12)",
+            backdropFilter: "blur(28px) saturate(200%)",
+            WebkitBackdropFilter: "blur(28px) saturate(200%)",
+            boxShadow:
+              "inset 0 1px 0 0 rgba(255,255,255,0.7), inset 0 0 0 1px rgba(255,255,255,0.05), inset 0 -8px 16px -8px rgba(255,255,255,0.25), 0 12px 40px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08)",
+          }}
+        >
+          {/* Specular highlight sweep */}
+          <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/40 via-white/5 to-transparent opacity-60" />
+          {/* Bottom glow */}
+          <div className="pointer-events-none absolute inset-x-8 -bottom-px h-px bg-white/40 blur-sm" />
+          <div className="relative z-10 flex justify-between items-center h-16">
             {/* Logo */}
             <a href="/" className="flex items-center gap-2">
-              <img src="/assets/Sunadh-Logo.png" alt="Logo" className="h-16 w-auto select-none pointer-events-none brightness-0 invert drop-shadow-[0_0_8px_rgba(192,193,255,0.5)]" />
+              <img src="/assets/Sunadh-Logo.png" alt="Logo" className={`h-12 w-auto select-none pointer-events-none ${logoFilter}`} />
             </a>
 
             {/* Desktop Nav */}
@@ -84,10 +124,10 @@ export default function Header() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-2 font-jetbrains text-xs uppercase tracking-[0.05em] transition-colors rounded-lg ${
+                  className={`px-4 py-2 text-base font-bold transition-colors rounded-lg ${
                     location.pathname === link.href
-                      ? "text-[#c0c1ff] bg-[#c0c1ff]/10"
-                      : "text-zinc-400 hover:text-zinc-100 hover:bg-white/5"
+                      ? `${navTextActive} ${navActiveBg}`
+                      : `${navText} ${navHoverBg}`
                   }`}
                 >
                   {link.label}
@@ -97,11 +137,20 @@ export default function Header() {
 
             {/* Controls */}
             <div className="flex items-center gap-3">
+              {/* Mobile search toggle */}
+              <button
+                onClick={() => setIsSearchOpen((p) => !p)}
+                className={`md:hidden p-2 rounded-lg ${navText} ${navHoverBg} transition`}
+                aria-label="Search"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+
               {/* Search */}
               <div className="hidden md:flex items-center gap-2">
                 <button
                   onClick={() => setIsSearchOpen((p) => !p)}
-                  className="p-2 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition"
+                  className={`p-2 rounded-lg ${navText} ${navHoverBg} transition`}
                 >
                   <Search className="w-5 h-5" />
                 </button>
@@ -114,18 +163,18 @@ export default function Header() {
                       value={searchQuery}
                       onChange={(e) => handleSearchChange(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
-                      className="w-56 px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-[#c0c1ff]/50 font-dmsans"
+                      className="w-56 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-fuchsia-400"
                     />
                     {suggestions.length > 0 && (
-                      <div className="absolute top-full left-0 w-full bg-[#18181b]/95 backdrop-blur-xl border border-white/10 rounded-lg mt-1 shadow-xl z-50 overflow-hidden">
+                      <div className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl border border-zinc-200 rounded-lg mt-1 shadow-xl z-50 overflow-hidden">
                         {suggestions.map((item, i) => (
                           <button
                             key={i}
-                            className="w-full text-left px-4 py-2 hover:bg-white/5 flex justify-between text-sm text-zinc-200"
+                            className="w-full text-left px-4 py-2 hover:bg-zinc-50 flex justify-between text-sm text-zinc-800"
                             onClick={() => handleSearchSubmit(item.path)}
                           >
                             <span>{item.name}</span>
-                            <span className="text-xs text-zinc-500 capitalize font-jetbrains">{item.type}</span>
+                            <span className="text-xs text-zinc-400 capitalize">{item.type}</span>
                           </button>
                         ))}
                       </div>
@@ -138,24 +187,23 @@ export default function Header() {
               {!user ? (
                 <button
                   onClick={() => (window.location.href = "/Authenticate")}
-                  className="hidden md:flex relative group items-center gap-2 px-5 py-2 bg-gradient-to-r from-[#6366F1] to-[#4edea3] text-white font-jetbrains text-xs font-semibold rounded-lg uppercase tracking-wider shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_32px_rgba(99,102,241,0.6)] transition-all duration-300 overflow-hidden"
+                  className="hidden md:inline-flex items-center gap-2 px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white text-base font-bold rounded-lg shadow-sm transition-colors"
                 >
-                  <span className="relative z-10">Sign In</span>
-                  <span className="relative z-10">→</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#4edea3] to-[#6366F1] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span>Sign In</span>
+                  <span>→</span>
                 </button>
               ) : (
                 <div className="hidden md:block relative" ref={userMenuRef}>
                   <button
                     onClick={() => setIsUserMenuOpen((p) => !p)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-100 transition"
                   >
                     <img
                       src={user?.picture}
                       alt={user?.name ?? "user"}
-                      className="w-8 h-8 rounded-full ring-2 ring-white/10 object-cover"
+                      className="w-8 h-8 rounded-full ring-2 ring-zinc-200 object-cover"
                     />
-                    <ChevronDown className={`w-4 h-4 text-zinc-400 transition ${isUserMenuOpen ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`w-4 h-4 text-zinc-500 transition ${isUserMenuOpen ? "rotate-180" : ""}`} />
                   </button>
 
                   <AnimatePresence>
@@ -165,21 +213,21 @@ export default function Header() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.18 }}
-                        className="absolute right-0 mt-2 w-56 bg-[#18181b]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-xl py-2 z-[200]"
+                        className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl border border-zinc-200 rounded-xl shadow-xl py-2 z-[200]"
                       >
-                        <div className="px-4 py-3 border-b border-white/5">
-                          <p className="text-sm font-semibold text-zinc-100">{user?.name}</p>
-                          <p className="text-xs text-zinc-500 font-jetbrains">{user?.email}</p>
+                        <div className="px-4 py-3 border-b border-zinc-100">
+                          <p className="text-sm font-semibold text-zinc-900">{user?.name}</p>
+                          <p className="text-xs text-zinc-500">{user?.email}</p>
                         </div>
-                        <a href="/profile" className="flex items-center px-4 py-2 text-sm text-zinc-300 hover:bg-white/5">
-                          <User className="w-4 h-4 mr-3 text-zinc-500" /> Profile
+                        <a href="/profile" className="flex items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
+                          <User className="w-4 h-4 mr-3 text-zinc-400" /> Profile
                         </a>
-                        <a href="/notifications" className="flex items-center px-4 py-2 text-sm text-zinc-300 hover:bg-white/5">
-                          <Bell className="w-4 h-4 mr-3 text-zinc-500" /> Notifications
+                        <a href="/notifications" className="flex items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
+                          <Bell className="w-4 h-4 mr-3 text-zinc-400" /> Notifications
                         </a>
                         <button
                           onClick={handleLogout}
-                          className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                         >
                           Sign Out
                         </button>
@@ -192,7 +240,7 @@ export default function Header() {
               {/* Mobile menu toggle */}
               <button
                 onClick={() => setIsMobileMenuOpen((p) => !p)}
-                className="xl:hidden p-2 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition"
+                className={`xl:hidden p-2 rounded-lg ${navText} ${navHoverBg} transition`}
               >
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -200,6 +248,43 @@ export default function Header() {
           </div>
         </div>
       </header>
+
+      {/* Mobile search panel */}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden fixed left-4 right-4 top-24 z-[9999] rounded-2xl bg-white/95 backdrop-blur-xl border border-zinc-200 shadow-lg p-3"
+          >
+            <input
+              autoFocus
+              type="text"
+              placeholder="Search courses, instructors, careers…"
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
+              className="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-lg text-base text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-fuchsia-400"
+            />
+            {suggestions.length > 0 && (
+              <div className="mt-2 max-h-64 overflow-auto rounded-lg border border-zinc-200 bg-white">
+                {suggestions.map((item) => (
+                  <button
+                    key={item.path}
+                    className="w-full text-left px-4 py-2.5 hover:bg-zinc-50 flex justify-between text-sm text-zinc-800"
+                    onClick={() => handleSearchSubmit(item.path)}
+                  >
+                    <span>{item.name}</span>
+                    <span className="text-xs text-zinc-400 capitalize">{item.type}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile dropdown */}
       <AnimatePresence>
@@ -209,27 +294,27 @@ export default function Header() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="xl:hidden fixed left-0 right-0 top-20 z-[9999] bg-[#09090B]/95 backdrop-blur-xl border-b border-white/5"
+            className="xl:hidden fixed left-4 right-4 top-24 z-[9999] rounded-2xl bg-white/95 backdrop-blur-xl border border-zinc-200 shadow-lg"
           >
             <div className="px-4 py-3 space-y-1">
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="flex items-center px-3 py-2.5 rounded-lg text-zinc-300 hover:bg-white/5 font-jetbrains text-xs uppercase tracking-[0.05em]"
+                  className="flex items-center px-3 py-2.5 rounded-lg text-zinc-700 hover:bg-zinc-100 text-sm font-medium"
                 >
                   {link.label}
                 </a>
               ))}
-              <a href="/my-learning" className="flex items-center px-3 py-2.5 rounded-lg text-zinc-300 hover:bg-white/5 font-jetbrains text-xs uppercase tracking-[0.05em]">
+              <a href="/my-learning" className="flex items-center px-3 py-2.5 rounded-lg text-zinc-700 hover:bg-zinc-100 text-sm font-medium">
                 My Learning
               </a>
               {!user ? (
-                <a href="/Authenticate" className="block px-3 py-2.5 bg-gradient-to-r from-[#6366F1] to-[#4edea3] text-white rounded-lg text-center font-jetbrains text-xs uppercase font-semibold shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+                <a href="/Authenticate" className="block px-3 py-2.5 bg-zinc-900 text-white rounded-lg text-center text-sm font-medium hover:bg-zinc-800">
                   Sign In
                 </a>
               ) : (
-                <button onClick={handleLogout} className="w-full text-left px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 font-jetbrains text-xs uppercase">
+                <button onClick={handleLogout} className="w-full text-left px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-50 text-sm font-medium">
                   Sign Out
                 </button>
               )}

@@ -5,7 +5,7 @@ import { useAuthContext } from "../context/AuthProvider";
 import { Lock, Search, ArrowRight, ChevronLeft, ChevronRight, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { DarkGradientBg } from "@/components/ui/elegant-dark-pattern";
+import { LightGlassBg } from "@/components/ui/light-glass-bg";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { PageHero } from "@/components/ui/page-hero";
 import { LogoCloud } from "@/components/ui/logo-cloud-3";
@@ -88,59 +88,59 @@ export default function CompaniesPage() {
   };
 
   return (
-    <DarkGradientBg className="text-[#e5e1e4]">
+    <LightGlassBg className="text-zinc-900">
 
-      <main className="relative z-10 w-full max-w-[1440px] mx-auto px-6 py-8">
+      <main className="relative z-10 w-full max-w-[1440px] mx-auto px-6 pt-28 pb-8">
         {/* Hero Section */}
         <PageHero
-          label={loading ? "COMPANIES" : `${filtered.length} COMPANIES`}
-          title={<>Top Companies<span className="text-[#c0c1ff]">.</span></>}
+          label={loading ? "Companies" : `${filtered.length} Companies`}
+          title={<>Top Companies<span className="text-[#6366F1]">.</span></>}
           subtitle="Explore comprehensive interview archives and coding patterns from the world's leading engineering teams."
           image="assets/companies-hero.png"
         >
-          <a href="#" className="inline-flex items-center gap-2 font-jetbrains text-xs text-[#c0c1ff] uppercase tracking-[0.2em] mb-6 border-b border-[#c0c1ff]/30 pb-1 hover:border-[#c0c1ff] transition-colors">
+          <a href="#" className="inline-flex items-center gap-2 text-sm font-bold text-[#6366F1] mb-6 border-b border-[#6366F1]/30 pb-1 hover:border-[#6366F1] transition-colors">
             Self-Training Guidance <span className="text-sm">↗</span>
           </a>
-          <div className="border-l-2 border-[#c0c1ff]/30 pl-6 mb-8 max-w-2xl">
-            <p className="font-jetbrains text-sm text-zinc-300 uppercase tracking-wide leading-relaxed mb-4">
+          <div className="border-l-2 border-[#6366F1]/30 pl-6 mb-8 max-w-2xl">
+            <p className="text-base font-bold text-zinc-900 leading-relaxed mb-4">
               "Practice with real papers. Crack real interviews."
             </p>
-            <p className="font-dmsans text-sm text-zinc-500 leading-relaxed">
-              Unlock your potential by leveraging resources from <span className="text-zinc-300 underline decoration-zinc-600">leading organizations</span>. Each company offers unique programs, tools, and learning paths designed to help you excel. Take charge of your professional journey with <span className="text-zinc-300 underline decoration-zinc-600">structured self-paced learning</span> and previous year question papers from renowned institutions.
+            <p className="font-dmsans text-sm text-zinc-700 leading-relaxed">
+              Unlock your potential by leveraging resources from <span className="text-zinc-900 font-semibold underline decoration-zinc-600">leading organizations</span>. Each company offers unique programs, tools, and learning paths designed to help you excel. Take charge of your professional journey with <span className="text-zinc-900 font-semibold underline decoration-zinc-600">structured self-paced learning</span> and previous year question papers from renowned institutions.
             </p>
           </div>
           <div className="flex gap-6 flex-wrap">
             <div className="flex items-center gap-2">
-              <span className="font-satoshi text-2xl font-bold text-white">50+</span>
-              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">Companies</span>
+              <span className="font-satoshi text-2xl font-bold text-zinc-900">50+</span>
+              <span className="text-sm font-bold text-zinc-900">Companies</span>
             </div>
-            <div className="w-px h-8 bg-white/10" />
+            <div className="w-px h-8 bg-zinc-300" />
             <div className="flex items-center gap-2">
-              <span className="font-satoshi text-2xl font-bold text-white">200+</span>
-              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">Papers</span>
+              <span className="font-satoshi text-2xl font-bold text-zinc-900">200+</span>
+              <span className="text-sm font-bold text-zinc-900">Papers</span>
             </div>
-            <div className="w-px h-8 bg-white/10" />
+            <div className="w-px h-8 bg-zinc-300" />
             <div className="flex items-center gap-2">
-              <span className="font-satoshi text-2xl font-bold text-white">5+</span>
-              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">Years</span>
+              <span className="font-satoshi text-2xl font-bold text-zinc-900">5+</span>
+              <span className="text-sm font-bold text-zinc-900">Years</span>
             </div>
-            <div className="w-px h-8 bg-white/10" />
+            <div className="w-px h-8 bg-zinc-300" />
             <div className="flex items-center gap-2">
-              <span className="font-satoshi text-2xl font-bold text-white">94%</span>
-              <span className="font-jetbrains text-[10px] text-zinc-500 uppercase">Success</span>
+              <span className="font-satoshi text-2xl font-bold text-zinc-900">94%</span>
+              <span className="text-sm font-bold text-zinc-900">Success</span>
             </div>
           </div>
         </PageHero>
 
         {/* Logo Cloud */}
         <section className="mb-12 max-w-3xl">
-          <p className="text-center font-dmsans text-sm text-zinc-500 mb-2">
-            <span className="text-zinc-600">Trusted by top companies.</span>{" "}
-            <span className="font-semibold text-zinc-400">Practice with real papers.</span>
+          <p className="text-center font-dmsans text-sm text-zinc-900 mb-2">
+            <span className="text-zinc-900">Trusted by top companies.</span>{" "}
+            <span className="font-semibold text-zinc-900">Practice with real papers.</span>
           </p>
-          <div className="h-px bg-white/5 [mask-image:linear-gradient(to_right,transparent,black,transparent)] mb-1" />
+          <div className="h-px bg-white/40 [mask-image:linear-gradient(to_right,transparent,black,transparent)] mb-1" />
           <LogoCloud logos={COMPANY_LOGOS} />
-          <div className="h-px bg-white/5 [mask-image:linear-gradient(to_right,transparent,black,transparent)]" />
+          <div className="h-px bg-white/40 [mask-image:linear-gradient(to_right,transparent,black,transparent)]" />
         </section>
 
         {/* Search Bar */}
@@ -151,7 +151,7 @@ export default function CompaniesPage() {
           transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="relative w-full md:w-[480px]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#908fa0]" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
             <input
               type="text"
               value={search}
@@ -159,7 +159,7 @@ export default function CompaniesPage() {
                 setSearch(e.target.value);
                 setCurrentPage(0);
               }}
-              className="w-full h-12 pl-12 pr-4 bg-[#201f22]/50 backdrop-blur-md border border-[#464554] rounded-lg font-dmsans text-[15px] text-[#e5e1e4] outline-none transition-all focus:ring-2 focus:ring-[#c0c1ff]/20 focus:border-[#c0c1ff] placeholder:text-[#908fa0]"
+              className="w-full h-12 pl-12 pr-4 bg-white/60 backdrop-blur-md border border-zinc-300 rounded-lg font-dmsans text-[15px] text-zinc-900 outline-none transition-all focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] placeholder:text-zinc-500"
               placeholder="Search companies, tech stacks, or domains..."
             />
           </div>
@@ -171,18 +171,18 @@ export default function CompaniesPage() {
             ? Array.from({ length: 8 }).map((_, idx) => (
                 <div
                   key={`skeleton-${idx}`}
-                  className="rounded-xl p-4 border border-white/[0.08] bg-[#18181b]/40 backdrop-blur-xl"
+                  className="rounded-xl p-4 border border-zinc-200/60 bg-[#18181b]/40 backdrop-blur-xl"
                 >
                   <div className="flex justify-between items-start mb-6">
-                    <div className="w-12 h-12 bg-white/5 rounded-lg animate-pulse" />
+                    <div className="w-12 h-12 bg-white/40 rounded-lg animate-pulse" />
                     <div className="flex gap-1">
-                      <div className="w-10 h-5 bg-[#353437] rounded animate-pulse" />
+                      <div className="w-10 h-5 bg-zinc-200 rounded animate-pulse" />
                     </div>
                   </div>
-                  <div className="h-6 bg-[#353437] rounded animate-pulse w-3/4 mb-2" />
-                  <div className="h-4 bg-[#353437] rounded animate-pulse w-full mb-4" />
-                  <div className="h-px bg-white/5 w-full mb-4" />
-                  <div className="h-4 bg-[#353437] rounded animate-pulse w-1/3" />
+                  <div className="h-6 bg-zinc-200 rounded animate-pulse w-3/4 mb-2" />
+                  <div className="h-4 bg-zinc-200 rounded animate-pulse w-full mb-4" />
+                  <div className="h-px bg-white/40 w-full mb-4" />
+                  <div className="h-4 bg-zinc-200 rounded animate-pulse w-1/3" />
                 </div>
               ))
             : paginated.map((c, idx) => (
@@ -208,8 +208,8 @@ export default function CompaniesPage() {
                       {/* Locked overlay */}
                       {!hasAccess && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-black/50 backdrop-blur-[2px] rounded-2xl">
-                          <Lock className="w-5 h-5 text-[#c0c1ff] mb-2" />
-                          <span className="font-jetbrains text-[10px] text-[#c0c1ff] tracking-widest uppercase">
+                          <Lock className="w-5 h-5 text-[#6366F1] mb-2" />
+                          <span className="font-jetbrains text-[10px] text-[#6366F1] tracking-widest uppercase">
                             ACCESS REQUIRED
                           </span>
                         </div>
@@ -217,8 +217,8 @@ export default function CompaniesPage() {
 
                       {/* Card header */}
                       <div className="flex justify-between items-start mb-6">
-                        <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center border border-white/5">
-                          <span className="font-satoshi text-lg font-bold text-[#c0c1ff]/60">
+                        <div className="w-12 h-12 bg-white/40 rounded-lg flex items-center justify-center border border-zinc-200/60">
+                          <span className="font-satoshi text-lg font-bold text-[#6366F1]/60">
                             {c.name.charAt(0)}
                           </span>
                         </div>
@@ -227,7 +227,7 @@ export default function CompaniesPage() {
                             {c.years.slice(0, 3).map((y) => (
                               <span
                                 key={y}
-                                className="font-jetbrains text-[10px] bg-[#353437] px-2 py-0.5 rounded text-[#c7c4d7]"
+                                className="font-jetbrains text-[10px] bg-zinc-200 px-2 py-0.5 rounded text-zinc-700"
                               >
                                 {y}
                               </span>
@@ -241,21 +241,21 @@ export default function CompaniesPage() {
                         {c.name}
                       </h3>
                       {c.description && (
-                        <p className="font-dmsans text-[13px] leading-relaxed text-[#908fa0] mb-4">
+                        <p className="font-dmsans text-[13px] leading-relaxed text-zinc-500 mb-4">
                           {c.description}
                         </p>
                       )}
 
                       {/* Divider + Link */}
                       <div className="mt-auto">
-                        <div className="h-px bg-white/5 w-full mb-4" />
+                        <div className="h-px bg-white/40 w-full mb-4" />
                         {hasAccess ? (
-                          <span className="inline-flex items-center text-[#c0c1ff] font-jetbrains text-xs group-hover:gap-2 transition-all">
+                          <span className="inline-flex items-center text-[#6366F1] font-jetbrains text-xs group-hover:gap-2 transition-all">
                             View Papers
                             <ArrowRight className="w-3.5 h-3.5 ml-1" />
                           </span>
                         ) : (
-                          <span className="inline-flex items-center text-[#908fa0] font-jetbrains text-xs">
+                          <span className="inline-flex items-center text-zinc-500 font-jetbrains text-xs">
                             View Papers
                             <Lock className="w-3 h-3 ml-1" />
                           </span>
@@ -274,13 +274,13 @@ export default function CompaniesPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/[0.08]">
-              <Building2 className="w-7 h-7 text-[#908fa0]" />
+            <div className="w-16 h-16 bg-white/40 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-zinc-200/60">
+              <Building2 className="w-7 h-7 text-zinc-500" />
             </div>
-            <h3 className="font-satoshi text-lg font-semibold text-[#e5e1e4] mb-1">
+            <h3 className="font-satoshi text-lg font-semibold text-zinc-900 mb-1">
               No Companies Found
             </h3>
-            <p className="font-dmsans text-sm text-[#908fa0]">
+            <p className="font-dmsans text-sm text-zinc-500">
               {search
                 ? "Try a different search term."
                 : "Check back soon for company papers."}
@@ -291,21 +291,21 @@ export default function CompaniesPage() {
         {/* Pagination */}
         {!loading && filtered.length > PAGE_SIZE && (
           <motion.footer
-            className="mt-20 flex justify-between items-center py-6 border-t border-white/5"
+            className="mt-20 flex justify-between items-center py-6 border-t border-zinc-200/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <div className="font-jetbrains text-xs text-[#908fa0] uppercase tracking-wider">
+            <div className="font-jetbrains text-xs text-zinc-500 uppercase tracking-wider">
               Page{" "}
-              <span className="text-[#e5e1e4]">
+              <span className="text-zinc-900">
                 {String(currentPage + 1).padStart(2, "0")}
               </span>{" "}
               / {String(totalPages).padStart(2, "0")}
             </div>
             <div className="flex gap-4">
               <button
-                className="px-6 py-2 border border-[#464554] rounded-lg font-jetbrains text-xs text-[#c7c4d7] hover:bg-white/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+                className="px-6 py-2 border border-zinc-300 rounded-lg font-jetbrains text-xs text-zinc-700 hover:bg-white/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
                 onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
                 disabled={currentPage === 0}
               >
@@ -313,7 +313,7 @@ export default function CompaniesPage() {
                 PREV
               </button>
               <button
-                className="px-6 py-2 bg-[#c0c1ff] text-[#0d0096] rounded-lg font-jetbrains text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+                className="px-6 py-2 bg-[#6366F1] text-white rounded-lg font-jetbrains text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
                 onClick={() =>
                   setCurrentPage((p) => Math.min(p + 1, totalPages - 1))
                 }
@@ -328,6 +328,6 @@ export default function CompaniesPage() {
       </main>
 
       <TestimonialSlider />
-    </DarkGradientBg>
+    </LightGlassBg>
   );
 }

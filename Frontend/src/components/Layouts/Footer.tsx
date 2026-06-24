@@ -5,7 +5,7 @@ const socialLinks = [
   { icon: <Twitter className="w-6 h-6" />, href: "https://twitter.com", label: "Twitter" },
   { icon: <Linkedin className="w-6 h-6" />, href: "https://linkedin.com", label: "LinkedIn" },
   { icon: <Github className="w-6 h-6" />, href: "https://github.com", label: "GitHub" },
-  { icon: <Mail className="w-6 h-6" />, href: "mailto:info@sunadhtechnologies.in", label: "Email" },
+  { icon: <Mail className="w-6 h-6" />, href: "mailto:info@alphabetmobility.org", label: "Email" },
 ];
 
 const navLinks = [
@@ -24,8 +24,8 @@ const Footer = () => {
       brandDescription="Your one-stop placement preparation platform. Master coding, ace aptitude, and land your dream job."
       socialLinks={socialLinks}
       navLinks={navLinks}
-      creatorName="Sunadh Technologies"
-      creatorUrl="https://sunadhtechnologies.in"
+      creatorName="AlphaMobility"
+      creatorUrl="https://alphabetmobility.org/"
       brandIcon={
         <GraduationCap className="w-8 sm:w-10 md:w-14 h-8 sm:h-10 md:h-14 text-[#09090B] drop-shadow-lg" />
       }
