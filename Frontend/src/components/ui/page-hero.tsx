@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 interface PageHeroProps {
   label: string;
@@ -9,7 +9,13 @@ interface PageHeroProps {
   image?: string;
 }
 
-export function PageHero({ label, title, subtitle, children, image = "assets/courses-hero.png" }: PageHeroProps) {
+export function PageHero({
+  label,
+  title,
+  subtitle,
+  children,
+  image = "assets/courses-hero.png",
+}: PageHeroProps) {
   return (
     <motion.header
       className="mb-12 relative overflow-hidden rounded-3xl border border-zinc-400 bg-white/60 backdrop-blur-xl shadow-[0_35px_80px_-10px_rgba(0,0,0,0.75)] ring-1 ring-zinc-900/20"

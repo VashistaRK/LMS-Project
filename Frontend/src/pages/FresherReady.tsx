@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuthContext } from "../context/AuthProvider";
@@ -43,7 +43,10 @@ export default function FreshersReady() {
     { key: "technical", label: "Technical", id: "technical-skills" },
   ];
 
-  const tabHeroContent: Record<string, { heading: string; sub: string; image: string }> = {
+  const tabHeroContent: Record<
+    string,
+    { heading: string; sub: string; image: string }
+  > = {
     communication: {
       heading: "Master Communication.",
       sub: "Ace interviews with verbal, written, and presentation practice modules.",
@@ -61,15 +64,18 @@ export default function FreshersReady() {
     },
   };
 
-  const tabContent: Record<string, {
-    whyTitle: string;
-    whyDesc: string;
-    tips: string[];
-    ctaTitle: string;
-    ctaDesc: string;
-    trainingTitle: string;
-    trainingBullets: string[];
-  }> = {
+  const tabContent: Record<
+    string,
+    {
+      whyTitle: string;
+      whyDesc: string;
+      tips: string[];
+      ctaTitle: string;
+      ctaDesc: string;
+      trainingTitle: string;
+      trainingBullets: string[];
+    }
+  > = {
     communication: {
       whyTitle: "Why Communication Skills Matter",
       whyDesc:
@@ -223,7 +229,10 @@ export default function FreshersReady() {
           subtitle={hero.sub}
           image={hero.image}
         >
-          <a href="#" className="inline-flex items-center gap-2 text-sm font-bold text-[#6366F1] mb-6 border-b border-[#6366F1]/30 pb-1 hover:border-[#6366F1] transition-colors">
+          <a
+            href="#"
+            className="inline-flex items-center gap-2 text-sm font-bold text-[#6366F1] mb-6 border-b border-[#6366F1]/30 pb-1 hover:border-[#6366F1] transition-colors"
+          >
             My Attempts <span className="text-sm">↗</span>
           </a>
           <div className="border-l-2 border-[#6366F1]/30 pl-6 mb-8 max-w-2xl">
@@ -231,28 +240,53 @@ export default function FreshersReady() {
               "Practice does not make perfect. Perfect practice makes perfect."
             </p>
             <p className="font-dmsans text-sm text-zinc-500 leading-relaxed">
-              Sharpen your skills with <span className="text-zinc-700 underline decoration-zinc-600">topic-wise practice tests</span> that mirror real placement rounds. Track your mastery, build your streak, and identify weak areas before the interview — with <span className="text-zinc-700 underline decoration-zinc-600">instant feedback and detailed analytics</span>.
+              Sharpen your skills with{" "}
+              <span className="text-zinc-700 underline decoration-zinc-600">
+                topic-wise practice tests
+              </span>{" "}
+              that mirror real placement rounds. Track your mastery, build your
+              streak, and identify weak areas before the interview — with{" "}
+              <span className="text-zinc-700 underline decoration-zinc-600">
+                instant feedback and detailed analytics
+              </span>
+              .
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <div className="flex flex-shrink-0 items-center gap-2">
-              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">156</span>
-              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">Tests</span>
+              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">
+                156
+              </span>
+              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">
+                Tests
+              </span>
             </div>
             <div className="hidden h-8 w-px bg-zinc-300 sm:block" />
             <div className="flex flex-shrink-0 items-center gap-2">
-              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">12</span>
-              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">Topics</span>
+              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">
+                12
+              </span>
+              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">
+                Topics
+              </span>
             </div>
             <div className="hidden h-8 w-px bg-zinc-300 sm:block" />
             <div className="flex flex-shrink-0 items-center gap-2">
-              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">45m</span>
-              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">Avg Duration</span>
+              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">
+                45m
+              </span>
+              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">
+                Avg Duration
+              </span>
             </div>
             <div className="hidden h-8 w-px bg-zinc-300 sm:block" />
             <div className="flex flex-shrink-0 items-center gap-2">
-              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">87%</span>
-              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">Pass Rate</span>
+              <span className="font-satoshi text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">
+                87%
+              </span>
+              <span className="font-jetbrains text-[11px] font-bold text-zinc-700 uppercase tracking-wider sm:text-xs">
+                Pass Rate
+              </span>
             </div>
           </div>
         </PageHero>
@@ -274,11 +308,13 @@ export default function FreshersReady() {
               className="p-4 sm:p-6 flex flex-col gap-1 rounded-none bg-white/60 backdrop-blur-xl border border-zinc-200/60"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                delay: i * 0.06,
+                duration: 0.4,
+                ease: [0.16, 1, 0.3, 1],
+              }}
             >
-              <span className="text-sm font-bold text-zinc-600">
-                {s.label}
-              </span>
+              <span className="text-sm font-bold text-zinc-600">{s.label}</span>
               <div className="flex items-end gap-2">
                 <span className="font-satoshi text-[24px] sm:text-[32px] font-bold tracking-[-0.03em] text-zinc-900 leading-[1.2]">
                   {s.value}
@@ -388,10 +424,16 @@ export default function FreshersReady() {
               <motion.img
                 src="/assets/Ai-Bot-2.png"
                 alt="AI Bot"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
                 className="w-20 h-20 object-contain drop-shadow-[0_0_24px_rgba(192,193,255,0.4)]"
                 animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               />
             </div>
 
@@ -430,9 +472,11 @@ export default function FreshersReady() {
                 transition={{ delay: i * 0.06, duration: 0.3 }}
               >
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-jetbrains text-[10px] text-emerald-600">
-                  {String(i + 1).padStart(2, '0')}
+                  {String(i + 1).padStart(2, "0")}
                 </span>
-                <p className="font-dmsans text-sm text-zinc-700 leading-relaxed">{b}</p>
+                <p className="font-dmsans text-sm text-zinc-700 leading-relaxed">
+                  {b}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -524,7 +568,8 @@ export default function FreshersReady() {
                         {it.title}
                       </h3>
                       <p className="font-dmsans text-[13px] text-zinc-500 leading-relaxed">
-                        {it.description || `${questionsCount} questions to test your skills.`}
+                        {it.description ||
+                          `${questionsCount} questions to test your skills.`}
                       </p>
                     </div>
 
