@@ -7,11 +7,27 @@ import { motion, AnimatePresence } from "framer-motion";
 type SearchItem = { type: string; name: string; path: string };
 
 const SEARCH_DATA: SearchItem[] = [
-  { type: "course", name: "React Basics", path: "/courses?search=react-basics" },
-  { type: "course", name: "Advanced Python", path: "/courses?search=advanced-python" },
+  {
+    type: "course",
+    name: "React Basics",
+    path: "/courses?search=react-basics",
+  },
+  {
+    type: "course",
+    name: "Advanced Python",
+    path: "/courses?search=advanced-python",
+  },
   { type: "instructor", name: "John Doe", path: "/instructors/john-doe" },
-  { type: "career", name: "Fullstack Developer", path: "/careers?search=fullstack-developer" },
-  { type: "course", name: "Data Science 101", path: "/courses?search=data-science-101" },
+  {
+    type: "career",
+    name: "Fullstack Developer",
+    path: "/careers?search=fullstack-developer",
+  },
+  {
+    type: "course",
+    name: "Data Science 101",
+    path: "/courses?search=data-science-101",
+  },
 ];
 
 const NAV_LINKS = [
@@ -20,6 +36,8 @@ const NAV_LINKS = [
   { href: "/courses", label: "Courses" },
   { href: "/resumes", label: "Resumes" },
   { href: "https://jobs.fresherready.com/", label: "Jobs Portal" },
+  { href: "https://sunadhedutech.com/", label: "Mock Interview" },
+  { href: "https://preplyfly.com/", label: "Preplyfly" },
 ];
 
 export default function Header() {
@@ -39,7 +57,10 @@ export default function Header() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(e.target as Node)
+      ) {
         setIsUserMenuOpen(false);
       }
     };
@@ -73,12 +94,17 @@ export default function Header() {
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     if (!value.trim()) return setSuggestions([]);
-    setSuggestions(SEARCH_DATA.filter((s) => s.name.toLowerCase().includes(value.toLowerCase())));
+    setSuggestions(
+      SEARCH_DATA.filter((s) =>
+        s.name.toLowerCase().includes(value.toLowerCase()),
+      ),
+    );
   };
 
   const handleSearchSubmit = (path?: string) => {
     if (path) navigate(path);
-    else if (searchQuery.trim()) navigate(`/courses/?search=${encodeURIComponent(searchQuery.trim())}`);
+    else if (searchQuery.trim())
+      navigate(`/courses/?search=${encodeURIComponent(searchQuery.trim())}`);
     setSearchQuery("");
     setSuggestions([]);
     setIsSearchOpen(false);
@@ -115,7 +141,11 @@ export default function Header() {
           <div className="relative z-10 flex justify-between items-center h-16">
             {/* Logo */}
             <a href="/" className="flex items-center gap-2">
-              <img src="/assets/Sunadh-Logo.png" alt="Logo" className={`h-12 w-auto select-none pointer-events-none ${logoFilter}`} />
+              <img
+                src="/assets/Sunadh-Logo.png"
+                alt="Logo"
+                className={`h-12 w-auto select-none pointer-events-none ${logoFilter}`}
+              />
             </a>
 
             {/* Desktop Nav */}
@@ -162,7 +192,9 @@ export default function Header() {
                       placeholder="Search..."
                       value={searchQuery}
                       onChange={(e) => handleSearchChange(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && handleSearchSubmit()
+                      }
                       className="w-56 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-fuchsia-400"
                     />
                     {suggestions.length > 0 && (
@@ -174,7 +206,9 @@ export default function Header() {
                             onClick={() => handleSearchSubmit(item.path)}
                           >
                             <span>{item.name}</span>
-                            <span className="text-xs text-zinc-400 capitalize">{item.type}</span>
+                            <span className="text-xs text-zinc-400 capitalize">
+                              {item.type}
+                            </span>
                           </button>
                         ))}
                       </div>
@@ -203,7 +237,9 @@ export default function Header() {
                       alt={user?.name ?? "user"}
                       className="w-8 h-8 rounded-full ring-2 ring-zinc-200 object-cover"
                     />
-                    <ChevronDown className={`w-4 h-4 text-zinc-500 transition ${isUserMenuOpen ? "rotate-180" : ""}`} />
+                    <ChevronDown
+                      className={`w-4 h-4 text-zinc-500 transition ${isUserMenuOpen ? "rotate-180" : ""}`}
+                    />
                   </button>
 
                   <AnimatePresence>
@@ -216,14 +252,24 @@ export default function Header() {
                         className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl border border-zinc-200 rounded-xl shadow-xl py-2 z-[200]"
                       >
                         <div className="px-4 py-3 border-b border-zinc-100">
-                          <p className="text-sm font-semibold text-zinc-900">{user?.name}</p>
+                          <p className="text-sm font-semibold text-zinc-900">
+                            {user?.name}
+                          </p>
                           <p className="text-xs text-zinc-500">{user?.email}</p>
                         </div>
-                        <a href="/profile" className="flex items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
-                          <User className="w-4 h-4 mr-3 text-zinc-400" /> Profile
+                        <a
+                          href="/profile"
+                          className="flex items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
+                        >
+                          <User className="w-4 h-4 mr-3 text-zinc-400" />{" "}
+                          Profile
                         </a>
-                        <a href="/notifications" className="flex items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
-                          <Bell className="w-4 h-4 mr-3 text-zinc-400" /> Notifications
+                        <a
+                          href="/notifications"
+                          className="flex items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
+                        >
+                          <Bell className="w-4 h-4 mr-3 text-zinc-400" />{" "}
+                          Notifications
                         </a>
                         <button
                           onClick={handleLogout}
@@ -242,7 +288,11 @@ export default function Header() {
                 onClick={() => setIsMobileMenuOpen((p) => !p)}
                 className={`xl:hidden p-2 rounded-lg ${navText} ${navHoverBg} transition`}
               >
-                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
               </button>
             </div>
           </div>
@@ -277,7 +327,9 @@ export default function Header() {
                     onClick={() => handleSearchSubmit(item.path)}
                   >
                     <span>{item.name}</span>
-                    <span className="text-xs text-zinc-400 capitalize">{item.type}</span>
+                    <span className="text-xs text-zinc-400 capitalize">
+                      {item.type}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -306,15 +358,24 @@ export default function Header() {
                   {link.label}
                 </a>
               ))}
-              <a href="/my-learning" className="flex items-center px-3 py-2.5 rounded-lg text-zinc-700 hover:bg-zinc-100 text-sm font-medium">
+              <a
+                href="/my-learning"
+                className="flex items-center px-3 py-2.5 rounded-lg text-zinc-700 hover:bg-zinc-100 text-sm font-medium"
+              >
                 My Learning
               </a>
               {!user ? (
-                <a href="/Authenticate" className="block px-3 py-2.5 bg-zinc-900 text-white rounded-lg text-center text-sm font-medium hover:bg-zinc-800">
+                <a
+                  href="/Authenticate"
+                  className="block px-3 py-2.5 bg-zinc-900 text-white rounded-lg text-center text-sm font-medium hover:bg-zinc-800"
+                >
                   Sign In
                 </a>
               ) : (
-                <button onClick={handleLogout} className="w-full text-left px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-50 text-sm font-medium">
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-50 text-sm font-medium"
+                >
                   Sign Out
                 </button>
               )}

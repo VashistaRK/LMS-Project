@@ -438,7 +438,7 @@ export default function FreshersReady() {
             </div>
 
             <a
-              href="/Ai-Tutor"
+              href="https://talkivo.in/"
               className="relative z-10 inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#6366F1] text-white text-sm font-bold hover:opacity-90 transition-opacity"
             >
               Launch AI Tutor →
